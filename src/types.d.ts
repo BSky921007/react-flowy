@@ -7,9 +7,9 @@ export type Position = {
 
 export type CardData = {
     id: number,
-    lefticon: string, 
-    righticon: string, 
     name: string, 
+    lefticon: string, 
+    desc: string, 
     desc1: string, 
     desc2: string, 
     desc3: string, 
@@ -32,6 +32,8 @@ export type RightCardProps = {
     isMoving: Boolean,
     isSelected: Boolean, 
     updatedId: number, 
+    onProp: Function, 
+    onDeleteCard: Function, 
     onOver: Function, 
     onLeave: Function, 
     onMouseDown: Function, 
@@ -40,9 +42,8 @@ export type RightCardProps = {
 }
 
 export type LeftCardProps = {
-    id: string, 
-    lefticon1: string, 
-    lefticon2: string, 
+    id: number, 
+    lefticon: string, 
     name: string, 
     desc: string
 }
@@ -58,4 +59,14 @@ export type ArrowData = {
 export type ArrowProps = {
     data: ArrowData, 
     isSelected: Boolean
+}
+
+export type PropWrapProps = {
+    data: Boolean, 
+    onClick: Function, 
+}
+
+export type CanvasProps = {
+    data: CardData[], 
+    onPropsView: Function, 
 }

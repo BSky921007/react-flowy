@@ -6,7 +6,6 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import {CardList_Actions, CardList_Triggers, CardList_Structure} from '../Globals';
 
-
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -43,15 +42,14 @@ function a11yProps(index: number) {
 export default function LeftTab() {
 	const [open, setOpen] = React.useState(true);
   	const [value, setValue] = React.useState(0);
-  
+	
+	const handleOpen = () => {
+		setOpen(!open);
+	}
+	  
 	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
 		setValue(newValue);
 	};
-
-	const handleOpen = () => {
-		console.log(open);
-		setOpen(!open);
-	}
 
 	return (
 		<div id="leftcard">
@@ -59,13 +57,13 @@ export default function LeftTab() {
 				open ? (
 					<div id="closecard">
 						<IconButton aria-label="delete" size="large" onClick={() => handleOpen()}>
-							<img src="assets/closeleft.svg"/>	
+							<img src="assets/closeleft.svg" alt="NO"/>	
 						</IconButton>
 					</div>
 				) : (
 					<div id="opencard">
 						<IconButton aria-label="delete" size="large" onClick={() => handleOpen()} style={{marginLeft: '-25px', paddingRight: '0px'}}>
-							<img src="assets/openright.svg"/>	
+							<img src="assets/openright.svg" alt="NO"/>	
 						</IconButton>
 					</div>
 				)
@@ -75,7 +73,7 @@ export default function LeftTab() {
 					<>
 						<p id="header">Blocks</p>
 						<div id="search">
-							<img src="assets/search.svg" />
+							<img src="assets/search.svg" alt="NO"/>
 							<input type="text" placeholder="Search blocks" />
 						</div>
 						<div id="subnav" >
@@ -123,13 +121,13 @@ export default function LeftTab() {
 								return <LeftCard key={trigger.id} data={trigger} open={open}/>
 							})
 						}
-						<Divider style={{width: '40px', marginLeft: '20px'}}/>
+						<Divider style={{width: '40px', marginLeft: '20px', marginTop: '10px'}}/>
 						{
 							CardList_Actions.map((trigger) => {
 								return <LeftCard key={trigger.id} data={trigger} open={open}/>
 							})
 						}
-						<Divider style={{width: '40px', marginLeft: '20px'}}/>
+						<Divider style={{width: '40px', marginLeft: '20px', marginTop: '10px'}}/>
 						{
 							CardList_Structure.map((trigger) => {
 								return <LeftCard key={trigger.id} data={trigger} open={open}/>
@@ -138,13 +136,6 @@ export default function LeftTab() {
 					</div>
 				)
 			}
-			<div id="footer">
-				<a href="https://github.com/alyssaxuu/flowy/" target="_blank">GitHub</a>
-				<span>·</span>
-				<a href="https://twitter.com/alyssaxuu/status/1199724989353730048" target="_blank">Twitter</a>
-				<span>·</span>
-				<a href="https://alyssax.com" target="_blank"><p>Made with</p><img src="assets/heart.svg" /><p>by</p> Alyssa X</a>
-			</div>
 		</div>    
   );
 }

@@ -2,18 +2,21 @@ import React, { DragEvent, MouseEvent, useCallback } from 'react';
 import RightCard from './RightCard';
 import Arrow from './Arrow';
 import {Right_Card, cardWidth, paddingX, paddingLeft, paddingTop} from '../Globals';
-import { ArrowData, CardData, Position } from '../types';
+import { ArrowData, CardData, Position, CanvasProps } from '../types';
 
-const Canvas = () => {
-    const [hasFirstCard, setHasFirsCard] = React.useState(false);
+const Canvas = (props: CanvasProps) => {
+    const [hasFirstCard, setHasFirstCard] = React.useState(false);
     const [isMoving, setIsMoving] = React.useState(false);
+    const [isRealMoving, setIsRealMoving] = React.useState(false);
     const [cnt, setCnt] = React.useState(1);
     const [parentId, setParentId] = React.useState(-1);
     const [selectedId, setSelectedId] = React.useState(-1);
     const [updatedId, setUpdatedId] = React.useState(-1);
+    const [isRemoving, setIsRemoving] = React.useState(false);
     const [selectedIds, setSelectedIds] = React.useState<number[]>([]);
     const [selectedCards, setSelectedCards] = React.useState<CardData[]>([]);
     const [rightCards, setRightCards] = React.useState<CardData[]>([]);
+    const [originalCards, setOriginalCards] = React.useState<CardData[]>([]);
     const [arrows, setArrows] = React.useState<ArrowData[]>([]);
     const [selectedArrows, setSelectedArrows] = React.useState<ArrowData[]>([]);
 
@@ -21,12 +24,38 @@ const Canvas = () => {
         setParentId(idToUpdate);
     }  
 
+    const viewProps = (id: number) => {
+        props.onPropsView(rightCards, id);
+    }
+
+    const deleteCard = (id: number) => {
+        if (id > 0) {
+            const newCards = [...rightCards];
+            const tempSelectedIds = getElements(id, newCards);
+            const tempSelCard = newCards.find((newCard) => newCard.id === id);
+            if (tempSelCard) {
+                const tempParentCard = newCards.find((newCard) => newCard.id === tempSelCard.parentId);
+                if(tempParentCard) {
+                    tempParentCard.children = tempParentCard.children.filter((b) => b !== id);
+                }
+            }
+            const nonSelectedCards = rearrange(newCards.filter((newCard) => !tempSelectedIds.includes(newCard.id)));
+            const newArrows = drawArrows(nonSelectedCards);
+            const emptyArrows: ArrowData[] = [];
+            const emptyCards: CardData[] = [];
+            setSelectedCards(emptyCards);
+            setSelectedArrows(emptyArrows);
+            setIsMoving(false);
+            setRightCards(nonSelectedCards);
+            setArrows(newArrows);
+        }
+    }
+
     const formatParent = () => {
         setParentId(-1);
     }  
 
     const drawArrows = useCallback((elements: CardData[]): ArrowData[] => {
-        console.log(elements);
         const newArrow: ArrowData[] = [];
         let i = 0;
         elements.map((element) => {
@@ -106,7 +135,6 @@ const Canvas = () => {
     }, []);
 
     const rearrange = useCallback((rightCards) => {
-        console.log('rearrange', rightCards);
         const newCards = [...rightCards];
         const rootElement = newCards.find(({ id }) => id === 1);
         if (rootElement) {
@@ -124,123 +152,130 @@ const Canvas = () => {
         event.preventDefault();
     }, []);
 
-    const handleMouseDown = useCallback((selId: number) => {
-        setIsMoving(true);
+    const handleMouseDown = useCallback((selId: number) => {        
         if(selId > -1 && selId !== 1) {
-            const newCards = [...rightCards];
-            const tempSelectedIds = getElements(selId, newCards);
-            const tempSelCard = newCards.find((newCard) => newCard.id === selId);
-            if (tempSelCard) {
-                const tempParentCard = newCards.find((newCard) => newCard.id === tempSelCard.parentId);
-                tempSelCard.parentId = 0;
-                if(tempParentCard) {
-                    tempParentCard.children = tempParentCard.children.filter((b) => b !== selId);
-                }
-            }
-            setSelectedIds(tempSelectedIds);
-            setSelectedCards(newCards.filter((newCard) => tempSelectedIds.includes(newCard.id)));
-            // console.log(newCards.filter((newCard) => tempSelectedIds.includes(newCard.id)))
-            const nonSelectedCards = rearrange(newCards.filter((newCard) => !tempSelectedIds.includes(newCard.id)));
-            // console.log(nonSelectedCards);
-            const newArrows = drawArrows(nonSelectedCards);
-            const newSelectedArrows = drawArrows(selectedCards);
-            setArrows(newArrows);
-            setSelectedArrows(newSelectedArrows);
-            setRightCards(nonSelectedCards);
+            setIsMoving(true);
             setSelectedId(selId);
         }
     }, [rightCards, selectedCards]);
 
     const handleMouseMove = useCallback((movementX: number, movementY: number, pageX: number, pageY: number, ratio: number, updateId: number) => {
-        if(isMoving) {
-            if(pageX < (paddingLeft+5) || pageY < (paddingTop+5)) {
-                setIsMoving(false);
-                const newCards: CardData[] = [];
-                const newArrows: ArrowData[] = [];
-                setSelectedCards(newCards);
-                setSelectedArrows(newArrows);
-                return;
-            }
-            const newChilds = [...selectedCards];
-            const selectedCard = newChilds.find((newCard) => newCard.id === updateId);
-            const nonSelected = [...rightCards];
-            let cnt = 0;
-            for (let i = 0; i < nonSelected.length; i ++) {
-                if (((nonSelected[i].position.x+paddingLeft) < pageX && pageX < (nonSelected[i].position.x+paddingLeft+318))
-                        && ((nonSelected[i].position.y+paddingTop) < pageY && pageY < (nonSelected[i].position.y+paddingTop+122))) {
-                    cnt ++;
-                    setUpdatedId(nonSelected[i].id);
-                    break;
-                } else {
-                    setUpdatedId(-1);
+        if (isMoving) {
+            if (isRealMoving) {
+                if(pageX < (paddingLeft+5) || pageY < (paddingTop+5)) {
+                    setIsMoving(false);
+                    const newCards: CardData[] = [];
+                    const newArrows: ArrowData[] = [];
+                    setSelectedCards(newCards);
+                    setSelectedArrows(newArrows);
+                    setIsRealMoving(false);
+                    return;
                 }
-            }
-            const newSelectedArrows = drawArrows(newChilds);
-
-            console.log(cnt, pageX, pageY);
-            if (selectedCard && selectedCards.length) {
-                newChilds.map((selCard) => {
-                    const { position } = selCard;
-                    position.x += movementX/ratio;
-                    position.y += movementY/ratio;
-                });
-
-
-                setRightCards(nonSelected);
-                setSelectedCards(newChilds);
+                const newChilds = [...selectedCards];
+                const selectedCard = newChilds.find((newCard) => newCard.id === updateId);
+                const nonSelected = [...rightCards];
+                let cnt = 0;
+                for (let i = 0; i < nonSelected.length; i ++) {
+                    if (((nonSelected[i].position.x+paddingLeft) < pageX && pageX < (nonSelected[i].position.x+paddingLeft+318))
+                            && ((nonSelected[i].position.y+paddingTop) < pageY && pageY < (nonSelected[i].position.y+paddingTop+122))) {
+                        cnt ++;
+                        setUpdatedId(nonSelected[i].id);
+                        break;
+                    } else {
+                        setUpdatedId(-1);
+                    }
+                }
+                const newSelectedArrows = drawArrows(newChilds);
+    
+                if (selectedCard && selectedCards.length) {
+                    newChilds.map((selCard) => {
+                        const { position } = selCard;
+                        position.x += movementX/ratio;
+                        position.y += movementY/ratio;
+                    });
+    
+                    setRightCards(nonSelected);
+                    setSelectedCards(newChilds);
+                    setSelectedArrows(newSelectedArrows);
+                    setSelectedId(updateId);
+                }    
+            } else {
+                const newCards = [...rightCards];
+                const tempSelectedIds = getElements(selectedId, newCards);
+                const tempSelCard = newCards.find((newCard) => newCard.id === selectedId);
+                if (tempSelCard) {
+                    const tempParentCard = newCards.find((newCard) => newCard.id === tempSelCard.parentId);
+                    if(tempParentCard) {
+                        tempParentCard.children = tempParentCard.children.filter((b) => b !== selectedId);
+                    }
+                }
+                const nonSelectedCards = rearrange(newCards.filter((newCard) => !tempSelectedIds.includes(newCard.id)));
+                const newArrows = drawArrows(nonSelectedCards);
+                
+                setSelectedIds(tempSelectedIds);
+                const newSelectedCards = rearrange(newCards.filter((newCard) => tempSelectedIds.includes(newCard.id)));
+                const newSelectedArrows = drawArrows(newSelectedCards);
+                setSelectedCards(newSelectedCards)
                 setSelectedArrows(newSelectedArrows);
-                setSelectedId(updateId);
+                setSelectedId(selectedId);
+                setIsMoving(true);
+                setRightCards(nonSelectedCards);
+                setArrows(newArrows);
+                setIsRealMoving(true);
             }
         }
-    }, [selectedCards, selectedId, rightCards, updatedId]);
+    }, [selectedCards, selectedId, rightCards, updatedId, isRealMoving]);
 
-    const handleMouseUp = useCallback((event: MouseEvent<HTMLDivElement>) => {
-        if(isMoving) setIsMoving(false);
+    const handleMouseUp = useCallback(() => {
+        if (isMoving) setIsMoving(false);
         else return;
-        if (selectedId > -1) { 
-            const newCards: CardData[] = [];
-            const newArrows: ArrowData[] = [];
-            const newSelectedArrows: ArrowData[] = [];
-            if (updatedId === -1) {
-                setSelectedCards(newCards);
-                setSelectedArrows(newArrows);
-            } else {
-                console.log(selectedId, updatedId);
-                const newCards = [...rightCards];
-                const updateCard = newCards.find(({ id }) => id === updatedId);
-                if (updateCard) {
-                    updateCard.children.push(selectedId);
-                    const tempSelectedCards = [...selectedCards];
-                    const tempSelectedCard = tempSelectedCards.find(({ id }) => id === selectedId);
-                    if (tempSelectedCard) {
-                        tempSelectedCard.parentId = updatedId;
+        if (isRealMoving) {
+            if (selectedId > -1) { 
+                const newCards: CardData[] = [];
+                const newArrows: ArrowData[] = [];
+                const newSelectedArrows: ArrowData[] = [];
+                if (updatedId === -1) {
+                    setSelectedCards(newCards);
+                    setSelectedArrows(newArrows);
+                } else {
+                    const newCards = [...rightCards];
+                    const updateCard = newCards.find(({ id }) => id === updatedId);
+                    if (updateCard) {
+                        updateCard.children.push(selectedId);
+                        const tempSelectedCards = [...selectedCards];
+                        const tempSelectedCard = tempSelectedCards.find(({ id }) => id === selectedId);
+                        if (tempSelectedCard) {
+                            tempSelectedCard.parentId = updatedId;
+                        }
+                        let tempCards = newCards.concat(tempSelectedCards);
+                        tempCards = rearrange([...tempCards]);
+                        setRightCards(tempCards);
+                        setOriginalCards(tempCards);
+                        const newArrows = drawArrows(tempCards);
+                        setArrows(newArrows);
+                        setSelectedArrows(newSelectedArrows);
                     }
-                    let tempCards = newCards.concat(tempSelectedCards);
-                    tempCards = rearrange([...tempCards]);
-                    setRightCards(tempCards);
-                    const newArrows = drawArrows(tempCards);
-                    setArrows(newArrows);
-                    setSelectedArrows(newSelectedArrows);
                 }
             }
-        } 
-        setSelectedId(-1);
-        setUpdatedId(-1);
-    }, [selectedId, updatedId]);
+            setSelectedId(-1);
+            setUpdatedId(-1); 
+            setIsRealMoving(false);
+        }
+    }, [selectedId, updatedId, isRealMoving]);
 
     const handleDrop = React.useCallback((event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         const { pageX, pageY, dataTransfer } = event;
         const activeCard = dataTransfer.getData('activeCard');
         const activeData = JSON.parse(activeCard);
-
+        
         if (!hasFirstCard) {
-            setHasFirsCard(true);
+            setHasFirstCard(true);
             const data: CardData = {
                 id: (cnt), 
                 name: Right_Card[activeData.id-1].name, 
                 lefticon: Right_Card[activeData.id-1].lefticon, 
-                righticon: Right_Card[activeData.id-1].righticon, 
+                desc: Right_Card[activeData.id-1].desc, 
                 desc1: Right_Card[activeData.id-1].desc1, 
                 desc2: Right_Card[activeData.id-1].desc2, 
                 desc3: Right_Card[activeData.id-1].desc3, 
@@ -280,7 +315,7 @@ const Canvas = () => {
                     id: (cnt), 
                     name: Right_Card[activeData.id-1].name, 
                     lefticon: Right_Card[activeData.id-1].lefticon, 
-                    righticon: Right_Card[activeData.id-1].righticon, 
+                    desc: Right_Card[activeData.id-1].desc, 
                     desc1: Right_Card[activeData.id-1].desc1, 
                     desc2: Right_Card[activeData.id-1].desc2, 
                     desc3: Right_Card[activeData.id-1].desc3, 
@@ -309,8 +344,6 @@ const Canvas = () => {
         }
     }, [hasFirstCard, parentId]);
 
-    console.log(updatedId);
-    
     return (
         <div id="canvas" onDragOver={handleDragOver} onDrop={handleDrop}>
             {
@@ -318,6 +351,8 @@ const Canvas = () => {
                     return <RightCard 
                                 key={rightCard?.id} 
                                 data={rightCard} 
+                                onProp={viewProps}
+                                onDeleteCard={deleteCard}
                                 onOver={updateParent}
                                 onLeave={formatParent}
                                 onMouseDown={handleMouseDown}
@@ -334,6 +369,8 @@ const Canvas = () => {
                     return <RightCard 
                                 key={selectedCard?.id} 
                                 data={selectedCard} 
+                                onProp={viewProps}
+                                onDeleteCard={deleteCard}
                                 onOver={updateParent}
                                 onLeave={formatParent}
                                 onMouseDown={handleMouseDown}

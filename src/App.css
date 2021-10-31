@@ -56,7 +56,7 @@
   margin-right: 10px
 }
 #back img {
-  margin-top: 13px;
+  margin-top: 6px;
 }
 #names {
   display: inline-block;
@@ -301,6 +301,9 @@ color: #C9C9D5;
 .blockelem:first-child {
   margin-top: 0px
 }
+.rightcard {
+  width: 318px;
+}
 .blockelem {
   padding-top: 10px;
   /* width: 318px; */
@@ -328,7 +331,7 @@ color: #C9C9D5;
   width: 15px;
 }
 #blocklist {
-  /* height: calc(100% - 220px); */
+  height: 900px;
   overflow: auto;
 }
 #proplist {
@@ -620,7 +623,7 @@ color: #C9C9D5;
   cursor: pointer;
 }
 .blockyright img {
-  margin-top: 12px;
+  margin-top: 0px;
 }
 .blockyleft {
   display: inline-block;

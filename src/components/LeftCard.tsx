@@ -1,5 +1,5 @@
-import React, { DragEvent, useContext } from 'react';
-import {base_url} from '../Globals';
+import React, { DragEvent } from 'react';
+import { base_url } from '../Globals';
 import {LeftCardProps} from '../types';
 
 type CardProps = {
@@ -9,7 +9,7 @@ type CardProps = {
 
 const LeftCard = (props: CardProps) => {
     const {data, open} = props;
-    const { id, lefticon1, lefticon2, name, desc } = data;
+    const { id, lefticon, name, desc } = data;
 
     const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
         event.dataTransfer.setData('activeCard', JSON.stringify({ id }));
@@ -22,12 +22,12 @@ const LeftCard = (props: CardProps) => {
                     <>
                         <input type="hidden" name='blockelemtype' className="blockelemtype" value="1" />
                         <div className="grabme">
-                            <img src={lefticon1} alt="test"/>
+                            <img src={`${base_url}/assets/grabme.svg`} alt="NO"/>
                         </div>
                         <div className="blockin">
                             <div className="blockico">
                                 <span></span>
-                                <img src={lefticon2} />
+                                <img src={lefticon} alt="NO"/>
                             </div>
                             <div className="blocktext">
                                 <p className="blocktitle">{name}</p>
@@ -40,7 +40,7 @@ const LeftCard = (props: CardProps) => {
                         <div className="blockin">
                             <div className="blockico" style={{marginLeft: '10px'}}>
                                 <span></span>
-                                <img src={lefticon2} />
+                                <img src={lefticon} alt="NO"/>
                             </div>
                         </div>
                     </>
