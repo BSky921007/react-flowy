@@ -13,11 +13,11 @@ export const App = () => {
 
   const onViewProps = (rightCards: CardData[], id: number) => {
     setRightCards(rightCards);
-    setIsOpenProp(true);
+    setIsOpenProp(!isOpenProp);
   }
 
   const onViewProp = () => {
-    setIsOpenProp(false);
+    setIsOpenProp(!isOpenProp);
   }
 
   return (
@@ -25,7 +25,7 @@ export const App = () => {
       <Header />
       <LeftTab />
       <PropWrap data={isOpenProp} onClick={onViewProp}/>
-      <Canvas data={rightCards} onPropsView={onViewProps}/>
+      <Canvas data={rightCards} isOpenProp={isOpenProp} onPropsView={onViewProps}/>
     </div>
   );
 }

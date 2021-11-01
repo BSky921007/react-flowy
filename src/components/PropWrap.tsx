@@ -42,6 +42,7 @@ const PropWrap = (props: PropWrapProps) => {
     const [value, setValue] = React.useState(0);
   
     const handleOpen = () => {
+      console.log('click x button on prop wrap');
       setOpen(false);
       props.onClick();
 	}

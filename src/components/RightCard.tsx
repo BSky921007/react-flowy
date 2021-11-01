@@ -7,6 +7,7 @@ import {base_url, paddingLeft, paddingTop} from '../Globals';
 const RightCard = (props: RightCardProps) => {
     const { id, lefticon, name, desc1, desc2, desc3, desc4, position } = props.data;
     const [isDragOver, setIsDragOver] = React.useState(false);
+    const [openProps, setOpenProps] = React.useState(props.isOpenProp);
     const [moving, setMoving] = React.useState(props.isMoving);
     const [isRemove, setIsRemove] = React.useState(false);
     const [isSelected, setIsSelected] = React.useState(props.isSelected);
@@ -37,16 +38,16 @@ const RightCard = (props: RightCardProps) => {
     const handleMouseDown = (event: MouseEvent<HTMLDivElement>) => {
         const clickOffsetX = event.pageX - paddingLeft - position.x;
         const clickOffsetY = event.pageY - paddingTop - position.y;
+        console.log('mouse down on right card', id);
 
         if ((32 < clickOffsetX && clickOffsetX < 56) && (23 < clickOffsetY && clickOffsetY < 47)) {
             props.onProp(id);
+            setOpenProps(!openProps);
         } else if ((280 < clickOffsetX && clickOffsetX < 293) && (33 < clickOffsetY && clickOffsetY < 46)) {
-            const isRemoveCard = true;
             setMoving(false);
             setIsSelected(true);
             props.onDeleteCard(id);
         } else {
-            const isRemoveCard = false;
             setMoving(true);
             setIsSelected(true);
             props.onMouseDown(id);
@@ -55,7 +56,7 @@ const RightCard = (props: RightCardProps) => {
     
     const handleMouseMove = (event: MouseEvent<HTMLDivElement>) => {
         if (moving) {
-            const { movementX, movementY, pageX, pageY, screenX, screenY } = event;
+            const { movementX, movementY, pageX, pageY } = event;
             const ratioX = event.screenX/event.pageX;
             const ratioY = event.screenY/event.pageY;
             const ratio = (ratioX < ratioY) ? ratioX : ratioY;
@@ -64,18 +65,10 @@ const RightCard = (props: RightCardProps) => {
     }
     
     const handleMouseUp = (event: MouseEvent<HTMLDivElement>) => {
-        const clickOffsetX = event.pageX - paddingLeft - position.x;
-        const clickOffsetY = event.pageY - paddingTop - position.y;
-
-        // if ((280 < clickOffsetX && clickOffsetX < 293) && (33 < clickOffsetY && clickOffsetY < 46)) {
-        //     const isRemoveCard = true;
-        //     setMoving(false);
-        //     props.onMouseUp(isRemoveCard);
-        // } else {
-            // const isRemoveCard = false;
+        if (moving) {
             setMoving(false);
             props.onMouseUp();
-        // }
+        }
     }
 
     var offsetXTemp = document.getElementById(`block-${id}`)?.offsetWidth ? document.getElementById(`block-${id}`)!.offsetWidth/2 : 0;    
@@ -89,6 +82,7 @@ const RightCard = (props: RightCardProps) => {
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
+            // style={{left: position?.x, top: position?.y, opacity: `${props.isSelected? 0.5:1}`, border: `${openProps?'2px solid #217CE8':'0px' }`}}
             style={{left: position?.x, top: position?.y, opacity: `${props.isSelected? 0.5:1}`}}
         >
             <div className='blockyleft' style={{pointerEvents: 'none'}}>

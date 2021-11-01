@@ -31,6 +31,7 @@ export type RightCardProps = {
     data: CardData,
     isMoving: Boolean,
     isSelected: Boolean, 
+    isOpenProp: Boolean, 
     updatedId: number, 
     onProp: Function, 
     onDeleteCard: Function, 
@@ -68,5 +69,6 @@ export type PropWrapProps = {
 
 export type CanvasProps = {
     data: CardData[], 
+    isOpenProp: Boolean, 
     onPropsView: Function, 
 }
