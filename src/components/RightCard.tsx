@@ -40,17 +40,31 @@ const RightCard = (props: RightCardProps) => {
         const clickOffsetY = event.pageY - paddingTop - position.y;
         console.log('mouse down on right card', id);
 
-        if ((32 < clickOffsetX && clickOffsetX < 56) && (23 < clickOffsetY && clickOffsetY < 47)) {
-            props.onProp(id);
-            setOpenProps(!openProps);
-        } else if ((280 < clickOffsetX && clickOffsetX < 293) && (33 < clickOffsetY && clickOffsetY < 46)) {
+        const cardWidth = 318;
+        const xButtonWidth = 43
+
+        const topBarHeight = 51;
+        const topBarMargin = 20;
+
+        const xButtonEndX = cardWidth - topBarMargin
+        const xButtonStartX = xButtonEndX - xButtonWidth
+        
+        const topBarStartY = topBarMargin
+        const topBarEndY = topBarStartY + topBarHeight
+
+        if ((topBarMargin < clickOffsetX && clickOffsetX < xButtonStartX) && 
+            (topBarStartY < clickOffsetY && clickOffsetY < topBarEndY)) {
+            setMoving(true);
+            setIsSelected(true);
+            props.onMouseDown(id);
+        } else if ((xButtonStartX < clickOffsetX && clickOffsetX < xButtonEndX) && 
+                   (topBarStartY < clickOffsetY && clickOffsetY < topBarEndY)) {
             setMoving(false);
             setIsSelected(true);
             props.onDeleteCard(id);
         } else {
-            setMoving(true);
-            setIsSelected(true);
-            props.onMouseDown(id);
+            props.onProp(id);
+            setOpenProps(!openProps);
         }
     }
     

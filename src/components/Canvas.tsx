@@ -53,7 +53,7 @@ const Canvas = (props: CanvasProps) => {
                 setHasFirstCard(false);
                 setCnt(1);
             }
-            setSelectedId(-1);
+	    setSelectedId(-1)
         }
     }
 
@@ -336,7 +336,7 @@ const Canvas = (props: CanvasProps) => {
         console.log('mouse up on canvas', isMoving);
         if (moveFirstChild) {
             setMoveFirstChild(false);
-            setSelectedId(-1);
+	    setSelectedId(-1);
         } else {
             if (isMoving) setIsMoving(false);
             else return;

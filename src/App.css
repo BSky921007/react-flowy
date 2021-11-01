@@ -48,7 +48,6 @@
   width: 40px;
   height: 40px;
   border-radius: 100px;
-  background-color: #F1F4FC;
   text-align: center;
   display: inline-block;
   vertical-align: top;
@@ -326,8 +325,6 @@ color: #C9C9D5;
 }
 .grabme {
   margin-top: 10px;
-  margin-left: 10px;
-  margin-bottom: -14px;
   width: 15px;
 }
 #blocklist {
@@ -341,11 +338,14 @@ color: #C9C9D5;
   padding-top: 30px;
 }
 .blockin {
+  padding-left: 10px;
+  padding-right: 10px;
   display: inline-block;
   vertical-align: top;
-  margin-left: 12px;
 }
 .blockico {
+  margin: 0px;
+  padding: 0px;
   width: 36px;
   height: 36px;
   background-color: #F1F4FC;
@@ -405,7 +405,6 @@ color: #C9C9D5;
 }
 #opencard {
   /* position: absolute; */
-  margin-left: 20px;
   z-index: 10;
 }
 #canvas {
@@ -605,13 +604,11 @@ color: #C9C9D5;
   vertical-align: middle;
 }
 .blockyright {
-  display: inline-block;
   float: right;
   vertical-align: middle;
   margin-right: 20px;
-  margin-top: 10px;
-  width: 28px;
-  height: 28px;
+  width: 43px;
+  height: 51px;
   border-radius: 5px;
   text-align: center; 
   background-color: #FFF;

@@ -38,7 +38,7 @@ const LeftCard = (props: CardProps) => {
                 ) : (
                     <>
                         <div className="blockin">
-                            <div className="blockico" style={{marginLeft: '10px'}}>
+                            <div className="blockico">
                                 <span></span>
                                 <img src={lefticon} alt="NO"/>
                             </div>

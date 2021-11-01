@@ -62,7 +62,7 @@ export default function LeftTab() {
 					</div>
 				) : (
 					<div id="opencard">
-						<IconButton aria-label="delete" size="large" onClick={() => handleOpen()} style={{marginLeft: '-25px', paddingRight: '0px'}}>
+						<IconButton aria-label="delete" size="large" onClick={() => handleOpen()}>
 							<img src="assets/openright.svg" alt="NO"/>	
 						</IconButton>
 					</div>
@@ -115,19 +115,19 @@ export default function LeftTab() {
 			}
 			{
 				!open && (
-					<div id="blocklist" style={{marginLeft: '-20px'}}>
+					<div id="blocklist">
 						{
 							CardList_Triggers.map((trigger) => {
 								return <LeftCard key={trigger.id} data={trigger} open={open}/>
 							})
 						}
-						<Divider style={{width: '40px', marginLeft: '20px', marginTop: '10px'}}/>
+						<Divider style={{width: '40px', marginLeft: '9px', marginTop: '10px'}}/>
 						{
 							CardList_Actions.map((trigger) => {
 								return <LeftCard key={trigger.id} data={trigger} open={open}/>
 							})
 						}
-						<Divider style={{width: '40px', marginLeft: '20px', marginTop: '10px'}}/>
+						<Divider style={{width: '40px', marginLeft: '9px', marginTop: '10px'}}/>
 						{
 							CardList_Structure.map((trigger) => {
 								return <LeftCard key={trigger.id} data={trigger} open={open}/>
