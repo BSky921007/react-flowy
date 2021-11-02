@@ -22,12 +22,11 @@ const PropWrap = (props: PropWrapProps) => {
     }
     console.log(props.propData);
     setPropCard(props.propData);
-    setInputData(props.propData.desc2);
+    setInputData(props.propData?.desc2);
   }, [props]);
 
   const handleOpen = () => {
     setOpen(false);
-    props.onClick();
 	}
 
   const deleteBlock = () => {
@@ -39,8 +38,11 @@ const PropWrap = (props: PropWrapProps) => {
     props.onSave(inputData);
   }
 
-  const onInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const onCancel = () => {
+    setInputData(props.propData?.desc2);
+  }
 
+  const onInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputData(event.target.value);
   }
 
@@ -75,7 +77,7 @@ const PropWrap = (props: PropWrapProps) => {
                     style={{ width: '287px' }}
                   />
                   <div className="custombutton">
-                    <Button variant="text">cancel</Button>
+                    <Button variant="text" onClick={() => onCancel()}>cancel</Button>
                     <Button variant="text" onClick={() => onSave()}>save</Button>
                   </div>
                 </>

@@ -62,7 +62,6 @@ export type ArrowProps = {
 export type PropWrapProps = {
     data: Boolean, 
     propData: CardData, 
-    onClick: Function, 
     onDelete: Function, 
     onSave: Function
 }

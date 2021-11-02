@@ -14,11 +14,13 @@ export const App = () => {
   
   const onViewProps = (propCards: CardData[], id: number) => {
     let flag = false;
+    console.log(propCards, id);
     setRightCards(propCards);
     for (var i = 0; i < propCards.length; i ++) {
       if (propCards[i].isOpenProps === true) {
         flag = true;
         setIndex(i);
+        console.log(i);
         break;
       }
     } 
@@ -61,15 +63,11 @@ export const App = () => {
     }
   }
 
-  const onViewProp = () => {
-    // setIsOpenProp(!isOpenProp);
-  }
-
   return (
     <div className="App">
       <Header />
       <LeftTab />
-      <PropWrap data={isOpenProp} propData={rightCards[index]} onClick={onViewProp} onDelete={deleteCard} onSave={saveCard} />
+      <PropWrap data={isOpenProp} propData={rightCards[index]} onDelete={deleteCard} onSave={saveCard} />
       <Canvas isOpenProp={isOpenProp} onPropsView={onViewProps} data={rightCards} />
     </div>
   );
