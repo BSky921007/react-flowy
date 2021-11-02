@@ -5,9 +5,9 @@ import { RightCardProps } from '../types';
 import {base_url, paddingLeft, paddingTop} from '../Globals';
 
 const RightCard = (props: RightCardProps) => {
-    const { id, lefticon, name, desc1, desc2, desc3, desc4, position } = props.data;
+    const { id, lefticon, name, desc1, desc2, desc3, desc4, position, isOpenProps } = props.data;
     const [isDragOver, setIsDragOver] = React.useState(false);
-    const [openProps, setOpenProps] = React.useState(props.isOpenProp);
+    const [openProps, setOpenProps] = React.useState(isOpenProps);
     const [moving, setMoving] = React.useState(props.isMoving);
     const [isRemove, setIsRemove] = React.useState(false);
     const [isSelected, setIsSelected] = React.useState(props.isSelected);
@@ -64,7 +64,7 @@ const RightCard = (props: RightCardProps) => {
             props.onDeleteCard(id);
         } else {
             props.onProp(id);
-            setOpenProps(!openProps);
+            // setOpenProps(!openProps);
         }
     }
     
@@ -96,8 +96,7 @@ const RightCard = (props: RightCardProps) => {
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
-            // style={{left: position?.x, top: position?.y, opacity: `${props.isSelected? 0.5:1}`, border: `${openProps?'2px solid #217CE8':'0px' }`}}
-            style={{left: position?.x, top: position?.y, opacity: `${props.isSelected? 0.5:1}`}}
+            style={{left: position?.x, top: position?.y, opacity: `${props.isSelected? 0.5:1}`, border: `${isOpenProps?'2px solid #217CE8':'0px' }`}}
         >
             <div className='blockyleft' style={{pointerEvents: 'none'}}>
                 <IconButton aria-label="delete" size="large">

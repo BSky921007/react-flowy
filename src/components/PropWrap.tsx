@@ -1,109 +1,101 @@
-import React from 'react';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
+import React, { useEffect, useState } from 'react';
 import IconButton from '@mui/material/IconButton';
+import Button from '@mui/material/Button';
+import TextareaAutosize from '@mui/material/TextareaAutosize';
 import {PropWrapProps} from '../types';
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <div>
-          {children}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function a11yProps(index: number) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
-
 const PropWrap = (props: PropWrapProps) => {
-    const [open, setOpen] = React.useState(props.data);
-    const [value, setValue] = React.useState(0);
-  
-    const handleOpen = () => {
-      console.log('click x button on prop wrap');
+  console.log(props);
+  const [open, setOpen] = useState(props.data);
+  const [isCustom, setIsCustom] = useState(false);
+  const [propCard, setPropCard] = useState(props.propData);
+  const [inputData, setInputData] = useState('');
+
+  useEffect(() => {
+    setOpen(props.data);
+    if (!props.propData) {
       setOpen(false);
-      props.onClick();
+    } else if (props.propData.name === 'Custom') {
+      setIsCustom(true);
+    } else {
+      setIsCustom(false);
+    }
+    console.log(props.propData);
+    setPropCard(props.propData);
+    setInputData(props.propData.desc2);
+  }, [props]);
+
+  const handleOpen = () => {
+    setOpen(false);
+    props.onClick();
 	}
 
-	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-		setValue(newValue);
-	};
+  const deleteBlock = () => {
+    props.onDelete();
+  }
 
-    return (
-        <div id="propwrap" className="itson">
-            <div id="properties" className={`${props.data&&'expanded'}`}>
-                <div id="close">
-                    <IconButton aria-label="delete" size="large" onClick={() => handleOpen()}>
-                        <img src="assets/close.svg" alt="NO"/>
-                    </IconButton>                    
-                </div>
-                <p id="header2">Properties</p>
-                <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                    <Tab label="BlockType" {...a11yProps(0)} />
-                    <Tab label="Description" {...a11yProps(1)} />
-                    <Tab label="TextTemplate" {...a11yProps(2)} />
-                </Tabs>
-                <TabPanel value={value} index={0}>
-                    <div id="proplist">
-                        <p className="inputlabel">Select database</p>
-                        <div className="dropme">Database 1 <img src="assets/dropdown.svg" alt="NO"/></div>
-                        <p className="inputlabel">Check properties</p>
-                        <div className="dropme">All<img src="assets/dropdown.svg" alt="NO"/></div>
-                        <div className="checkus"><img src="assets/checkon.svg" alt="NO"/><p>Log on successful performance</p></div>
-                        <div className="checkus"><img src="assets/checkoff.svg" alt="NO"/><p>Give priority to this block</p></div>
-                    </div>
-                    <div id="divisionthing"></div>
-                    <div id="removeblock">Delete blocks</div>                    
-                </TabPanel>
-                <TabPanel value={value} index={1}>
-                    <div id="proplist">
-                        <p className="inputlabel">Select database</p>
-                        <div className="dropme">Database 1 <img src="assets/dropdown.svg" alt="NO"/></div>
-                        <p className="inputlabel">Check properties</p>
-                        <div className="dropme">All<img src="assets/dropdown.svg" alt="NO"/></div>
-                        <div className="checkus"><img src="assets/checkon.svg" alt="NO"/><p>Log on successful performance</p></div>
-                        <div className="checkus"><img src="assets/checkoff.svg" alt="NO"/><p>Give priority to this block</p></div>
-                    </div>
-                    <div id="divisionthing"></div>
-                    <div id="removeblock">Delete blocks</div>
-                </TabPanel>
-                <TabPanel value={value} index={2}>
-                    <div id="proplist">
-                        <p className="inputlabel">Select database</p>
-                        <div className="dropme">Database 1 <img src="assets/dropdown.svg" alt="NO"/></div>
-                        <p className="inputlabel">Check properties</p>
-                        <div className="dropme">All<img src="assets/dropdown.svg" alt="NO"/></div>
-                        <div className="checkus"><img src="assets/checkon.svg" alt="NO"/><p>Log on successful performance</p></div>
-                        <div className="checkus"><img src="assets/checkoff.svg" alt="NO"/><p>Give priority to this block</p></div>
-                    </div>
-                    <div id="divisionthing"></div>
-                    <div id="removeblock">Delete blocks</div>
-                </TabPanel>
-            </div>
+  const onSave = () => {
+    console.log(inputData);
+    props.onSave(inputData);
+  }
+
+  const onInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+
+    setInputData(event.target.value);
+  }
+
+  return (
+    <div id="propwrap" className="itson">
+      <div id="properties" className={`${open&&'expanded'}`}>
+        <div id="close">
+          <IconButton aria-label="delete" size="large" onClick={() => handleOpen()}>
+            <img src="assets/close.svg" alt="NO"/>
+          </IconButton>                    
         </div>
-    )
+        <p id="header2">Properties</p>
+          <div id="proplist">
+            <p className="inputlabel">Block Type</p>
+            <div className="dropme">
+              {propCard?.name}
+            </div>
+            <p className="inputlabel">Description</p>
+            <div className="dropme">
+              {propCard?.desc}
+            </div>
+            {
+              isCustom ? (
+                <>
+                  <p className="inputlabel">Action Custom</p>
+                  <TextareaAutosize
+                    aria-label="minimum height"
+                    minRows={3}
+                    placeholder="Write custom text here..."
+                    value={inputData}
+                    onChange={(event) => onInputChange(event)}
+                    style={{ width: '287px' }}
+                  />
+                  <div className="custombutton">
+                    <Button variant="text">cancel</Button>
+                    <Button variant="text" onClick={() => onSave()}>save</Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="inputlabel">Template</p>
+                  <div className="dropme">
+                    {propCard?.desc1}{propCard?.desc2}{propCard?.desc3}{propCard?.desc4}
+                  </div>
+                </>
+              )
+            }
+          </div>
+          <div id="divisionthing"></div>
+          <div id="removeblock">
+            <Button variant="text" onClick={() => deleteBlock()}>Delete Blocks</Button>
+          </div>   
+      </div>
+    </div>
+  )
 }
 
 export default PropWrap;

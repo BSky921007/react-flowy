@@ -17,10 +17,8 @@ export type CardData = {
     position: Position, 
     parentId: number,
     children: number[], 
-    childrenCnt: number
-    leftWidth: number, 
-    rightWidth: number, 
-    childWidth: number, 
+    childrenCnt: number,
+    isOpenProps: Boolean
 }
 
 export type CardProps = {
@@ -31,7 +29,6 @@ export type RightCardProps = {
     data: CardData,
     isMoving: Boolean,
     isSelected: Boolean, 
-    isOpenProp: Boolean, 
     updatedId: number, 
     onProp: Function, 
     onDeleteCard: Function, 
@@ -64,11 +61,14 @@ export type ArrowProps = {
 
 export type PropWrapProps = {
     data: Boolean, 
+    propData: CardData, 
     onClick: Function, 
+    onDelete: Function, 
+    onSave: Function
 }
 
 export type CanvasProps = {
-    data: CardData[], 
     isOpenProp: Boolean, 
     onPropsView: Function, 
+    data: CardData[]
 }

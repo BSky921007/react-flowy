@@ -159,6 +159,7 @@
 }
 #leftcard {
   width: fixed;
+  height: 100%;
   padding-right: 20px;
   background-color: #FFF;
   border: 1px solid #E8E8EF;
@@ -298,7 +299,7 @@ color: #C9C9D5;
   margin-right: 5px;
 }
 .blockelem:first-child {
-  margin-top: 0px
+  margin-top: 10px
 }
 .rightcard {
   width: 318px;
@@ -334,7 +335,6 @@ color: #C9C9D5;
 #proplist {
   height: calc(100% - 305px);
   overflow: auto;
-  margin-top: -30px;
   padding-top: 30px;
 }
 .blockin {
@@ -423,7 +423,6 @@ color: #C9C9D5;
   width: 311px;
   height: 100%;
   padding-left: 20px;
-  overflow: hidden;
   z-index: -2;
 }
 #properties {
@@ -445,8 +444,9 @@ color: #C9C9D5;
 .expanded {
   right: 0!important;
   opacity: 1!important;
+  border-left: 1px solid #E8E8EF;
   box-shadow: -4px 0px 40px rgba(26, 26, 73, 0.05);
-      z-index: 2;
+  z-index: 2;
 }
 #header2 {
   font-size: 20px;
@@ -522,6 +522,10 @@ color: #C9C9D5;
   font-size: 14px;
   color: #253134;
 }
+.custombutton {
+  display: flex;
+  justify-content: flex-end;
+}
 .dropme {
   background-color: #FFF;
   border-radius: 5px;
@@ -530,11 +534,10 @@ color: #C9C9D5;
   font-family: Roboto;
   font-size: 14px;
   color: #253134;
-  text-indent: 20px;
-  height: 40px;
-  line-height: 40px;
-  width: 287px;
+  height: fit-content;
+  width: 250px;
   margin-bottom: 25px;
+  padding: 20px
 }
 .dropme img {
   margin-top: 17px;

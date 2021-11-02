@@ -1,32 +1,58 @@
-import React, { DragEvent, MouseEvent, useCallback } from 'react';
+import React, { DragEvent, useState, useCallback, useEffect } from 'react';
 import RightCard from './RightCard';
 import Arrow from './Arrow';
 import {Right_Card, cardWidth, paddingX, paddingLeft, paddingTop} from '../Globals';
 import { ArrowData, CardData, Position, CanvasProps } from '../types';
 
 const Canvas = (props: CanvasProps) => {
-    const [hasFirstCard, setHasFirstCard] = React.useState(false);
-    const [isMoving, setIsMoving] = React.useState(false);
-    const [isRealMoving, setIsRealMoving] = React.useState(false);
-    const [moveFirstChild, setMoveFirstChild] = React.useState(false);
-    const [cnt, setCnt] = React.useState(1);
-    const [parentId, setParentId] = React.useState(-1);
-    const [selectedId, setSelectedId] = React.useState(-1);
-    const [updatedId, setUpdatedId] = React.useState(-1);
-    const [isRemoving, setIsRemoving] = React.useState(false);
-    const [selectedIds, setSelectedIds] = React.useState<number[]>([]);
-    const [selectedCards, setSelectedCards] = React.useState<CardData[]>([]);
-    const [rightCards, setRightCards] = React.useState<CardData[]>([]);
-    const [originalCards, setOriginalCards] = React.useState<CardData[]>([]);
-    const [arrows, setArrows] = React.useState<ArrowData[]>([]);
-    const [selectedArrows, setSelectedArrows] = React.useState<ArrowData[]>([]);
+    const [hasFirstCard, setHasFirstCard] = useState(false);
+    const [isMoving, setIsMoving] = useState(false);
+    const [isRealMoving, setIsRealMoving] = useState(false);
+    const [moveFirstChild, setMoveFirstChild] = useState(false);
+    const [cnt, setCnt] = useState(1);
+    const [parentId, setParentId] = useState(-1);
+    const [selectedId, setSelectedId] = useState(-1);
+    const [updatedId, setUpdatedId] = useState(-1);
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    const [selectedCards, setSelectedCards] = useState<CardData[]>([]);
+    // const [rightCards, setRightCards] = useState<CardData[]>([]);
+    const [rightCards, setRightCards] = useState<CardData[]>(props.data);
+    const [arrows, setArrows] = useState<ArrowData[]>([]);
+    const [selectedArrows, setSelectedArrows] = useState<ArrowData[]>([]);
+
+    useEffect(() => {
+        const newCards = rearrange(props.data);
+        setRightCards(newCards);
+        const newArrows = drawArrows(newCards);
+        setArrows(newArrows);
+    }, [props.data]);
 
     const updateParent = (idToUpdate: number) => {
         setParentId(idToUpdate);
     }  
 
     const viewProps = (id: number) => {
-        props.onPropsView(rightCards, id);
+        console.log(rightCards);
+        console.log(id);
+        const newCards = [...rightCards];
+        const tempCards = newCards.filter((newCard) => newCard.id !== id);
+        if (tempCards) {
+            tempCards.map((tempCard) => {
+                if (tempCard.isOpenProps) {
+                    tempCard.isOpenProps = false;
+                    console.log(tempCard);
+                }
+            });
+        }
+
+        const tempCard = newCards.find((newCard) => newCard.id === id);
+        if (tempCard) {
+            tempCard.isOpenProps = !tempCard.isOpenProps;
+        }
+
+        console.log(newCards);
+        setRightCards(newCards);
+        props.onPropsView(newCards, id);
     }
 
     const deleteCard = (id: number) => {
@@ -39,21 +65,25 @@ const Canvas = (props: CanvasProps) => {
                 if(tempParentCard) {
                     tempParentCard.children = tempParentCard.children.filter((b) => b !== id);
                 }
+                const nonSelectedCards = rearrange(newCards.filter((newCard) => !tempSelectedIds.includes(newCard.id)));
+                const newArrows = drawArrows(nonSelectedCards);
+                const emptyArrows: ArrowData[] = [];
+                const emptyCards: CardData[] = [];
+                if (tempSelCard.isOpenProps) {
+                    tempSelCard.isOpenProps = false;
+                    props.onPropsView(nonSelectedCards, id);
+                }
+                setSelectedCards(emptyCards);
+                setSelectedArrows(emptyArrows);
+                setIsMoving(false);
+                setRightCards(nonSelectedCards);
+                setArrows(newArrows);
+                if (id === 1) {
+                    setHasFirstCard(false);
+                    setCnt(1);
+                }
+                setSelectedId(-1);
             }
-            const nonSelectedCards = rearrange(newCards.filter((newCard) => !tempSelectedIds.includes(newCard.id)));
-            const newArrows = drawArrows(nonSelectedCards);
-            const emptyArrows: ArrowData[] = [];
-            const emptyCards: CardData[] = [];
-            setSelectedCards(emptyCards);
-            setSelectedArrows(emptyArrows);
-            setIsMoving(false);
-            setRightCards(nonSelectedCards);
-            setArrows(newArrows);
-            if (id === 1) {
-                setHasFirstCard(false);
-                setCnt(1);
-            }
-	    setSelectedId(-1)
         }
     }
 
@@ -159,7 +189,6 @@ const Canvas = (props: CanvasProps) => {
     }, []);
     
     const handleDrop = React.useCallback((event: DragEvent<HTMLDivElement>) => {
-        console.log(hasFirstCard);
         event.preventDefault();
         const { pageX, pageY, dataTransfer } = event;
         const activeCard = dataTransfer.getData('activeCard');
@@ -182,10 +211,8 @@ const Canvas = (props: CanvasProps) => {
                 }, 
                 parentId: 0, 
                 children: [], 
-                childrenCnt: 0, 
-                leftWidth: 0, 
-                rightWidth: 0, 
-                childWidth: 0, 
+                childrenCnt: 0,
+                isOpenProps: false
             }
             setCnt(cnt+1);
             setParentId(0);
@@ -223,9 +250,7 @@ const Canvas = (props: CanvasProps) => {
                     parentId: parentId, 
                     children: [], 
                     childrenCnt: 0, 
-                    leftWidth: 0, 
-                    rightWidth: 0, 
-                    childWidth: 0, 
+                    isOpenProps: false
                 }                
 
                 const newCards = rearrange([...newChilds, data]);
@@ -336,7 +361,7 @@ const Canvas = (props: CanvasProps) => {
         console.log('mouse up on canvas', isMoving);
         if (moveFirstChild) {
             setMoveFirstChild(false);
-	    setSelectedId(-1);
+	        setSelectedId(-1);
         } else {
             if (isMoving) setIsMoving(false);
             else return;
@@ -382,7 +407,6 @@ const Canvas = (props: CanvasProps) => {
                     return <RightCard 
                                 key={rightCard?.id} 
                                 data={rightCard} 
-                                isOpenProp={props.isOpenProp}
                                 onProp={viewProps}
                                 onDeleteCard={deleteCard}
                                 onOver={updateParent}
@@ -401,7 +425,6 @@ const Canvas = (props: CanvasProps) => {
                     return <RightCard 
                                 key={selectedCard?.id} 
                                 data={selectedCard} 
-                                isOpenProp={props.isOpenProp}
                                 onProp={viewProps}
                                 onDeleteCard={deleteCard}
                                 onOver={updateParent}
