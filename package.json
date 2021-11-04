@@ -12,13 +12,14 @@
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "@types/jest": "^26.0.15",
-    "@types/node": "^12.0.0",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "cra-template-typescript": "1.1.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-papaparse": "3.17.2",
     "react-scripts": "4.0.3",
+    "shuffle-seed": "1.1.6",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1"
   },
@@ -47,6 +48,10 @@
     ]
   },
   "devDependencies": {
+    "@types/lodash": "4.14.176",
+    "@types/node": "12.20.36",
+    "@types/shuffle-seed": "1.1.0",
+    "json-loader": "0.5.7",
     "prettier": "2.4.1"
   }
 }

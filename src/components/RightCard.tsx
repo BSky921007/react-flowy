@@ -38,7 +38,7 @@ const RightCard = (props: RightCardProps) => {
     const handleMouseDown = (event: MouseEvent<HTMLDivElement>) => {
         const clickOffsetX = event.pageX - paddingLeft - position.x;
         const clickOffsetY = event.pageY - paddingTop - position.y;
-        console.log('mouse down on right card', id);
+        // console.log('mouse down on right card', id);
 
         const cardWidth = 318;
         const xButtonWidth = 43

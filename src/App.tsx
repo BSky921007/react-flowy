@@ -14,13 +14,12 @@ export const App = () => {
   
   const onViewProps = (propCards: CardData[], id: number) => {
     let flag = false;
-    console.log(propCards, id);
+    // console.log(propCards, id);
     setRightCards(propCards);
     for (var i = 0; i < propCards.length; i ++) {
       if (propCards[i].isOpenProps === true) {
         flag = true;
         setIndex(i);
-        console.log(i);
         break;
       }
     } 
@@ -28,37 +27,37 @@ export const App = () => {
   }
 
   const deleteCard = () => {
-    console.log(rightCards, index);
+    // console.log(rightCards, index);
     if (index === 0) {
       const emptyCards: CardData[] = [];
       setRightCards(emptyCards);
     } else if (index > 0) {
       const newCards = [...rightCards];
-      console.log(newCards);
+      // console.log(newCards);
       const selectedCard = newCards[index];
-      console.log(selectedCard);
+      // console.log(selectedCard);
       const parentCard = newCards.find((newCard) => newCard.id === selectedCard.parentId);
       if (parentCard) {
         parentCard.children = parentCard.children.filter((b) => b !== selectedCard.id);
       }
       newCards.splice(index, 1);
-      console.log(parentCard);
-      console.log(newCards);
+      // console.log(parentCard);
+      // console.log(newCards);
       setRightCards(newCards);
     } else {
       return;
     }
   }
 
-  const saveCard = (customAction: string) => {
-    console.log(rightCards, index, customAction);
-    if (index > 0) {
+  const saveCard = (action: string) => {
+    console.log(rightCards, index, action);
+    if (index > -1) {
       const newCards = [...rightCards];
-      console.log(newCards);
+      // console.log(newCards);
       const selectedCard = newCards[index];
-      selectedCard.desc2 = customAction;
-      console.log(selectedCard);
-      console.log(newCards);
+      selectedCard.desc2 = action;
+      // console.log(selectedCard);
+      // console.log(newCards);
       setRightCards(newCards);
     }
   }

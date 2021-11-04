@@ -15,12 +15,12 @@ const Canvas = (props: CanvasProps) => {
     const [updatedId, setUpdatedId] = useState(-1);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [selectedCards, setSelectedCards] = useState<CardData[]>([]);
-    // const [rightCards, setRightCards] = useState<CardData[]>([]);
     const [rightCards, setRightCards] = useState<CardData[]>(props.data);
     const [arrows, setArrows] = useState<ArrowData[]>([]);
     const [selectedArrows, setSelectedArrows] = useState<ArrowData[]>([]);
 
     useEffect(() => {
+        // console.log(props.data);
         const newCards = rearrange(props.data);
         setRightCards(newCards);
         const newArrows = drawArrows(newCards);
@@ -32,15 +32,15 @@ const Canvas = (props: CanvasProps) => {
     }  
 
     const viewProps = (id: number) => {
-        console.log(rightCards);
-        console.log(id);
+        // console.log(rightCards);
+        // console.log(id);
         const newCards = [...rightCards];
         const tempCards = newCards.filter((newCard) => newCard.id !== id);
         if (tempCards) {
             tempCards.map((tempCard) => {
                 if (tempCard.isOpenProps) {
                     tempCard.isOpenProps = false;
-                    console.log(tempCard);
+                    // console.log(tempCard);
                 }
             });
         }
@@ -50,7 +50,7 @@ const Canvas = (props: CanvasProps) => {
             tempCard.isOpenProps = !tempCard.isOpenProps;
         }
 
-        console.log(newCards);
+        // console.log(newCards);
         setRightCards(newCards);
         props.onPropsView(newCards, id);
     }
@@ -266,8 +266,8 @@ const Canvas = (props: CanvasProps) => {
     }, [hasFirstCard, parentId]);
 
     const handleMouseDown = useCallback((selId: number) => {
-        console.log('mouse down on canvas', selId);
-        console.log(moveFirstChild);
+        // console.log('mouse down on canvas', selId);
+        // console.log(moveFirstChild);
         if (selId > -1) {
             setIsMoving(true);
             setSelectedId(selId);
@@ -277,7 +277,7 @@ const Canvas = (props: CanvasProps) => {
     }, [rightCards, selectedCards]);
 
     const handleMouseMove = useCallback((movementX: number, movementY: number, pageX: number, pageY: number, ratio: number, updateId: number) => {
-        console.log(isMoving, moveFirstChild);
+        // console.log(isMoving, moveFirstChild);
         if (isMoving) {
             if (moveFirstChild) {
                 const newChilds = [...rightCards];
@@ -358,7 +358,7 @@ const Canvas = (props: CanvasProps) => {
     }, [selectedCards, selectedId, rightCards, updatedId, isRealMoving]);
 
     const handleMouseUp = useCallback(() => {
-        console.log('mouse up on canvas', isMoving);
+        // console.log('mouse up on canvas', isMoving);
         if (moveFirstChild) {
             setMoveFirstChild(false);
 	        setSelectedId(-1);

@@ -357,3 +357,55 @@ export const Right_Card = [
         }
     }
 ];
+
+export const Prescribe_Names = [
+  'Prescribe A',
+  'Prescribe B',
+  'Prescribe C',
+  'Prescribe D',
+  'Prescribe E'
+];
+
+export const Order_Names = [
+    'Order A', 
+    'Order B', 
+    'Order C', 
+    'Order D', 
+    'Order E', 
+    'Order F', 
+    'Order G', 
+    'Order H', 
+    'Order I'
+];
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+export const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+
+export function getStyles(name, selectedName, theme) {
+  return {
+    fontWeight:
+    selectedName.indexOf(name) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
+
+export function arrayToString(names) {
+    if (!names) return '$';
+    let tempString = '';
+    for (var i = 0; i < names.length; i ++) {
+        tempString += names[i];
+        if (i === (names.length-1)) break;
+        tempString += ',';
+    }
+    return tempString;
+}
