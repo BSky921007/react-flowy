@@ -5,12 +5,30 @@ import Header from './components/Header';
 import LeftTab from './components/LeftTab';
 import Canvas from './components/Canvas';
 import PropWrap from './components/PropWrap';
-import { ArrowData, CardData } from './types';
+import { BranchProps, CardData, SelectTypes } from './types';
+import { arrayToString } from './Globals';
 
 export const App = () => {
   const [isOpenProp, setIsOpenProp] = useState(false);
   const [rightCards, setRightCards] = useState<CardData[]>([]);
   const [index, setIndex] = useState(0);
+
+  const getElements = useCallback((elementId: number, elements: CardData[]): number[] => {
+    const tempCard = elements.find(({id}) => id === elementId);
+    const childrenIds = tempCard?.children;
+    if (!childrenIds || childrenIds?.length === 0) {
+        return [elementId];
+    }
+    let result: number[] = [];
+    for (let i = 0; i < childrenIds!.length ; i++) {
+        const child = childrenIds[i];
+        const childElements = getElements(child, elements);
+        if (result.find((temp) => temp === elementId)) result = [...result, ...childElements];
+        else result = [...result, elementId, ...childElements];
+    }
+    if (result.length > 0) return result;
+    else return [];
+}, []);
   
   const onViewProps = (propCards: CardData[], id: number) => {
     let flag = false;
@@ -27,35 +45,56 @@ export const App = () => {
   }
 
   const deleteCard = () => {
-    // console.log(rightCards, index);
+    console.log(rightCards, index);
     if (index === 0) {
       const emptyCards: CardData[] = [];
       setRightCards(emptyCards);
     } else if (index > 0) {
       const newCards = [...rightCards];
-      // console.log(newCards);
-      const selectedCard = newCards[index];
-      // console.log(selectedCard);
-      const parentCard = newCards.find((newCard) => newCard.id === selectedCard.parentId);
-      if (parentCard) {
-        parentCard.children = parentCard.children.filter((b) => b !== selectedCard.id);
+      const id = newCards[index].id;
+      const tempSelectedIds = getElements(id, newCards);
+      const tempSelCard = newCards.find((newCard) => newCard.id === id);
+      if (tempSelCard) {
+        const tempParentCard = newCards.find((newCard) => newCard.id === tempSelCard.parentId);
+        if(tempParentCard) {
+          tempParentCard.children = tempParentCard.children.filter((b) => b !== id);
+          tempParentCard.childrenCnt --;
+        }
+        setRightCards(newCards.filter((newCard) => !tempSelectedIds.includes(newCard.id)));
       }
-      newCards.splice(index, 1);
-      // console.log(parentCard);
-      // console.log(newCards);
-      setRightCards(newCards);
     } else {
       return;
     }
   }
 
-  const saveCard = (action: string) => {
+  const saveCard = (action: SelectTypes[], input: string) => {
+    // console.log(rightCards, index, action);
+    if (index > -1) {
+      const newCards = [...rightCards];
+      // console.log(newCards);
+      const selectedCard = newCards[index];
+      console.log(selectedCard);
+      if (selectedCard.name === 'Custom') {
+        selectedCard.template = input;
+        selectedCard.selectedOptions = action;
+      } else {
+        selectedCard.template = arrayToString(action);
+        selectedCard.selectedOptions = action;
+      }
+      // console.log(selectedCard);
+      // console.log(newCards);
+      setRightCards(newCards);
+    }
+  }
+
+  const saveBranch = (action: BranchProps[]) => {
     console.log(rightCards, index, action);
     if (index > -1) {
       const newCards = [...rightCards];
       // console.log(newCards);
       const selectedCard = newCards[index];
-      selectedCard.desc2 = action;
+      // selectedCard.template = arrayToString(action);
+      selectedCard.selectedBranches = action;
       // console.log(selectedCard);
       // console.log(newCards);
       setRightCards(newCards);
@@ -66,7 +105,7 @@ export const App = () => {
     <div className="App">
       <Header />
       <LeftTab />
-      <PropWrap data={isOpenProp} propData={rightCards[index]} onDelete={deleteCard} onSave={saveCard} />
+      <PropWrap data={isOpenProp} propData={rightCards[index]} onDelete={deleteCard} onSave={saveCard} onSaveBranch={saveBranch} />
       <Canvas isOpenProp={isOpenProp} onPropsView={onViewProps} data={rightCards} />
     </div>
   );

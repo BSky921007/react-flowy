@@ -11,25 +11,33 @@ export const CardList_Triggers = [
         id: 1, 
         name: "Time elapsed", 
         desc: "Trigger care process at a set time after an event.", 
-        lefticon: `${base_url}/assets/time.svg`
+        lefticon: `${base_url}/assets/time_elapsed.svg`, 
+        selectType: '', 
+        targetResource: '', 
     }, 
     {
         id: 2, 
-        name: "New patient info", 
+        name: "New patient", 
         desc: "Trigger care process when a new patient is created.", 
-        lefticon: `${base_url}/assets/arrow.svg`
+        lefticon: `${base_url}/assets/new_patient_info.svg`, 
+        selectType: '', 
+        targetResource: '', 
     }, 
     {
         id: 3, 
         name: "New action", 
         desc: "Trigger care process when a new action is performed.", 
-        lefticon: `${base_url}/assets/dropdown.svg`
+        lefticon: `${base_url}/assets/new_action.svg`, 
+        selectType: '', 
+        targetResource: '', 
     }, 
     {
         id: 4, 
         name: "New Data", 
         desc: "Trigger care process when new data is recorded.", 
-        lefticon: `${base_url}/assets/arrow.svg`
+        lefticon: `${base_url}/assets/new_data.svg`, 
+        selectType: '', 
+        targetResource: '', 
     }
 ];
 
@@ -38,55 +46,73 @@ export const CardList_Actions = [
         id: 5, 
         name: "Elicit", 
         desc: "Elicit a set of clinical findings from a patient.", 
-        lefticon: `${base_url}/assets/error.svg`
+        lefticon: `${base_url}/assets/elicit.svg`, 
+        selectType: 'multi', 
+        targetResource: 'findings', 
     }, 
     {
         id: 6, 
         name: "Prescribe", 
         desc: "Prescribe one or more medications.", 
-        lefticon: `${base_url}/assets/eye.svg`
+        lefticon: `${base_url}/assets/prescribe.svg`, 
+        selectType: 'multi', 
+        targetResource: 'dosages', 
     }, 
     {
         id: 7, 
         name: "Order", 
         desc: "Order a test for a patient.", 
-        lefticon: `${base_url}/assets/log.svg`
+        lefticon: `${base_url}/assets/order.svg`, 
+        selectType: 'multi', 
+        targetResource: 'tests', 
     }, 
     {
         id: 8, 
         name: "Record", 
         desc: "Record one or more diagnoses.", 
-        lefticon: `${base_url}/assets/dropdown.svg`
+        lefticon: `${base_url}/assets/record.svg`, 
+        selectType: 'multi', 
+        targetResource: 'diseases', 
     }, 
     {
         id: 9, 
         name: "Apply", 
         desc: "Apply a guideline recommendation.", 
-        lefticon: `${base_url}/assets/error.svg`
+        lefticon: `${base_url}/assets/apply.svg`, 
+        selectType: 'single', 
+        targetResource: 'keypoints', 
     }, 
     {
         id: 10, 
         name: "Schedule", 
         desc: "Schedule a follow-up visit.", 
-        lefticon: `${base_url}/assets/eye.svg`
+        lefticon: `${base_url}/assets/schedule.svg`, 
+        selectType: 'single', 
+        targetResource: 'specialties', 
     }, 
     {
         id: 11, 
         name: "Link", 
         desc: "Link to another care bundle.", 
-        lefticon: `${base_url}/assets/log.svg`
+        lefticon: `${base_url}/assets/link.svg`, 
+        selectType: 'single', 
+        targetResource: 'pathways', 
     }, 
     {
         id: 12, 
         name: "Use", 
         desc: "Use a clinical calculator.", 
-        lefticon: `${base_url}/assets/time.svg`
+        lefticon: `${base_url}/assets/use.svg`, 
+        selectType: 'single', 
+        targetResource: 'calculators', 
     }, 
     {
         id: 13, 
         name: "Custom", 
         desc: "Write a block with custom text.", 
-        lefticon: `${base_url}/assets/time.svg`
+        lefticon: `${base_url}/assets/custom.svg`, 
+        selectType: 'multi', 
+        targetResource: 'references', 
     }
 ];
 
@@ -95,25 +121,33 @@ export const CardList_Structure = [
         id: 14, 
         name: "Start", 
         desc: "Begin care process.", 
-        lefticon: `${base_url}/assets/eye.svg`
+        lefticon: `${base_url}/assets/start.svg`, 
+        selectType: '', 
+        targetResource: '', 
     }, 
     {
         id: 15, 
         name: "Filter", 
         desc: "Continue only if a specific condition is met.", 
-        lefticon: `${base_url}/assets/eye.svg`
+        lefticon: `${base_url}/assets/filter.svg`, 
+        selectType: '', 
+        targetResource: '', 
     }, 
     {
         id: 16, 
         name: "Branch", 
         desc: "Branch on a specific condition.", 
-        lefticon: `${base_url}/assets/log.svg`
+        lefticon: `${base_url}/assets/branch.svg`, 
+        selectType: '', 
+        targetResource: '', 
     }, 
     {
         id: 17, 
         name: "End", 
         desc: "End care process.", 
-        lefticon: `${base_url}/assets/time.svg`
+        lefticon: `${base_url}/assets/end.svg`, 
+        selectType: '', 
+        targetResource: '', 
     }
 ];
 
@@ -121,12 +155,12 @@ export const Right_Card = [
     {
         id: 1, 
         name: "Time elapsed", 
-        lefticon: `${base_url}/assets/timeblue.svg`, 
+        lefticon: `${base_url}/assets/time_elapsed.svg`, 
         desc: "Trigger care process at a set time after an event.", 
-        desc1: "When ", 
-        desc2: "${condition}", 
-        desc3: " is met", 
-        desc4: "",
+        template: "When ${condition} is met", 
+        begin: "", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -134,13 +168,13 @@ export const Right_Card = [
     }, 
     {
         id: 2, 
-        name: "New patient info", 
-        lefticon: `${base_url}/assets/arrow.svg`, 
+        name: "New patient", 
+        lefticon: `${base_url}/assets/new_patient_info.svg`, 
         desc: "Trigger care process when a new patient is created.", 
-        desc1: "When ", 
-        desc2: "a new patient", 
-        desc3: " is created", 
-        desc4: "",
+        template: "When a new patient is created", 
+        begin: "", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -149,12 +183,12 @@ export const Right_Card = [
     {
         id: 3, 
         name: "New action", 
-        lefticon: `${base_url}/assets/dropdown.svg`, 
+        lefticon: `${base_url}/assets/new_action.svg`, 
         desc: "Trigger care process when a new action is performed.", 
-        desc1: "When ", 
-        desc2: "${condition}", 
-        desc3: " is met", 
-        desc4: "",
+        template: "When ${condition} is met", 
+        begin: "", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -163,12 +197,12 @@ export const Right_Card = [
     {
         id: 4, 
         name: "New data", 
-        lefticon: `${base_url}/assets/arrow.svg`, 
+        lefticon: `${base_url}/assets/new_data.svg`, 
         desc: "Trigger care process when new data is recorded.", 
-        desc1: "When ", 
-        desc2: "${condition}", 
-        desc3: " is met", 
-        desc4: "",
+        template: "When ${condition} is met", 
+        begin: "", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -177,12 +211,12 @@ export const Right_Card = [
     {
         id: 5, 
         name: "Elicit", 
-        lefticon: `${base_url}/assets/errorred.svg`, 
+        lefticon: `${base_url}/assets/elicit.svg`, 
         desc: "Elicit a set of clinical findings from a patient.", 
-        desc1: "Elicit the following findings: ", 
-        desc2: "${findings}", 
-        desc3: "", 
-        desc4: "",
+        template: "${findings}", 
+        begin: "Elicit the following findings: ", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -191,12 +225,12 @@ export const Right_Card = [
     {
         id: 6, 
         name: "Prescribe", 
-        lefticon: `${base_url}/assets/eyeblue.svg`, 
+        lefticon: `${base_url}/assets/prescribe.svg`, 
         desc: "Prescribe one or more medications.", 
-        desc1: "Write the following prescriptions: ", 
-        desc2: "${dosages}", 
-        desc3: "", 
-        desc4: "",
+        template: "${dosages}", 
+        begin: "Write the following prescriptions: ", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -205,12 +239,12 @@ export const Right_Card = [
     {
         id: 7, 
         name: "Order", 
-        lefticon: `${base_url}/assets/logred.svg`, 
+        lefticon: `${base_url}/assets/order.svg`, 
         desc: "Order a test for a patient.", 
-        desc1: "Order the following tests: ", 
-        desc2: "${tests}", 
-        desc3: "", 
-        desc4: "",
+        template: "${tests}", 
+        begin: "Order the following tests: ", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -219,12 +253,12 @@ export const Right_Card = [
     {
         id: 8, 
         name: "Record", 
-        lefticon: `${base_url}/assets/dropdown.svg`, 
+        lefticon: `${base_url}/assets/record.svg`, 
         desc: "Record one or more diagnoses.", 
-        desc1: "Record the following diagnoses: ", 
-        desc2: "${diseases}", 
-        desc3: "", 
-        desc4: "",
+        template: "${diseases}", 
+        begin: "Record the following diagnoses: ", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -233,12 +267,12 @@ export const Right_Card = [
     {
         id: 9, 
         name: "Apply", 
-        lefticon: `${base_url}/assets/errorred.svg`, 
+        lefticon: `${base_url}/assets/apply.svg`, 
         desc: "Apply a guideline recommendation.", 
-        desc1: "Apply the following guidelines: ", 
-        desc2: "${keypoints}", 
-        desc3: "", 
-        desc4: "",
+        template: "${keypoints}",  
+        begin: "Apply the following guidelines: ", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -247,12 +281,12 @@ export const Right_Card = [
     {
         id: 10, 
         name: "Schedule", 
-        lefticon: `${base_url}/assets/eyeblue.svg`, 
+        lefticon: `${base_url}/assets/schedule.svg`, 
         desc: "Schedule a follow-up visit.", 
-        desc1: "Schedule the following visits: ", 
-        desc2: "${visits}", 
-        desc3: "", 
-        desc4: "",
+        template: "${visits}", 
+        begin: "Schedule the following visits: ", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -261,12 +295,12 @@ export const Right_Card = [
     {
         id: 11, 
         name: "Link", 
-        lefticon: `${base_url}/assets/logred.svg`, 
+        lefticon: `${base_url}/assets/link.svg`, 
         desc: "Link to another care bundle.", 
-        desc1: "Link to this care bundle: ", 
-        desc2: "${bundle}", 
-        desc3: "", 
-        desc4: "",
+        template: "${bundle}", 
+        begin: "Link to this care bundle: ", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -275,12 +309,12 @@ export const Right_Card = [
     {
         id: 12, 
         name: "Use", 
-        lefticon: `${base_url}/assets/timeblue.svg`, 
+        lefticon: `${base_url}/assets/use.svg`, 
         desc: "Use a clinical calculator.", 
-        desc1: "Use this calculator: ", 
-        desc2: "${calculator}", 
-        desc3: "", 
-        desc4: "",
+        template: "${calculator}", 
+        begin: "Use this calculator: ", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -289,12 +323,12 @@ export const Right_Card = [
     {
         id: 13, 
         name: "Custom", 
-        lefticon: `${base_url}/assets/timeblue.svg`, 
+        lefticon: `${base_url}/assets/custom.svg`, 
         desc: "Write a block with custom text.", 
-        desc1: "", 
-        desc2: "${text}", 
-        desc3: "", 
-        desc4: "",
+        template: "${references}", 
+        begin: "", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -303,12 +337,12 @@ export const Right_Card = [
     {
         id: 14, 
         name: "Start", 
-        lefticon: `${base_url}/assets/eyeblue.svg`, 
+        lefticon: `${base_url}/assets/start.svg`, 
         desc: "Begin care process.", 
-        desc1: "Begin care process", 
-        desc2: "", 
-        desc3: "", 
-        desc4: "",
+        template: "Begin care process", 
+        begin: "", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -317,12 +351,12 @@ export const Right_Card = [
     {
         id: 15, 
         name: "Filter", 
-        lefticon: `${base_url}/assets/eyeblue.svg`, 
+        lefticon: `${base_url}/assets/filter.svg`, 
         desc: "Continue only if a specific condition is met.", 
-        desc1: "When ", 
-        desc2: "${condition}", 
-        desc3: " is met", 
-        desc4: "",
+        template: "When ${condition} is met",
+        begin: "", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -331,12 +365,12 @@ export const Right_Card = [
     {
         id: 16, 
         name: "Branch", 
-        lefticon: `${base_url}/assets/logred.svg`, 
+        lefticon: `${base_url}/assets/branch.svg`, 
         desc: "Branch on a specific condition.", 
-        desc1: "Branch on ", 
-        desc2: "${condition}", 
-        desc3: "", 
-        desc4: "",
+        template: "Branch on ${condition}", 
+        begin: "", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
@@ -345,37 +379,17 @@ export const Right_Card = [
     {
         id: 17, 
         name: "End", 
-        lefticon: `${base_url}/assets/timeblue.svg`, 
+        lefticon: `${base_url}/assets/end.svg`, 
         desc: "End care process.", 
-        desc1: "End of care process", 
-        desc2: "", 
-        desc3: "", 
-        desc4: "",
+        template: "End of care process", 
+        begin: "", 
+        selectedOptions: [], 
+        selectedBranches: [], 
         position: {
             x: 0,
             y: 0
         }
     }
-];
-
-export const Prescribe_Names = [
-  'Prescribe A',
-  'Prescribe B',
-  'Prescribe C',
-  'Prescribe D',
-  'Prescribe E'
-];
-
-export const Order_Names = [
-    'Order A', 
-    'Order B', 
-    'Order C', 
-    'Order D', 
-    'Order E', 
-    'Order F', 
-    'Order G', 
-    'Order H', 
-    'Order I'
 ];
 
 const ITEM_HEIGHT = 48;
@@ -389,7 +403,6 @@ export const MenuProps = {
   },
 };
 
-
 export function getStyles(name, selectedName, theme) {
   return {
     fontWeight:
@@ -400,10 +413,10 @@ export function getStyles(name, selectedName, theme) {
 }
 
 export function arrayToString(names) {
-    if (!names) return '$';
+    if (!names) return 'No Select';
     let tempString = '';
     for (var i = 0; i < names.length; i ++) {
-        tempString += names[i];
+        tempString += names[i].name;
         if (i === (names.length-1)) break;
         tempString += ',';
     }

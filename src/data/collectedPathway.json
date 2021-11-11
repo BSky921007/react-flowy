@@ -1,0 +1,670 @@
+{
+  "diseases": [],
+  "assessments": [
+    {
+      "id": "recozBaBMRjsIAuyt",
+      "value": 7,
+      "description": "Ungraded statement",
+      "subtext": "No formal recommendation made.",
+      "color": "#eeeeee",
+      "letter": "⁄"
+    }
+  ],
+  "categories": [],
+  "specialties": [],
+  "keypoints": [
+    {
+      "id": "recPWZ7iivhTbWAWY",
+      "type": "recommendation",
+      "topicId": "recQyuDc0z9YDWdyr",
+      "order": 1,
+      "criteria": [
+        {
+          "id": "A",
+          "text": "Does the patient have LV hypertrophy?",
+          "value": true
+        },
+        {
+          "id": "B",
+          "text": "Does the patient have a decreased LVEF?",
+          "value": true
+        },
+        {
+          "id": "C",
+          "text": "Does the patient have regional wall motion abnormalities?",
+          "value": true
+        }
+      ],
+      "conditions": [
+        {
+          "name": "A or B or C",
+          "order": 0,
+          "condition": "A or B or C",
+          "qualifier": ""
+        }
+      ],
+      "calculatorId": "",
+      "introText": "",
+      "result": true,
+      "trueRecommendations": [
+        {
+          "text": [
+            "Assess the following elements on echocardiogram:",
+            [
+              "early diastolic mitral inflow velocity",
+              "late diastolic mitral inflow velocity.[grading:1]"
+            ]
+          ],
+          "type": "recommendation",
+          "point": "N/D.",
+          "gradings": [
+            {
+              "gradingStrengthId": "",
+              "gradingLevelId": "",
+              "assessmentId": "recozBaBMRjsIAuyt",
+              "gradingSystem": {
+                "organisationId": "rec0QjnqKx0uJxTgj",
+                "cluster": 1
+              }
+            }
+          ]
+        }
+      ],
+      "falseRecommendations": [],
+      "comment": "",
+      "dxIfTrue": [],
+      "dxIfFalse": [],
+      "drugIds": [],
+      "indicationIds": [],
+      "handoutIds": []
+    },
+    {
+      "id": "rec0ynhMe4do8qXVM",
+      "type": "recommendation",
+      "topicId": "recrAZLDbc8qNpqtJ",
+      "order": 2,
+      "criteria": [],
+      "conditions": [],
+      "calculatorId": "rec4NZLGrCSw7xOjL",
+      "introText": "",
+      "result": true,
+      "trueRecommendations": [
+        {
+          "text": [
+            "Assess the following elements on echocardiogram:",
+            [
+              "septal and lateral peak early diastolic tissue velocity",
+              "early diastolic mitral inflow velocity",
+              "tricuspid regurgitation jet peak velocity",
+              "LA volume indexed to body surface area.[grading:1]"
+            ]
+          ],
+          "type": "recommendation",
+          "point": "N/D.",
+          "gradings": [
+            {
+              "gradingStrengthId": "",
+              "gradingLevelId": "",
+              "assessmentId": "recozBaBMRjsIAuyt",
+              "gradingSystem": {
+                "organisationId": "rec0QjnqKx0uJxTgj",
+                "cluster": 1
+              }
+            }
+          ]
+        }
+      ],
+      "falseRecommendations": [],
+      "comment": "",
+      "dxIfTrue": [],
+      "dxIfFalse": [],
+      "drugIds": [],
+      "indicationIds": [],
+      "handoutIds": []
+    },
+    {
+      "id": "rec1FUoAnrn63nIRF",
+      "type": "recommendation",
+      "topicId": "recHEjplQ4ptuTCm1",
+      "order": 3,
+      "criteria": [
+        {
+          "id": "A",
+          "text": "Does the patient have an E/A ratio ≥ 2?",
+          "value": true
+        }
+      ],
+      "conditions": [
+        {
+          "name": "A",
+          "order": 0,
+          "condition": "A",
+          "qualifier": ""
+        }
+      ],
+      "calculatorId": "",
+      "introText": "",
+      "result": true,
+      "trueRecommendations": [
+        {
+          "text": [
+            "Grade 3 diastolic dysfunction.[grading:1]"
+          ],
+          "type": "recommendation",
+          "point": "N/D.",
+          "gradings": [
+            {
+              "gradingStrengthId": "",
+              "gradingLevelId": "",
+              "assessmentId": "recozBaBMRjsIAuyt",
+              "gradingSystem": {
+                "organisationId": "rec0QjnqKx0uJxTgj",
+                "cluster": 1
+              }
+            }
+          ]
+        }
+      ],
+      "falseRecommendations": [],
+      "comment": "",
+      "dxIfTrue": [],
+      "dxIfFalse": [],
+      "drugIds": [],
+      "indicationIds": [],
+      "handoutIds": []
+    },
+    {
+      "id": "recDytbykho5Pcxve",
+      "type": "recommendation",
+      "topicId": "rec942rOx04ppcv6W",
+      "order": 4,
+      "criteria": [
+        {
+          "id": "A",
+          "text": "Does the patient have an E/A ratio ≤ 0.8?",
+          "value": true
+        },
+        {
+          "id": "B",
+          "text": "Does the patient have an E velocity ≤ 50 cm/s?",
+          "value": true
+        }
+      ],
+      "conditions": [
+        {
+          "name": "A and B",
+          "order": 0,
+          "condition": "A and B",
+          "qualifier": ""
+        }
+      ],
+      "calculatorId": "",
+      "introText": "",
+      "result": true,
+      "trueRecommendations": [
+        {
+          "text": [
+            "Grade 1 diastolic dysfunction.[grading:1]"
+          ],
+          "type": "recommendation",
+          "point": "N/D.",
+          "gradings": [
+            {
+              "gradingStrengthId": "",
+              "gradingLevelId": "",
+              "assessmentId": "recozBaBMRjsIAuyt",
+              "gradingSystem": {
+                "organisationId": "rec0QjnqKx0uJxTgj",
+                "cluster": 1
+              }
+            }
+          ]
+        }
+      ],
+      "falseRecommendations": [],
+      "comment": "",
+      "dxIfTrue": [],
+      "dxIfFalse": [],
+      "drugIds": [],
+      "indicationIds": [],
+      "handoutIds": []
+    },
+    {
+      "id": "recVAONX7rZ08nMBf",
+      "type": "recommendation",
+      "topicId": "rechy7BkYLVeGP1nh",
+      "order": 5,
+      "criteria": [],
+      "conditions": [],
+      "calculatorId": "recQmg5VTtYBm8Jrf",
+      "introText": "",
+      "result": true,
+      "trueRecommendations": [
+        {
+          "text": [
+            "Assess the following elements on echocardiogram:",
+            [
+              "septal and lateral peak early diastolic tissue velocity",
+              "tricuspid regurgitation jet peak velocity",
+              "LA volume indexed to body surface area.[grading:1]"
+            ]
+          ],
+          "type": "recommendation",
+          "point": "N/D.",
+          "gradings": [
+            {
+              "gradingStrengthId": "",
+              "gradingLevelId": "",
+              "assessmentId": "recozBaBMRjsIAuyt",
+              "gradingSystem": {
+                "organisationId": "rec0QjnqKx0uJxTgj",
+                "cluster": 1
+              }
+            }
+          ]
+        }
+      ],
+      "falseRecommendations": [],
+      "comment": "",
+      "dxIfTrue": [],
+      "dxIfFalse": [],
+      "drugIds": [],
+      "indicationIds": [],
+      "handoutIds": []
+    }
+  ],
+  "pathways": [
+    {
+      "id": "recGqPfICnJVB1J3i",
+      "status": "Published",
+      "name": "Grading",
+      "diseaseId": "",
+      "presentationId": "recR6hlzTh7jD8k2G",
+      "graph": [
+        {
+          "type": "node",
+          "id": "recPWZ7iivhTbWAWY_before_0",
+          "heads": [
+            "recPWZ7iivhTbWAWY_if_true",
+            "rec0ynhMe4do8qXVM_if_true",
+            "rec1FUoAnrn63nIRF_before_0"
+          ],
+          "keypointId": "recPWZ7iivhTbWAWY",
+          "subType": "criteria",
+          "criteriaName": [
+            "A",
+            "B",
+            "C"
+          ]
+        },
+        {
+          "type": "edge",
+          "label": "Yes to any",
+          "tail": "recPWZ7iivhTbWAWY_before_0",
+          "head": "recPWZ7iivhTbWAWY_if_true"
+        },
+        {
+          "type": "edge",
+          "label": "No to all",
+          "tail": "recPWZ7iivhTbWAWY_before_0",
+          "head": "rec0ynhMe4do8qXVM_if_true"
+        },
+        {
+          "type": "node",
+          "id": "recPWZ7iivhTbWAWY_if_true",
+          "heads": [
+            "recPWZ7iivhTbWAWY_if_true",
+            "rec0ynhMe4do8qXVM_if_true",
+            "rec1FUoAnrn63nIRF_before_0"
+          ],
+          "keypointId": "recPWZ7iivhTbWAWY",
+          "subType": "keypoint",
+          "state": true
+        },
+        {
+          "type": "edge",
+          "label": "then",
+          "tail": "recPWZ7iivhTbWAWY_if_true",
+          "head": "rec1FUoAnrn63nIRF_before_0"
+        },
+        {
+          "type": "node",
+          "id": "rec0ynhMe4do8qXVM_if_true",
+          "heads": [],
+          "keypointId": "rec0ynhMe4do8qXVM",
+          "subType": "keypoint",
+          "state": true
+        },
+        {
+          "type": "node",
+          "id": "rec1FUoAnrn63nIRF_before_0",
+          "heads": [
+            "rec1FUoAnrn63nIRF_if_true",
+            "recDytbykho5Pcxve_before_0"
+          ],
+          "keypointId": "rec1FUoAnrn63nIRF",
+          "subType": "criteria",
+          "criteriaName": [
+            "A"
+          ]
+        },
+        {
+          "type": "edge",
+          "label": "Yes",
+          "tail": "rec1FUoAnrn63nIRF_before_0",
+          "head": "rec1FUoAnrn63nIRF_if_true"
+        },
+        {
+          "type": "edge",
+          "label": "No",
+          "tail": "rec1FUoAnrn63nIRF_before_0",
+          "head": "recDytbykho5Pcxve_before_0"
+        },
+        {
+          "type": "node",
+          "id": "rec1FUoAnrn63nIRF_if_true",
+          "heads": [
+            "rec1FUoAnrn63nIRF_if_true",
+            "recDytbykho5Pcxve_before_0"
+          ],
+          "keypointId": "rec1FUoAnrn63nIRF",
+          "subType": "keypoint",
+          "state": true
+        },
+        {
+          "type": "node",
+          "id": "recDytbykho5Pcxve_before_0",
+          "heads": [
+            "recDytbykho5Pcxve_if_true",
+            "recVAONX7rZ08nMBf_if_true"
+          ],
+          "keypointId": "recDytbykho5Pcxve",
+          "subType": "criteria",
+          "criteriaName": [
+            "A",
+            "B"
+          ]
+        },
+        {
+          "type": "edge",
+          "label": "Yes to all",
+          "tail": "recDytbykho5Pcxve_before_0",
+          "head": "recDytbykho5Pcxve_if_true"
+        },
+        {
+          "type": "edge",
+          "label": "No to any",
+          "tail": "recDytbykho5Pcxve_before_0",
+          "head": "recVAONX7rZ08nMBf_if_true"
+        },
+        {
+          "type": "node",
+          "id": "recDytbykho5Pcxve_if_true",
+          "heads": [
+            "recDytbykho5Pcxve_if_true",
+            "recVAONX7rZ08nMBf_if_true"
+          ],
+          "keypointId": "recDytbykho5Pcxve",
+          "subType": "keypoint",
+          "state": true
+        },
+        {
+          "type": "node",
+          "id": "recVAONX7rZ08nMBf_if_true",
+          "heads": [],
+          "keypointId": "recVAONX7rZ08nMBf",
+          "subType": "keypoint",
+          "state": true
+        }
+      ],
+      "slug": "J3i-grading"
+    }
+  ],
+  "associations": [],
+  "references": [
+    {
+      "id": "recM0yF2QzLQIpi6w",
+      "name": "Investigation Algorithms",
+      "type": "guideline",
+      "url": "https://pathway.md",
+      "authors": "L Mullie.",
+      "year": 2020,
+      "referenceFragment": "Pathway Editors.",
+      "organisationIds": [
+        "rec0QjnqKx0uJxTgj"
+      ]
+    }
+  ],
+  "organisations": [
+    {
+      "id": "rec0QjnqKx0uJxTgj",
+      "name": "Pathway",
+      "acronym": "Pathway",
+      "locationIds": [
+        "recmMZyCa5TVebvMj"
+      ]
+    }
+  ],
+  "presentations": [],
+  "findings": [],
+  "updates": [],
+  "calculators": [
+    null,
+    {
+      "id": "rec4NZLGrCSw7xOjL",
+      "unlisted": false,
+      "status": "Published",
+      "name": "Assessment of diastolic function (no LV structural pathology)",
+      "type": "numerical",
+      "diseaseId": "recjaCzw2tiVV7Id8",
+      "referenceId": "recrzGZyrvzND2YEO",
+      "criteriaGroups": [
+        {
+          "name": "default",
+          "criteria": [
+            {
+              "id": "A",
+              "text": "Septal e' < 7 cm/s or lateral e' < 10 cm/s",
+              "value": 1
+            },
+            {
+              "id": "B",
+              "text": "Average E/e' ratio > 14",
+              "value": 1
+            },
+            {
+              "id": "C",
+              "text": "Peak TR velocity > 2.8 m/s",
+              "value": 1
+            },
+            {
+              "id": "D",
+              "text": "LA volume index > 34 mL/m²",
+              "value": 1
+            }
+          ],
+          "mode": "check"
+        }
+      ],
+      "conditions": [
+        {
+          "name": "A",
+          "order": 0,
+          "condition": "score >= 3",
+          "qualifier": "Abnormal diastolic function"
+        },
+        {
+          "name": "B",
+          "order": 1,
+          "condition": "score >= 2",
+          "qualifier": "Indeterminate diastolic function"
+        },
+        {
+          "name": "C",
+          "order": 2,
+          "condition": "true",
+          "qualifier": "No diastolic dysfunction"
+        }
+      ]
+    },
+    {
+      "id": "recQmg5VTtYBm8Jrf",
+      "unlisted": false,
+      "status": "Published",
+      "name": "Assessment of diastolic dysfunction severity (with LV structural pathology)",
+      "type": "numerical",
+      "diseaseId": "recjaCzw2tiVV7Id8",
+      "referenceId": "recrzGZyrvzND2YEO",
+      "criteriaGroups": [
+        {
+          "name": "default",
+          "criteria": [
+            {
+              "id": "A",
+              "text": "Average E/e' ratio > 14",
+              "value": 1
+            },
+            {
+              "id": "B",
+              "text": "Peak TR velocity > 2.8 m/s",
+              "value": 1
+            },
+            {
+              "id": "C",
+              "text": "LA volume index > 34 mL/m²",
+              "value": 1
+            }
+          ],
+          "mode": "check"
+        }
+      ],
+      "conditions": [
+        {
+          "name": "A",
+          "order": 0,
+          "condition": "score >= 2",
+          "qualifier": "Grade 2 diastolic dysfunction"
+        },
+        {
+          "name": "B",
+          "order": 1,
+          "condition": "true",
+          "qualifier": "Grade 1 diastolic dysfunction"
+        }
+      ]
+    }
+  ],
+  "aspects": [
+    {
+      "id": "recv5JIM2bPSL3fEY",
+      "name": "Diagnostic investigations",
+      "order": 3,
+      "type": "evaluation"
+    }
+  ],
+  "gradings": [],
+  "studies": [],
+  "locations": [],
+  "topics": [
+    {
+      "id": "recQyuDc0z9YDWdyr",
+      "unlisted": false,
+      "title": "Assessment for structural LV pathology",
+      "referenceId": "recM0yF2QzLQIpi6w",
+      "aspectId": "recv5JIM2bPSL3fEY",
+      "studyIds": [],
+      "prependText": "",
+      "topicGroupId": "01975100b53d3973",
+      "presentationId": "recR6hlzTh7jD8k2G",
+      "icon": "",
+      "keypointIds": [
+        "recPWZ7iivhTbWAWY"
+      ],
+      "points": [
+        "N/D."
+      ]
+    },
+    {
+      "id": "recrAZLDbc8qNpqtJ",
+      "unlisted": false,
+      "title": "Assessment of patients with no structural LV pathology",
+      "referenceId": "recM0yF2QzLQIpi6w",
+      "aspectId": "recv5JIM2bPSL3fEY",
+      "studyIds": [],
+      "prependText": "",
+      "topicGroupId": "59dc4b6eedbfa7e4",
+      "presentationId": "recR6hlzTh7jD8k2G",
+      "icon": "",
+      "keypointIds": [
+        "rec0ynhMe4do8qXVM"
+      ],
+      "points": [
+        "N/D."
+      ]
+    },
+    {
+      "id": "recHEjplQ4ptuTCm1",
+      "unlisted": false,
+      "title": "Assessment for severe diastolic dysfunction",
+      "referenceId": "recM0yF2QzLQIpi6w",
+      "aspectId": "recv5JIM2bPSL3fEY",
+      "studyIds": [],
+      "prependText": "",
+      "topicGroupId": "5bb9394fecf4105e",
+      "presentationId": "recR6hlzTh7jD8k2G",
+      "icon": "",
+      "keypointIds": [
+        "rec1FUoAnrn63nIRF"
+      ],
+      "points": [
+        "N/D."
+      ]
+    },
+    {
+      "id": "rec942rOx04ppcv6W",
+      "unlisted": false,
+      "title": "Assessment for mild diastolic dysfunction",
+      "referenceId": "recM0yF2QzLQIpi6w",
+      "aspectId": "recv5JIM2bPSL3fEY",
+      "studyIds": [],
+      "prependText": "",
+      "topicGroupId": "533631b7181a6688",
+      "presentationId": "recR6hlzTh7jD8k2G",
+      "icon": "",
+      "keypointIds": [
+        "recDytbykho5Pcxve"
+      ],
+      "points": [
+        "N/D."
+      ]
+    },
+    {
+      "id": "rechy7BkYLVeGP1nh",
+      "unlisted": false,
+      "title": "Assessment for moderate diastolic dysfunction",
+      "referenceId": "recM0yF2QzLQIpi6w",
+      "aspectId": "recv5JIM2bPSL3fEY",
+      "studyIds": [],
+      "prependText": "",
+      "topicGroupId": "642a452410267e20",
+      "presentationId": "recR6hlzTh7jD8k2G",
+      "icon": "",
+      "keypointIds": [
+        "recVAONX7rZ08nMBf"
+      ],
+      "points": [
+        "N/D."
+      ]
+    }
+  ],
+  "handouts": [],
+  "interventions": [],
+  "dosages": [],
+  "indications": [],
+  "drugs": [],
+  "index": {
+    "synonymSets": [],
+    "synonymSetIds": {},
+    "exactWords": []
+  }
+}

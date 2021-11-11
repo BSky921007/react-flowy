@@ -158,11 +158,13 @@
   margin-top: 15px;
 }
 #leftcard {
+  height: 100%;
   width: fixed;
   padding-right: 20px;
   background-color: #FFF;
   border: 1px solid #E8E8EF;
   box-sizing: border-box;
+  border-bottom: none;
   padding-top: 85px;
   padding-left: 20px;
   position: absolute;
@@ -326,14 +328,39 @@ color: #C9C9D5;
   margin-top: 10px;
   width: 15px;
 }
+.branch {
+  display: flex;
+  margin-bottom: 15px;
+}
+.branch img {
+  width: 20px;
+  margin-right: 12px;
+  color: white;
+}
+.branch button {
+  width: 100%;
+}
+.branchlist {
+  display: flex;
+  margin-bottom: 15px;
+  height: 42px;
+}
+.branchlist img {
+  width: 24px;
+  margin-right: 12px;
+}
+.branchlist .crossbutton {
+  /* width: 20px; */
+  margin-right: -15px;
+  margin-left: -15px;
+}
 #blocklist {
-  height: 900px;
+  height: 100%;
   overflow: auto;
 }
 #proplist {
-  height: calc(100% - 305px);
   overflow: auto;
-  padding-top: 30px;
+  min-height: 500px;
 }
 .blockin {
   padding-left: 10px;
@@ -412,13 +439,54 @@ color: #C9C9D5;
   top: 71px;
   left: 361px;
   z-index: 0;
-  overflow: auto;
+  /* overflow: auto; */
 }
+
+#modal {
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#pathway {
+  background-color: white;
+  margin: 10rem;
+  width: 100% - 20rem;
+  padding: 5rem;
+}
+
+#pathwaytitle {
+  background-color: white;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+}
+
+#closemodal {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: white;
+  cursor: pointer;
+}
+
+#closemodal img {
+  width: 24px;
+  height: 24px;
+  padding: 4px;
+}
+
 #propwrap {
   position: absolute;
   right: 0;
   top: 0;
-  width: 311px;
+  width: 500px;
   height: 100%;
   padding-left: 20px;
   z-index: -2;
@@ -426,7 +494,9 @@ color: #C9C9D5;
 #properties {
   position: absolute;
   height: 100%;
-  width: 311px;
+  width: 450px;
+  padding-left: 25px;
+  padding-right: 25px;
   background-color: #FFF;
   right: -150px;
   opacity: 0;
@@ -452,6 +522,12 @@ color: #C9C9D5;
   font-weight: bold;
   color: #393C44;
   margin-top: 101px;
+}
+.header2 {
+  font-size: 20px;
+  font-family: Roboto;
+  font-weight: bold;
+  color: #393C44;
 }
 #close {
   margin-top: 100px;
@@ -515,17 +591,39 @@ color: #C9C9D5;
   line-height: 48px;
   text-align: center;
 }
+
+.react-dropdown-select-option-label {
+  padding: 3px;
+}
+
+.react-dropdown-select-option-remove {
+  padding-right: 6px;
+}
+
+.react-dropdown-select-option {
+  border-radius: 5px !important;
+}
+
 .inputlabel {
   font-family: Roboto;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #253134;
+}
+
+.inputlabelValue {
+  font-family: Roboto;
+  font-size: 16px;
   color: #253134;
 }
 .inputcomponent {
-  width: 287px;
+  width: 98%;
 }
 .custombutton {
   display: flex;
   justify-content: flex-end;
+  margin-right: 24px;
+  margin-top: 24px;
 }
 .dropme {
   background-color: #FFF;
@@ -536,7 +634,7 @@ color: #C9C9D5;
   font-size: 14px;
   color: #253134;
   height: fit-content;
-  width: 250px;
+  /* width: 250px; */
   margin-bottom: 25px;
   padding: 20px
 }
@@ -567,14 +665,31 @@ color: #C9C9D5;
   right: 0px;
   bottom: 80;
 }
+.previewwrapper {
+  border: 1px solid lightgray;
+  border-bottom: 0px;
+  padding: 16px;
+  box-shadow: 0px 2px 8px rgb(34 34 87 / 5%);
+  margin-bottom: 32px;
+  max-height: calc(100vh - 600px);
+  overflow: scroll;
+}
+.removeblockwrapper {
+  background-color: white;
+  width: 100%;
+  border-top: 1px solid lightgray;
+  position: absolute;
+  height: 130px;
+  bottom: 0;
+  left: 0;
+  padding-left: 16px;
+}
 #removeblock {
   border-radius: 5px;
-  position: absolute;
-  bottom: 20px;
   font-family: Roboto;
   font-size: 14px;
   text-align: center;
-  width: 287px;
+  /* width: 287px; */
   height: 38px;
   line-height: 38px;
   color: #253134;
@@ -636,21 +751,28 @@ color: #C9C9D5;
   background-color: #E9E9EF;
 }
 .blockyinfo {
+  display: inline-block;
+  width: calc(100% - 32px);
   font-family: Roboto;
   font-size: 14px;
-  color: #808292;
-  margin-top: 15px;
-  text-indent: 20px;
-  margin-bottom: 20px;
-}
-.blockyinfo span {
-  color: #253134;
-  font-weight: 500;
-  display: inline-block;
-  border-bottom: 1px solid #D3DCEA;
   line-height: 20px;
-  text-indent: 0px;
+  color: #808292;
+  margin: 16px;
+  color: #253134;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+.blockyinfoTextLabel {
+  font-weight: normal;
+}
+
+.blockyinfoTextValue {
+  font-weight: bold;
+  border-bottom: 1px solid #D3DCEA;
+}
+
 .block {
   background-color: #FFF;
   margin-top: 0px!important;
@@ -670,4 +792,14 @@ color: #C9C9D5;
   #names {
       display: none;
   }   
+}
+
+.branchinfo {
+  position: absolute;
+  width: 150px;
+  height: 21px;
+  margin-bottom: -21px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

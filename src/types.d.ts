@@ -5,20 +5,53 @@ export type Position = {
     y: number
 }
 
+export type SelectTypes = {
+    name: string, 
+    id: string
+}
+
+export type BranchData = {
+    name: string, 
+    criteria_id: string, 
+    source: string, 
+    mapper: string, 
+    field: string, 
+    operator: string, 
+    target: string, 
+    units: string, 
+    care_bundles: string
+}
+
+export type BranchProps = {
+    id: number, 
+    data: BranchData
+}
+
+export type PreviewModalData = {
+    pathway_id: string, 
+}
+
+export type PreviewModalProps = {
+    data: RenderedPathwayData,
+    onClose: () => void
+}
+
 export type CardData = {
     id: number,
     name: string, 
     lefticon: string, 
     desc: string, 
-    desc1: string, 
-    desc2: string, 
-    desc3: string, 
-    desc4: string,
+    template: string, 
+    begin: string, 
+    selectedOptions: SelectTypes[], 
+    selectedBranches: BranchProps[], 
     position: Position, 
     parentId: number,
     children: number[], 
     childrenCnt: number,
-    isOpenProps: Boolean
+    isOpenProps: Boolean,
+    isBranch: boolean, 
+    addedBranch: string, 
 }
 
 export type CardProps = {
@@ -43,7 +76,9 @@ export type LeftCardProps = {
     id: number, 
     lefticon: string, 
     name: string, 
-    desc: string
+    desc: string, 
+    selectType: string, 
+    targetResource: string
 }
 
 export type ArrowData = {
@@ -63,7 +98,8 @@ export type PropWrapProps = {
     data: Boolean, 
     propData: CardData, 
     onDelete: Function, 
-    onSave: Function
+    onSave: Function, 
+    onSaveBranch: Function, 
 }
 
 export type CanvasProps = {
@@ -71,3 +107,4 @@ export type CanvasProps = {
     onPropsView: Function, 
     data: CardData[]
 }
+

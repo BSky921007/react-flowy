@@ -3,8 +3,11 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 
+import PathwayWrapper from './components/PathwayWrapper'
+
 ReactDOM.render(
   <React.StrictMode>
+    {/* <ExamplePathway pathwayId="fake for demo" /> */}
     <App />
   </React.StrictMode>,
   document.getElementById('root')

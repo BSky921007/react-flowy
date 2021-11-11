@@ -1,35 +1,36 @@
-import React, { DragEvent, MouseEvent, useCallback } from 'react';
+import React, { DragEvent, MouseEvent, useCallback, useState } from 'react';
 import IconButton from '@mui/material/IconButton';
-import Button from '@mui/material/Button';
 import { RightCardProps } from '../types';
 import {base_url, paddingLeft, paddingTop} from '../Globals';
 
 const RightCard = (props: RightCardProps) => {
-    const { id, lefticon, name, desc1, desc2, desc3, desc4, position, isOpenProps } = props.data;
-    const [isDragOver, setIsDragOver] = React.useState(false);
-    const [openProps, setOpenProps] = React.useState(isOpenProps);
-    const [moving, setMoving] = React.useState(props.isMoving);
-    const [isRemove, setIsRemove] = React.useState(false);
-    const [isSelected, setIsSelected] = React.useState(props.isSelected);
-    const [updatedId, setUpdatedId] = React.useState(props.updatedId);
-    
-    const handleDragOver = React.useCallback((event: DragEvent<HTMLDivElement>) => {
+    const { id, lefticon, name, template, addedBranch, begin, position, isOpenProps } = props.data;
+    const [isDragOver, setIsDragOver] = useState(false);
+    const [moving, setMoving] = useState(props.isMoving);
+    const [isAddBranch, setIsAddBranch] = useState(false);
+
+    const templateIsDefault = (template.indexOf('${') > -1) || (template.length === 0);
+
+    const handleDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
+
+        const offsetY = event.pageY - position.y;
+        if (offsetY < 121)  setIsAddBranch(true);
+        else                setIsAddBranch(false);
         if (!isDragOver) {
-            setIsDragOver(true);
+            setIsDragOver(!isDragOver);
         }
         props.onOver(id);
-    }, [isDragOver]);
+    }, [id, position.y, props, isDragOver]);
 
-    const handleDragLeave = React.useCallback((event: DragEvent<HTMLDivElement>) => {
+    const handleDragLeave = useCallback((event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         if (isDragOver) {
-            setIsDragOver(false);
+            setIsDragOver(!isDragOver);
         }
-
         props.onLeave();
-    }, [isDragOver]);
-
+    }, [props, isDragOver]);
+    
     const handleDrop = useCallback((event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         setIsDragOver(false);
@@ -38,7 +39,6 @@ const RightCard = (props: RightCardProps) => {
     const handleMouseDown = (event: MouseEvent<HTMLDivElement>) => {
         const clickOffsetX = event.pageX - paddingLeft - position.x;
         const clickOffsetY = event.pageY - paddingTop - position.y;
-        // console.log('mouse down on right card', id);
 
         const cardWidth = 318;
         const xButtonWidth = 43
@@ -55,16 +55,13 @@ const RightCard = (props: RightCardProps) => {
         if ((topBarMargin < clickOffsetX && clickOffsetX < xButtonStartX) && 
             (topBarStartY < clickOffsetY && clickOffsetY < topBarEndY)) {
             setMoving(true);
-            setIsSelected(true);
             props.onMouseDown(id);
         } else if ((xButtonStartX < clickOffsetX && clickOffsetX < xButtonEndX) && 
                    (topBarStartY < clickOffsetY && clickOffsetY < topBarEndY)) {
             setMoving(false);
-            setIsSelected(true);
             props.onDeleteCard(id);
         } else {
             props.onProp(id);
-            // setOpenProps(!openProps);
         }
     }
     
@@ -86,8 +83,13 @@ const RightCard = (props: RightCardProps) => {
     }
 
     var offsetXTemp = document.getElementById(`block-${id}`)?.offsetWidth ? document.getElementById(`block-${id}`)!.offsetWidth/2 : 0;    
+    var offsetYTemp = document.getElementById(`block-${id}`)?.offsetHeight ? document.getElementById(`block-${id}`)!.offsetHeight-122 : 0;
 
     return (
+        <>
+        <div className="branchinfo" style={{left: position.x, top: position.y-30}}>
+            {addedBranch}
+        </div>
         <div id={`block-${id}`} 
             className="blockelem noselect block rightcard"
             onDragOver={handleDragOver}
@@ -96,11 +98,11 @@ const RightCard = (props: RightCardProps) => {
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
-            style={{left: position?.x, top: position?.y, opacity: `${props.isSelected? 0.5:1}`, border: `${isOpenProps?'2px solid #217CE8':'0px' }`}}
+            style={{left: position?.x, top: position?.y, opacity: `${props.isSelected? 0.5:1}`, border: `2px solid ${isOpenProps ? '#217CE8' : '#C5CCD0' }`}}
         >
             <div className='blockyleft' style={{pointerEvents: 'none'}}>
                 <IconButton aria-label="delete" size="large">
-                    <img src={lefticon} alt="NO"/>
+                    <img src={lefticon} alt="NO" style={{width: '24px'}}/>
                 </IconButton>
                 <p className='blockyname'>{name}</p>
             </div>
@@ -109,11 +111,27 @@ const RightCard = (props: RightCardProps) => {
                     <img src={`${base_url}/assets/close.svg`} alt="NO"/>
                 </IconButton>
             </div>
-            <div className='blockydiv'  style={{pointerEvents: 'none'}}></div>
-            <div className='blockyinfo'  style={{pointerEvents: 'none'}}>{desc1}<span>{desc2}</span>{desc3}<span>{desc4}</span></div>
-            <div className={`indicator ${(isDragOver || props.updatedId === id)? '' : 'invisible'}`}  style={{pointerEvents: 'none', left: `${offsetXTemp-7}px`}}></div>
+            <div className='blockydiv' style={{pointerEvents: 'none'}}></div>
+            <div className='blockyinfo' style={{pointerEvents: 'none'}}>
+                <span className='blockyinfoTextLabel'>{begin}</span>
+                { 
+                    templateIsDefault ?
+                        <span className='blockyinfoTextLabel'>[...]</span> 
+                    :
+                        <span className='blockyinfoTextValue'>{template}</span> 
+                }
+            </div>
+            {
+                isAddBranch ? (
+                    <div className={`indicator ${(isDragOver || props.updatedId === id) ? '' : 'invisible'}`}  style={{pointerEvents: 'none', left: `${offsetXTemp-7}px`, top: `${offsetYTemp}px`}}></div>
+                ) : (
+                    <div className={`indicator ${(isDragOver || props.updatedId === id) ? '' : 'invisible'}`}  style={{pointerEvents: 'none', left: `${offsetXTemp-7}px`}}></div>
+                )
+            }
         </div>
+        </>
     )
 }
-
 export default React.memo(RightCard);
+
+// default border color #E9E9EF, C5CCD0

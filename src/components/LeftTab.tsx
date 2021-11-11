@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { base_url } from '../Globals'
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import LeftCard from './LeftCard';
@@ -57,13 +58,13 @@ export default function LeftTab() {
 				open ? (
 					<div id="closecard">
 						<IconButton aria-label="delete" size="large" onClick={() => handleOpen()}>
-							<img src="assets/closeleft.svg" alt="NO"/>	
+							<img src={`${base_url}/assets/closeleft.svg`} alt="NO"/>	
 						</IconButton>
 					</div>
 				) : (
 					<div id="opencard">
 						<IconButton aria-label="delete" size="large" onClick={() => handleOpen()}>
-							<img src="assets/openright.svg" alt="NO"/>	
+							<img src={`${base_url}/assets/openright.svg`} alt="NO"/>	
 						</IconButton>
 					</div>
 				)
@@ -73,7 +74,7 @@ export default function LeftTab() {
 					<>
 						<p id="header">Blocks</p>
 						<div id="search">
-							<img src="assets/search.svg" alt="NO"/>
+							<img src={`${base_url}/assets/search.svg`} alt="NO"/>
 							<input type="text" placeholder="Search blocks" />
 						</div>
 						<div id="subnav" >
