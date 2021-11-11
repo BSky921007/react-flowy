@@ -1,7 +1,7 @@
-import React, { DragEvent, useState, useCallback, useEffect } from 'react';
+import React, { DragEvent, MouseEvent, useState, useCallback, useEffect } from 'react';
 import RightCard from './RightCard';
 import Arrow from './Arrow';
-import { Right_Card, cardWidth, paddingX, paddingLeft, paddingTop } from '../Globals';
+import { Right_Card, cardWidth, paddingX, paddingLeft, paddingTop, cardHeight } from '../Globals';
 import { ArrowData, CardData, Position, CanvasProps } from '../types';
 
 const Canvas = (props: CanvasProps) => {
@@ -9,6 +9,8 @@ const Canvas = (props: CanvasProps) => {
     const [hasFirstCard, setHasFirstCard] = useState(false);
     const [isMoving, setIsMoving] = useState(false);
     const [isRealMoving, setIsRealMoving] = useState(false);
+    const [isCardClicking, setIsCardClicking] = useState(false);
+    const [isCanvasClicking, setIsCanvasClicking] = useState(false);
     const [moveFirstChild, setMoveFirstChild] = useState(false);
     const [cnt, setCnt] = useState(1);
     const [parentId, setParentId] = useState(-1);
@@ -96,6 +98,9 @@ const Canvas = (props: CanvasProps) => {
 
     useEffect(() => {
         const newCards = rearrange(props.data);
+        if (newCards.length === 0) {
+            setHasFirstCard(false);
+        }
         setRightCards(newCards);
         const newArrows = drawArrows(newCards);
         setArrows(newArrows);
@@ -186,7 +191,6 @@ const Canvas = (props: CanvasProps) => {
     
     const handleDrop = useCallback((event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
-        console.log(rightCards);
         const { pageX, pageY, dataTransfer } = event;
         const activeCard = dataTransfer.getData('activeCard');
         const activeBranch = dataTransfer.getData('activeBranch');
@@ -196,7 +200,7 @@ const Canvas = (props: CanvasProps) => {
             if (!hasFirstCard) {
                 setHasFirstCard(true);
                 const data: CardData = {
-                    id: (cnt), 
+                    id: 1, 
                     name: Right_Card[activeData.id-1].name, 
                     lefticon: Right_Card[activeData.id-1].lefticon, 
                     desc: Right_Card[activeData.id-1].desc, 
@@ -215,7 +219,7 @@ const Canvas = (props: CanvasProps) => {
                     childrenCnt: 0,
                     isOpenProps: false
                 }
-                setCnt(cnt+1);
+                setCnt(2);
                 setParentId(0);
                 setUpdatedId(-1);
                 setRightCards([...rightCards, data]);
@@ -288,14 +292,16 @@ const Canvas = (props: CanvasProps) => {
     }, [cnt, hasFirstCard, parentId, rightCards, drawArrows, rearrange]);
     // }, [hasFirstCard, parentId]);
 
-    const handleMouseDown = useCallback((selId: number) => {
+    const handleMouseDown = (selId: number) => {
+        console.log(selId);
         if (selId > -1) {
             setIsMoving(true);
             setSelectedId(selId);
+            console.log(selId);
             if (selId === 1)    setMoveFirstChild(true);
             else                setMoveFirstChild(false);
         }
-    }, []);
+    }
     // }, [rightCards, selectedCards]);
 
     const handleMouseMove = useCallback((movementX: number, movementY: number, pageX: number, pageY: number, ratio: number, updateId: number) => {
@@ -419,10 +425,54 @@ const Canvas = (props: CanvasProps) => {
         }
     }, [rightCards, selectedId, selectedCards, updatedId, isMoving, isRealMoving, moveFirstChild, drawArrows, rearrange]);
     // }, [selectedId, updatedId, isRealMoving]);
+    
+    const handleDown = (event: MouseEvent<HTMLDivElement>) => {
+        let isCardClick: boolean = false;
+        console.log(rightCards);
+        setIsCanvasClicking(true);
+        if (rightCards) {
+            for (let i = 0; i < rightCards.length; i ++) {
+                if ((rightCards[i].position.x < (event.pageX - paddingLeft)) && ((event.pageX - paddingLeft) < rightCards[i].position.x + cardWidth) 
+                        && (rightCards[i].position.y < (event.pageY - paddingTop)) && ((event.pageY - paddingTop) < rightCards[i].position.y + cardHeight)) {
+                    isCardClick = true;
+                    break;
+                }
+            }
+        }
+        setIsCardClicking(isCardClick);
+        if (!isCardClick) {
+            document.getElementById('canvas')!.style.cursor = 'grabbing';
+        }
+    }
 
+    const handleMove = (event: MouseEvent<HTMLDivElement>) => {
+        if (!isCardClicking && isCanvasClicking) {
+            if (rightCards) {
+                const newChilds = [...rightCards];
+                const ratioX = event.screenX/event.pageX;
+                const ratioY = event.screenY/event.pageY;
+                const ratio = (ratioX < ratioY) ? ratioX : ratioY;
+                for (let i = 0; i < newChilds.length; i ++) {
+                    const {position} = newChilds[i];
+                    position.x += event.movementX / ratio;
+                    position.y += event.movementY / ratio;
+                }
+
+                setRightCards(newChilds);
+                setArrows(drawArrows(newChilds));
+            }
+        }
+    }
+
+    const handleUp = (event: MouseEvent<HTMLDivElement>) => {
+        if (!isCardClicking)
+            setIsCardClicking(true);
+        setIsCanvasClicking(false);
+        document.getElementById("canvas")!.style.cursor = 'default';
+    }
 
     return (
-        <div id="canvas" onDragOver={handleDragOver} onDrop={handleDrop}>
+        <div id="canvas" onDragOver={handleDragOver} onDrop={handleDrop} onMouseDown={handleDown} onMouseMove={handleMove} onMouseUp={handleUp}>
             {
                 rightCards?.map((rightCard) => {
                     return  <RightCard 

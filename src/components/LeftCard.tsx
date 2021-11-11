@@ -1,4 +1,4 @@
-import React, { DragEvent } from 'react';
+import React, { DragEvent, useState } from 'react';
 import { base_url } from '../Globals';
 import {LeftCardProps} from '../types';
 
@@ -16,7 +16,11 @@ const LeftCard = (props: CardProps) => {
     }
    
     return (
-        <div className="blockelem create-flowy noselect" draggable={true} onDragStart={handleDragStart} style={{width: `${open&&'318px'}`}}>
+        <div 
+            className="blockelem create-flowy noselect" 
+            draggable={true} 
+            onDragStart={handleDragStart} 
+            style={{width: `${open&&'318px'}`}}>
         {
             open ? (
                 <>
