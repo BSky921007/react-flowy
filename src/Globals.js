@@ -160,7 +160,8 @@ export const Right_Card = [
         template: "When ${condition} is met", 
         begin: "", 
         selectedOptions: [], 
-        selectedBranches: [], 
+        selectedBranches: [],  
+        selectedFilters: [], 
         position: {
             x: 0,
             y: 0
@@ -174,7 +175,8 @@ export const Right_Card = [
         template: "When a new patient is created", 
         begin: "", 
         selectedOptions: [], 
-        selectedBranches: [], 
+        selectedBranches: [],  
+        selectedFilters: [], 
         position: {
             x: 0,
             y: 0
@@ -188,7 +190,8 @@ export const Right_Card = [
         template: "When ${condition} is met", 
         begin: "", 
         selectedOptions: [], 
-        selectedBranches: [], 
+        selectedBranches: [],  
+        selectedFilters: [], 
         position: {
             x: 0,
             y: 0
@@ -202,7 +205,8 @@ export const Right_Card = [
         template: "When ${condition} is met", 
         begin: "", 
         selectedOptions: [], 
-        selectedBranches: [], 
+        selectedBranches: [],  
+        selectedFilters: [], 
         position: {
             x: 0,
             y: 0
@@ -216,7 +220,8 @@ export const Right_Card = [
         template: "${findings}", 
         begin: "Elicit the following findings: ", 
         selectedOptions: [], 
-        selectedBranches: [], 
+        selectedBranches: [],  
+        selectedFilters: [], 
         position: {
             x: 0,
             y: 0
@@ -230,7 +235,8 @@ export const Right_Card = [
         template: "${dosages}", 
         begin: "Write the following prescriptions: ", 
         selectedOptions: [], 
-        selectedBranches: [], 
+        selectedBranches: [],  
+        selectedFilters: [], 
         position: {
             x: 0,
             y: 0
@@ -244,7 +250,8 @@ export const Right_Card = [
         template: "${tests}", 
         begin: "Order the following tests: ", 
         selectedOptions: [], 
-        selectedBranches: [], 
+        selectedBranches: [],  
+        selectedFilters: [], 
         position: {
             x: 0,
             y: 0
@@ -258,7 +265,8 @@ export const Right_Card = [
         template: "${diseases}", 
         begin: "Record the following diagnoses: ", 
         selectedOptions: [], 
-        selectedBranches: [], 
+        selectedBranches: [],  
+        selectedFilters: [], 
         position: {
             x: 0,
             y: 0
@@ -272,7 +280,8 @@ export const Right_Card = [
         template: "${keypoints}",  
         begin: "Apply the following guidelines: ", 
         selectedOptions: [], 
-        selectedBranches: [], 
+        selectedBranches: [],  
+        selectedFilters: [], 
         position: {
             x: 0,
             y: 0
@@ -286,7 +295,8 @@ export const Right_Card = [
         template: "${visits}", 
         begin: "Schedule the following visits: ", 
         selectedOptions: [], 
-        selectedBranches: [], 
+        selectedBranches: [],  
+        selectedFilters: [], 
         position: {
             x: 0,
             y: 0
@@ -300,7 +310,8 @@ export const Right_Card = [
         template: "${bundle}", 
         begin: "Link to this care bundle: ", 
         selectedOptions: [], 
-        selectedBranches: [], 
+        selectedBranches: [],  
+        selectedFilters: [], 
         position: {
             x: 0,
             y: 0
@@ -314,7 +325,8 @@ export const Right_Card = [
         template: "${calculator}", 
         begin: "Use this calculator: ", 
         selectedOptions: [], 
-        selectedBranches: [], 
+        selectedBranches: [],  
+        selectedFilters: [], 
         position: {
             x: 0,
             y: 0
@@ -328,7 +340,8 @@ export const Right_Card = [
         template: "${references}", 
         begin: "", 
         selectedOptions: [], 
-        selectedBranches: [], 
+        selectedBranches: [],  
+        selectedFilters: [], 
         position: {
             x: 0,
             y: 0
@@ -342,7 +355,8 @@ export const Right_Card = [
         template: "Begin care process", 
         begin: "", 
         selectedOptions: [], 
-        selectedBranches: [], 
+        selectedBranches: [],  
+        selectedFilters: [], 
         position: {
             x: 0,
             y: 0
@@ -357,6 +371,7 @@ export const Right_Card = [
         begin: "", 
         selectedOptions: [], 
         selectedBranches: [], 
+        selectedFilters: [],  
         position: {
             x: 0,
             y: 0
@@ -371,6 +386,7 @@ export const Right_Card = [
         begin: "", 
         selectedOptions: [], 
         selectedBranches: [], 
+        selectedFilters: [],  
         position: {
             x: 0,
             y: 0
@@ -385,10 +401,68 @@ export const Right_Card = [
         begin: "", 
         selectedOptions: [], 
         selectedBranches: [], 
+        selectedFilters: [], 
         position: {
             x: 0,
             y: 0
         }
+    }
+];
+
+export const Filter_Conditions = [
+    {
+        'id': '1', 
+        'name': 'Where', 
+    }, 
+    {
+        'id': '2', 
+        'name': 'and', 
+    }
+];
+
+export const Filter_Names = [
+    {
+        'id': '1', 
+        'name': 'label_id', 
+    }, 
+    {
+        'id': '2', 
+        'name': 'age', 
+    }, 
+    {
+        'id': '3', 
+        'name': 'sex', 
+    }, 
+    {
+        'id': '4', 
+        'name': 'hemoglobin', 
+    }
+];
+
+export const Filter_Filters = [
+    {
+        'id': '1', 
+        'name': 'contains...'
+    }, 
+    {
+        'id': '2', 
+        'name': 'does not contain...'
+    }, 
+    {
+        'id': '3', 
+        'name': 'is...'
+    }, 
+    {
+        'id': '4', 
+        'name': 'is not...'
+    }, 
+    {
+        'id': '5', 
+        'name': 'is empty'
+    }, 
+    {
+        'id': '6', 
+        'name': 'is not empty'
     }
 ];
 

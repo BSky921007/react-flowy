@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, MouseEvent } from 'react';
+import Select from 'react-dropdown-select';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
-import Select from 'react-dropdown-select';
+import ToggleButton from '@mui/material/ToggleButton';
+import { ReactComponent as DeleteIcon} from '../delete_icon.svg';
+import { ReactComponent as VerticalIcon} from '../grip_vertical_icon.svg';
 import BranchList from './BranchList';
+import FilterList from './FilterList';
 import Link_Names from '../data/pathways.json';
 import Use_Names from '../data/calculators.json';
 import Schedule_Names from '../data/specialties.json';
@@ -14,8 +18,8 @@ import Prescribe_Names from '../data/dosages.json';
 import Order_Names from '../data/tests.json';
 import Criteria_Names from '../data/criterias.json';
 import Reference_Names from '../data/references.json';
-import { base_url } from '../Globals';
-import { PropWrapProps, SelectTypes, BranchData, BranchProps } from '../types';
+import { base_url, Filter_Conditions, Filter_Names, Filter_Filters } from '../Globals';
+import { PropWrapProps, SelectTypes, BranchData, BranchProps, FilterProps } from '../types';
 
 import {
   DbProvider,
@@ -28,12 +32,15 @@ import {
 
 import untypedCollectedDb from '../data/parsed.test.json'
 
-const collectedDb = (untypedCollectedDb.objects as unknown) as Database
+const collectedDb = (untypedCollectedDb.objects as unknown) as Database;
+const options = ['label_id', 'Squash and merge', 'Rebase and merge'];
 
 const PropWrap = (props: PropWrapProps) => {
+  console.log(props);
   const [selectedName, setSelectedName] = useState<SelectTypes[]>([]);
   const [selectedBranchName, setSelectedBranchName] = useState<BranchData[]>([]);
   const [branches, setBranches] = useState<BranchProps[]>([]);
+  const [filters, setFilters] = useState<FilterProps[]>([]);
   const [linkNames, setLinkNames] = useState<SelectTypes[]>(Link_Names.slice(0, 100));
   const [useNames, setUseNames] = useState<SelectTypes[]>(Use_Names.slice(0, 100));
   const [scheduleNames, setScheduleNames] = useState<SelectTypes[]>(Schedule_Names.slice(0, 100));
@@ -44,6 +51,11 @@ const PropWrap = (props: PropWrapProps) => {
   const [orderNames, setOrderNames] = useState<SelectTypes[]>(Order_Names.slice(0, 100));
   const [referenceNames, setReferenceNames] = useState<SelectTypes[]>(Reference_Names.slice(0, 100));
   const [criteriaNames, setCriteriaNames] = useState<BranchData[]>(Criteria_Names);
+
+  const [selectedFilterCondition, setSelectedFilterCondition] = useState<SelectTypes[]>([]);
+  const [selectedFilterName, setSelectedFilterName] = useState<SelectTypes[]>([]);
+  const [selectedFilterFilter, setSelectedFilterFilter] = useState<SelectTypes[]>([]);
+  const [selectedFilterValue, setSelectedFilterValue] = useState<string>('');
 
   const [open, setOpen] = useState(props.data);
   const [openModal, setOpenModal] = useState(false);
@@ -57,6 +69,7 @@ const PropWrap = (props: PropWrapProps) => {
   const [isCustom, setIsCustom] = useState(false);
   const [isSchedule, setIsSchedule] = useState(false);
   const [isRecord, setIsRecord] = useState(false);
+  const [isFilter, setIsFilter] = useState(false);
   const [propCard, setPropCard] = useState(props.propData);
   const [inputData, setInputData] = useState('');
 
@@ -86,10 +99,14 @@ const PropWrap = (props: PropWrapProps) => {
     else                                        setIsBranch(false);
     if (props.propData.name === 'Custom')       setIsCustom(true);
     else                                        setIsCustom(false);
+    if (props.propData.name === 'Filter')       setIsFilter(true);
+    else                                        setIsFilter(false);
+
     setPropCard(props.propData);
     setInputData(props.propData.template);
     setSelectedName(props.propData.selectedOptions);
     setBranches(props.propData.selectedBranches);
+    setFilters(props.propData.selectedFilters);
     setSelectedBranchName([]);
   }, [props]);
 
@@ -97,7 +114,7 @@ const PropWrap = (props: PropWrapProps) => {
     setOpen(false);
 	}
 
-  const openNewBranch = () => {
+  const openNew = () => {
     setOpenModal(!openModal);
   }
 
@@ -118,8 +135,15 @@ const PropWrap = (props: PropWrapProps) => {
     setInputData(event.target.value);
   }
 
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedFilterValue(event.target.value);
+  }
+
   const onBranchSave = () => {
     const newBranches = [...branches];
+    if (selectedBranchName.length === 0) {
+      return;
+    }
     const tempBranch = {
       id: newBranches.length + 1, 
       data: selectedBranchName[0]
@@ -129,7 +153,7 @@ const PropWrap = (props: PropWrapProps) => {
     setOpenModal(!openModal);
     props.onSaveBranch([...newBranches, tempBranch]);
   }
-
+  
   const deleteBranch = (id: number) => {
     const newBranches = [...branches];
     const resultBranches = newBranches.filter((branch) => branch.id !== id);
@@ -142,11 +166,52 @@ const PropWrap = (props: PropWrapProps) => {
     setOpenModal(!openModal);
   }
 
-  const handleStart = (action: BranchProps) => {
-    console.log('prop wrap on drag start');
-    console.log(action);
+  const onFilterSave = () => {
+    const newFilters = [...filters];
+    if ((newFilters.length !== 0 && selectedFilterCondition.length === 0) || 
+        selectedFilterName.length === 0 || 
+        selectedFilterFilter.length === 0 || 
+        selectedFilterValue === '') {
+      return;
+    }
+    const tempFilter = {
+      id: newFilters.length + 1, 
+      data: {
+        condition: selectedFilterCondition[0] ? selectedFilterCondition : [{id: '1', name: 'where'}], 
+        name: selectedFilterName, 
+        filter: selectedFilterFilter, 
+        value: selectedFilterValue, 
+      }
+    }
+    setFilters([...newFilters, tempFilter]);
+    setSelectedFilterCondition([]);
+    setSelectedFilterName([]);
+    setSelectedFilterFilter([]);
+    setSelectedFilterValue('');
+    setOpenModal(!openModal);
+    props.onSaveFilter([...newFilters, tempFilter]);
   }
 
+  // const editFilter = (id: number) => {
+
+  // }
+
+  const deleteFilter = (id: number) => {
+    const newFilters = [...filters];
+    const resultFilters = newFilters.filter((filter) => filter.id !== id);
+    setFilters(resultFilters);
+    props.onSaveFilter(resultFilters);
+  }
+
+  const onFilterCancel = () => {
+    setSelectedFilterCondition([]);
+    setSelectedFilterName([]);
+    setSelectedFilterFilter([]);
+    setSelectedFilterValue('');
+    setOpenModal(!openModal);
+  }
+
+  
   return (
     <div id="propwrap" className="itson">
       <div id="properties" className={`${open&&'expanded'}`}>
@@ -223,7 +288,7 @@ const PropWrap = (props: PropWrapProps) => {
                     <DbProvider db={collectedDb}>
                       <Drug drugId="recsIaI9dkRGGpNKr"/>
                     </DbProvider>
-                  </PathwayThemeProvider>  
+                                  </PathwayThemeProvider>  
                   </div>
                 </>
               ) : isOrder ? (
@@ -348,7 +413,7 @@ const PropWrap = (props: PropWrapProps) => {
                   <div className="branch">
                     <Button 
                       variant="contained"
-                      onClick={openNewBranch}>
+                      onClick={openNew}>
                       <img src={`${base_url}/assets/plus_circle.svg`} alt="NO"/>
                       New branch
                     </Button>
@@ -357,6 +422,7 @@ const PropWrap = (props: PropWrapProps) => {
                     openModal && (
                       <>
                         <Select
+                          className="addbranch"
                           options={criteriaNames}
                           values={selectedBranchName}
                           onChange={(value) => {
@@ -398,6 +464,80 @@ const PropWrap = (props: PropWrapProps) => {
                     <Button variant="text" onClick={() => onSave()}>save</Button>
                   </div>
                 </>
+              ) : isFilter ? (
+                <>
+                  <p className="inputlabel">Add one or more conditions: </p>
+                  {
+                    filters.length > 0 && (
+                      filters.map((filter) => {
+                        return (
+                          <FilterList key={filter.id} data={filter} deleteFilter={deleteFilter}/>
+                        )
+                      })
+                    )
+                  }
+                  <div className="condition">
+                    <Button 
+                      className="buttonaddfilter"
+                      variant="outlined"
+                      onClick={openNew}>
+                      <img src={`${base_url}/assets/plus_circle.svg`} alt="NO"/>
+                      Add a new condition
+                    </Button>
+                  </div>
+                  {
+                    openModal && (
+                      <>
+                        <div className="selectgroup">
+                          {
+                            filters.length === 0 ? (
+                              <span className="addfilterstatic">Where</span>
+                            ) : (
+                              <Select
+                                className="addfilterselect"
+                                style={{width: '73px'}}
+                                options={Filter_Conditions}
+                                values={selectedFilterCondition}
+                                onChange={(value) => {
+                                  setSelectedFilterCondition(value);
+                                }}
+                                labelField="name"
+                                valueField="id"
+                              />
+                            )
+                          }
+                          <Select
+                            className="addfilterselect"
+                            style={{width: '112px'}}
+                            options={Filter_Names}
+                            values={selectedFilterName}
+                            onChange={(value) => {
+                              setSelectedFilterName(value);
+                            }}
+                            labelField="name"
+                            valueField="id"
+                          />
+                          <Select
+                            className="addfilterselect"
+                            style={{width: '172px'}}
+                            options={Filter_Filters}
+                            values={selectedFilterFilter}
+                            onChange={(value) => {
+                              setSelectedFilterFilter(value);
+                            }}
+                            labelField="name"
+                            valueField="id"
+                          />
+                          <input className="filterinput" type="text" onChange={(event) => handleChange(event)}/>                    
+                        </div>
+                        <div className="custombutton">
+                          <Button variant="text" onClick={() => onFilterCancel()}>cancel</Button>
+                          <Button variant="text" onClick={() => onFilterSave()}>save</Button>
+                        </div>
+                      </>
+                    )
+                  }
+                </>
               ) : (
                 <>
                   <p className="inputlabel">Template</p>
@@ -407,8 +547,7 @@ const PropWrap = (props: PropWrapProps) => {
                 </>
               )
             }
-          </div>
-          
+          </div>          
           <div className="removeblockwrapper">
             <p className="header2">Delete this block</p>
             <div id="removeblock">

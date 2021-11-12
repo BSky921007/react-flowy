@@ -5,7 +5,7 @@ import Header from './components/Header';
 import LeftTab from './components/LeftTab';
 import Canvas from './components/Canvas';
 import PropWrap from './components/PropWrap';
-import { BranchProps, CardData, SelectTypes } from './types';
+import { BranchProps, FilterProps, CardData, SelectTypes } from './types';
 import { arrayToString } from './Globals';
 
 export const App = () => {
@@ -81,22 +81,24 @@ export const App = () => {
         selectedCard.template = arrayToString(action);
         selectedCard.selectedOptions = action;
       }
-      // console.log(selectedCard);
-      // console.log(newCards);
       setRightCards(newCards);
     }
   }
 
   const saveBranch = (action: BranchProps[]) => {
-    console.log(rightCards, index, action);
     if (index > -1) {
       const newCards = [...rightCards];
-      // console.log(newCards);
       const selectedCard = newCards[index];
-      // selectedCard.template = arrayToString(action);
       selectedCard.selectedBranches = action;
-      // console.log(selectedCard);
-      // console.log(newCards);
+      setRightCards(newCards);
+    }
+  }
+
+  const saveFilter = (action: FilterProps[]) => {
+    if (index > -1) {
+      const newCards = [...rightCards];
+      const selectedCard = newCards[index];
+      selectedCard.selectedFilters = action;
       setRightCards(newCards);
     }
   }
@@ -105,8 +107,19 @@ export const App = () => {
     <div className="App">
       <Header />
       <LeftTab />
-      <PropWrap data={isOpenProp} propData={rightCards[index]} onDelete={deleteCard} onSave={saveCard} onSaveBranch={saveBranch} />
-      <Canvas isOpenProp={isOpenProp} onPropsView={onViewProps} data={rightCards} />
+      <PropWrap 
+        data={isOpenProp} 
+        propData={rightCards[index]} 
+        onDelete={deleteCard} 
+        onSave={saveCard} 
+        onSaveBranch={saveBranch} 
+        onSaveFilter={saveFilter}
+      />
+      <Canvas 
+        isOpenProp={isOpenProp} 
+        onPropsView={onViewProps} 
+        data={rightCards} 
+      />
     </div>
   );
 }

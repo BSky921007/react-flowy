@@ -9,7 +9,6 @@ const Canvas = (props: CanvasProps) => {
     const [hasFirstCard, setHasFirstCard] = useState(false);
     const [isMoving, setIsMoving] = useState(false);
     const [isRealMoving, setIsRealMoving] = useState(false);
-    const [isCardClicking, setIsCardClicking] = useState(false);
     const [isCanvasClicking, setIsCanvasClicking] = useState(false);
     const [moveFirstChild, setMoveFirstChild] = useState(false);
     const [cnt, setCnt] = useState(1);
@@ -208,6 +207,7 @@ const Canvas = (props: CanvasProps) => {
                     begin: Right_Card[activeData.id-1].begin, 
                     selectedOptions: [], 
                     selectedBranches: [], 
+                    selectedFilters: [], 
                     isBranch: false, 
                     addedBranch: '', 
                     position: {
@@ -248,6 +248,7 @@ const Canvas = (props: CanvasProps) => {
                         begin: Right_Card[activeData.id-1].begin, 
                         selectedOptions: [], 
                         selectedBranches: [], 
+                        selectedFilters: [], 
                         isBranch: childToUpdate.name === 'Branch' ? true : false, 
                         addedBranch: '', 
                         position: {
@@ -293,11 +294,10 @@ const Canvas = (props: CanvasProps) => {
     // }, [hasFirstCard, parentId]);
 
     const handleMouseDown = (selId: number) => {
-        console.log(selId);
         if (selId > -1) {
             setIsMoving(true);
             setSelectedId(selId);
-            console.log(selId);
+            
             if (selId === 1)    setMoveFirstChild(true);
             else                setMoveFirstChild(false);
         }
@@ -426,27 +426,23 @@ const Canvas = (props: CanvasProps) => {
     }, [rightCards, selectedId, selectedCards, updatedId, isMoving, isRealMoving, moveFirstChild, drawArrows, rearrange]);
     // }, [selectedId, updatedId, isRealMoving]);
     
-    const handleDown = (event: MouseEvent<HTMLDivElement>) => {
+    const handleDown = useCallback((event: MouseEvent<HTMLDivElement>) => {
         let isCardClick: boolean = false;
-        console.log(rightCards);
-        setIsCanvasClicking(true);
         if (rightCards) {
             for (let i = 0; i < rightCards.length; i ++) {
                 if ((rightCards[i].position.x < (event.pageX - paddingLeft)) && ((event.pageX - paddingLeft) < rightCards[i].position.x + cardWidth) 
-                        && (rightCards[i].position.y < (event.pageY - paddingTop)) && ((event.pageY - paddingTop) < rightCards[i].position.y + cardHeight)) {
+                && (rightCards[i].position.y < (event.pageY - paddingTop)) && ((event.pageY - paddingTop) < rightCards[i].position.y + cardHeight)) {
                     isCardClick = true;
                     break;
                 }
             }
+            if (isCardClick)    setIsCanvasClicking(false);
+            else                setIsCanvasClicking(true)
         }
-        setIsCardClicking(isCardClick);
-        if (!isCardClick) {
-            document.getElementById('canvas')!.style.cursor = 'grabbing';
-        }
-    }
+    }, [rightCards]);
 
-    const handleMove = (event: MouseEvent<HTMLDivElement>) => {
-        if (!isCardClicking && isCanvasClicking) {
+    const handleMove = useCallback((event: MouseEvent<HTMLDivElement>) => {
+        if (isCanvasClicking) {
             if (rightCards) {
                 const newChilds = [...rightCards];
                 const ratioX = event.screenX/event.pageX;
@@ -462,17 +458,25 @@ const Canvas = (props: CanvasProps) => {
                 setArrows(drawArrows(newChilds));
             }
         }
-    }
+    }, [isCanvasClicking, rightCards, drawArrows]);
 
-    const handleUp = (event: MouseEvent<HTMLDivElement>) => {
-        if (!isCardClicking)
-            setIsCardClicking(true);
-        setIsCanvasClicking(false);
-        document.getElementById("canvas")!.style.cursor = 'default';
-    }
+    const handleUp = useCallback((event: MouseEvent<HTMLDivElement>) => {
+        if (isCanvasClicking) {
+            setIsCanvasClicking(false);
+        }
+    }, [isCanvasClicking]);
+
 
     return (
-        <div id="canvas" onDragOver={handleDragOver} onDrop={handleDrop} onMouseDown={handleDown} onMouseMove={handleMove} onMouseUp={handleUp}>
+        <div 
+            id="canvas" 
+            style={{cursor: `${isCanvasClicking ? 'grabbing': 'move'}`}}
+            onDragOver={handleDragOver} 
+            onDrop={handleDrop} 
+            onMouseDown={handleDown} 
+            onMouseMove={handleMove} 
+            onMouseUp={handleUp}
+        >
             {
                 rightCards?.map((rightCard) => {
                     return  <RightCard 

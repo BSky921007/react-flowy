@@ -328,6 +328,23 @@ color: #C9C9D5;
   margin-top: 10px;
   width: 15px;
 }
+.condition {
+  display: flex;
+  margin-bottom: 15px;
+  border-color: white;
+}
+.condition img {
+  width: 20px;
+  margin-right: 12px;
+}
+.condition button {
+  width: calc(100% - 37px);
+  justify-content: start;
+  border-color: white;
+}
+.condition input {
+  width: 120px;
+}
 .branch {
   display: flex;
   margin-bottom: 15px;
@@ -338,12 +355,15 @@ color: #C9C9D5;
   color: white;
 }
 .branch button {
-  width: 100%;
+  width: calc(100% - 32px);
+}
+.addbranch {
+  width: calc(100% - 32px) !important;
 }
 .branchlist {
   display: flex;
-  margin-bottom: 15px;
-  height: 42px;
+  margin-bottom: 5px;
+  height: 24px;
 }
 .branchlist img {
   width: 24px;
@@ -354,13 +374,77 @@ color: #C9C9D5;
   margin-right: -15px;
   margin-left: -15px;
 }
+.selectgroup {
+  display: inline-flex;
+  /* height: 36px; */
+}
+.selectgroup * {
+  margin-right: -1px;
+  border-radius: 0px;
+}
+.selectgroup input {
+  /* height: 30px; */
+  width: 92px;
+  border: 1px solid #ccc;
+}
+.selectgroup > :first-child {
+  margin-right: 5px;
+  /* height: 36px; */
+  display: inline-flex;
+  align-items: center;
+}
+.selectgroup > :last-child {
+  margin-right: 16px;
+}
+.selectgroup svg {
+  height: 15px;
+  width: 24px;
+}
+.selectgroup button {
+  /* width: 38px; */
+  padding: 3px 5px;
+  text-transform: initial;
+  border-radius: 0px;
+  border-left: 0px;
+  border-color: #ccc;
+}
+.conditioninput {
+  border: 1px solid #ccc;
+  height: 32px !important; 
+}
+.conditioninput :focus {
+  outline: none;
+  border: 0px solid #217CE8 !important;
+}
+.addfilterstatic {
+  width: 73px;
+  justify-content: center;
+}
+.addfilterselect {
+  margin-right: 0px !important;
+  width: 120px;
+  height: 100%;
+}
+.addfilterselect input {
+  display: none;
+  width: 100%;
+}
+.addfilterinput {
+  height: auto !important;
+}
+.buttonaddfilter {
+  text-transform: initial;
+}
 #blocklist {
   height: 100%;
   overflow: auto;
 }
 #proplist {
-  overflow: auto;
+  position: absolute;
+  left: 0px;
+  width: 100%;
   min-height: 500px;
+  margin-left: 16px;
 }
 .blockin {
   padding-left: 10px;
@@ -439,7 +523,7 @@ color: #C9C9D5;
   top: 71px;
   left: 361px;
   z-index: 0;
-  /* overflow: auto; */
+  overflow: auto;
 }
 
 #modal {
@@ -744,6 +828,10 @@ color: #C9C9D5;
 .blockyleft {
   display: inline-block;
   margin-left: 20px;
+  width: 231px;
+}
+.blockyleft:hover {
+  cursor: grabbing !important;
 }
 .blockydiv {
   width: 100%;
@@ -763,7 +851,9 @@ color: #C9C9D5;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
+.blockyinfo:hover {
+  cursor: pointer;
+}
 .blockyinfoTextLabel {
   font-weight: normal;
 }

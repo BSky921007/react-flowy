@@ -27,6 +27,18 @@ export type BranchProps = {
     data: BranchData
 }
 
+export type FilterData = {
+    condition: SelectTypes[], 
+    name: SelectTypes[], 
+    filter: SelectTypes[], 
+    value: string | undefined, 
+}
+
+export type FilterProps = {
+    id: number, 
+    data: FilterData
+}
+
 export type PreviewModalData = {
     pathway_id: string, 
 }
@@ -45,6 +57,7 @@ export type CardData = {
     begin: string, 
     selectedOptions: SelectTypes[], 
     selectedBranches: BranchProps[], 
+    selectedFilters: FilterProps[], 
     position: Position, 
     parentId: number,
     children: number[], 
@@ -100,6 +113,7 @@ export type PropWrapProps = {
     onDelete: Function, 
     onSave: Function, 
     onSaveBranch: Function, 
+    onSaveFilter: Function, 
 }
 
 export type CanvasProps = {

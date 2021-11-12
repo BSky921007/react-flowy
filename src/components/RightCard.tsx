@@ -86,48 +86,48 @@ const RightCard = (props: RightCardProps) => {
 
     return (
         <>
-        <div className="branchinfo" style={{left: position.x, top: position.y-30}}>
-            {addedBranch}
-        </div>
-        <div id={`block-${id}`} 
-            className="blockelem noselect block rightcard"
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            style={{left: position?.x, top: position?.y, opacity: `${props.isSelected? 0.5:1}`, border: `2px solid ${isOpenProps ? '#217CE8' : '#C5CCD0' }`}}
-        >
-            <div className='blockyleft' style={{pointerEvents: 'none'}}>
-                <IconButton aria-label="delete" size="large">
-                    <img src={lefticon} alt="NO" style={{width: '24px'}}/>
-                </IconButton>
-                <p className='blockyname'>{name}</p>
+            <div className="branchinfo" style={{left: position.x, top: position.y-30}}>
+                {addedBranch}
             </div>
-            <div className='blockyright' style={{pointerEvents: 'none'}}>
-                <IconButton aria-label="delete" size="large">
-                    <img src={`${base_url}/assets/close.svg`} alt="NO"/>
-                </IconButton>
-            </div>
-            <div className='blockydiv' style={{pointerEvents: 'none'}}></div>
-            <div className='blockyinfo' style={{pointerEvents: 'none'}}>
-                <span className='blockyinfoTextLabel'>{begin}</span>
-                { 
-                    templateIsDefault ?
-                        <span className='blockyinfoTextLabel'>[...]</span> 
-                    :
-                        <span className='blockyinfoTextValue'>{template}</span> 
+            <div id={`block-${id}`} 
+                className="blockelem noselect block rightcard"
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                style={{left: position?.x, top: position?.y, opacity: `${props.isSelected? 0.5:1}`, border: `2px solid ${isOpenProps ? '#217CE8' : '#C5CCD0' }`}}
+            >
+                <div className='blockyleft'>
+                    <IconButton aria-label="delete" size="large">
+                        <img src={lefticon} alt="NO" style={{width: '24px'}}/>
+                    </IconButton>
+                    <p className='blockyname'>{name}</p>
+                </div>
+                <div className='blockyright'>
+                    <IconButton aria-label="delete" size="large">
+                        <img src={`${base_url}/assets/close.svg`} alt="NO"/>
+                    </IconButton>
+                </div>
+                <div className='blockydiv'></div>
+                <div className='blockyinfo'>
+                    <span className='blockyinfoTextLabel'>{begin}</span>
+                    { 
+                        templateIsDefault ?
+                            <span className='blockyinfoTextLabel'>[...]</span> 
+                        :
+                            <span className='blockyinfoTextValue'>{template}</span> 
+                    }
+                </div>
+                {
+                    isAddBranch ? (
+                        <div className={`indicator ${(isDragOver || props.updatedId === id) ? '' : 'invisible'}`}  style={{pointerEvents: 'none', left: `${offsetXTemp-7}px`, top: `${offsetYTemp}px`}}></div>
+                    ) : (
+                        <div className={`indicator ${(isDragOver || props.updatedId === id) ? '' : 'invisible'}`}  style={{pointerEvents: 'none', left: `${offsetXTemp-7}px`}}></div>
+                    )
                 }
             </div>
-            {
-                isAddBranch ? (
-                    <div className={`indicator ${(isDragOver || props.updatedId === id) ? '' : 'invisible'}`}  style={{pointerEvents: 'none', left: `${offsetXTemp-7}px`, top: `${offsetYTemp}px`}}></div>
-                ) : (
-                    <div className={`indicator ${(isDragOver || props.updatedId === id) ? '' : 'invisible'}`}  style={{pointerEvents: 'none', left: `${offsetXTemp-7}px`}}></div>
-                )
-            }
-        </div>
         </>
     )
 }
