@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useRef, MouseEvent } from 'react';
+import React, { useEffect, useState, useCallback, ReactComponentElement } from 'react';
 import Select from 'react-dropdown-select';
+import styled from '@emotion/styled';
+import { List, AutoSizer, ListProps } from 'react-virtualized';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
-import ToggleButton from '@mui/material/ToggleButton';
-import { ReactComponent as DeleteIcon} from '../delete_icon.svg';
-import { ReactComponent as VerticalIcon} from '../grip_vertical_icon.svg';
 import BranchList from './BranchList';
 import FilterList from './FilterList';
 import Link_Names from '../data/pathways.json';
@@ -16,8 +15,8 @@ import Record_Names from '../data/diseases.json';
 import Elicit_Names from '../data/findings.json';
 import Prescribe_Names from '../data/dosages.json';
 import Order_Names from '../data/tests.json';
+import Custom_Names from '../data/references.json';
 import Criteria_Names from '../data/criterias.json';
-import Reference_Names from '../data/references.json';
 import { base_url, Filter_Conditions, Filter_Names, Filter_Filters } from '../Globals';
 import { PropWrapProps, SelectTypes, BranchData, BranchProps, FilterProps } from '../types';
 
@@ -35,22 +34,43 @@ import untypedCollectedDb from '../data/parsed.test.json'
 const collectedDb = (untypedCollectedDb.objects as unknown) as Database;
 const options = ['label_id', 'Squash and merge', 'Rebase and merge'];
 
+const Title = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+`;
+
+const StyledList = styled<ReactComponentElement>(List)`
+  overflow: auto;
+  height: 200px;
+  max-height: 200px;
+`;
+
+const Item = styled.div`
+  display: flex;
+  padding: 0 10px;
+  align-items: center;
+  cursor: pointer;
+  width: 480px;
+  height: 40px;
+  display: inline-block;
+  white-space: nowrap;
+  
+  &:hover {
+    background: #f2f2f2;
+  }  
+`;
+  // ${({ disabled }) => disabled && 'text-decoration: line-through;'}
+
 const PropWrap = (props: PropWrapProps) => {
-  console.log(props);
-  const [selectedName, setSelectedName] = useState<SelectTypes[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<SelectTypes[]>([]);
+  const [actionType, setActionType] = useState<string>('');
+  const [structureType, setStructureType] = useState<string>('');
+  const [actions, setActions] = useState<SelectTypes[]>([]);
   const [selectedBranchName, setSelectedBranchName] = useState<BranchData[]>([]);
   const [branches, setBranches] = useState<BranchProps[]>([]);
   const [filters, setFilters] = useState<FilterProps[]>([]);
-  const [linkNames, setLinkNames] = useState<SelectTypes[]>(Link_Names.slice(0, 100));
-  const [useNames, setUseNames] = useState<SelectTypes[]>(Use_Names.slice(0, 100));
-  const [scheduleNames, setScheduleNames] = useState<SelectTypes[]>(Schedule_Names.slice(0, 100));
-  const [applyNames, setApplyNames] = useState<SelectTypes[]>(Apply_Names.slice(0, 100));
-  const [recordNames, setRecordNames] = useState<SelectTypes[]>(Record_Names.slice(0, 100));
-  const [elicitNames, setElicitNames] = useState<SelectTypes[]>(Elicit_Names.slice(0, 100));
-  const [prescribeNames, setPrescribeNames] = useState<SelectTypes[]>(Prescribe_Names.slice(0, 100));
-  const [orderNames, setOrderNames] = useState<SelectTypes[]>(Order_Names.slice(0, 100));
-  const [referenceNames, setReferenceNames] = useState<SelectTypes[]>(Reference_Names.slice(0, 100));
-  const [criteriaNames, setCriteriaNames] = useState<BranchData[]>(Criteria_Names);
+  const [criteriaNames, setCriteriaNames] = useState<BranchData[]>([]);
 
   const [selectedFilterCondition, setSelectedFilterCondition] = useState<SelectTypes[]>([]);
   const [selectedFilterName, setSelectedFilterName] = useState<SelectTypes[]>([]);
@@ -59,17 +79,6 @@ const PropWrap = (props: PropWrapProps) => {
 
   const [open, setOpen] = useState(props.data);
   const [openModal, setOpenModal] = useState(false);
-  const [isElicit, setIsElicit] = useState(false);
-  const [isPrescribe, setIsPrescribe] = useState(false);
-  const [isOrder, setIsOrder] = useState(false);
-  const [isApply, setIsApply] = useState(false);
-  const [isLink, setIsLink] = useState(false);
-  const [isUse, setIsUse] = useState(false);
-  const [isBranch, setIsBranch] = useState(false);
-  const [isCustom, setIsCustom] = useState(false);
-  const [isSchedule, setIsSchedule] = useState(false);
-  const [isRecord, setIsRecord] = useState(false);
-  const [isFilter, setIsFilter] = useState(false);
   const [propCard, setPropCard] = useState(props.propData);
   const [inputData, setInputData] = useState('');
 
@@ -78,37 +87,87 @@ const PropWrap = (props: PropWrapProps) => {
     if (!props.propData) {
       setOpen(false);
       return;
-    } 
-    if (props.propData.name === 'Elicit')       setIsElicit(true);
-    else                                        setIsElicit(false);
-    if (props.propData.name === 'Prescribe')    setIsPrescribe(true);
-    else                                        setIsPrescribe(false);
-    if (props.propData.name === 'Order')        setIsOrder(true);
-    else                                        setIsOrder(false);
-    if (props.propData.name === 'Apply')        setIsApply(true);
-    else                                        setIsApply(false);
-    if (props.propData.name === 'Link')         setIsLink(true);
-    else                                        setIsLink(false);
-    if (props.propData.name === 'Use')          setIsUse(true);
-    else                                        setIsUse(false);
-    if (props.propData.name === 'Schedule')     setIsSchedule(true);
-    else                                        setIsSchedule(false);
-    if (props.propData.name === 'Record')       setIsRecord(true);
-    else                                        setIsRecord(false);
-    if (props.propData.name === 'Branch')       setIsBranch(true);
-    else                                        setIsBranch(false);
-    if (props.propData.name === 'Custom')       setIsCustom(true);
-    else                                        setIsCustom(false);
-    if (props.propData.name === 'Filter')       setIsFilter(true);
-    else                                        setIsFilter(false);
+    }
 
     setPropCard(props.propData);
     setInputData(props.propData.template);
-    setSelectedName(props.propData.selectedOptions);
+    setSelectedOptions(props.propData.selectedOptions);
     setBranches(props.propData.selectedBranches);
     setFilters(props.propData.selectedFilters);
     setSelectedBranchName([]);
+
+    if (props.propData.name === 'Elicit') {
+      setActionType('Elicit');
+      setStructureType('');
+      setActions(Elicit_Names);
+    } else if (props.propData.name === 'Prescribe') {
+      setActionType('Prescribe');
+      setStructureType('');
+      setActions(Prescribe_Names);
+    } else if (props.propData.name === 'Order') {
+      setActionType('Order');
+      setStructureType('');
+      setActions(Order_Names);
+    } else if (props.propData.name === 'Apply') {
+      setActionType('Apply');
+      setStructureType('');
+      setActions(Apply_Names);
+    } else if (props.propData.name === 'Link') {
+      setActionType('Link');
+      setStructureType('');
+      setActions(Link_Names);
+    } else if (props.propData.name === 'Use') {
+      setActionType('Use');
+      setStructureType('');
+      setActions(Use_Names);
+    } else if (props.propData.name === 'Schedule') {
+      setActionType('Schedule');
+      setStructureType('');
+      setActions(Schedule_Names);
+    } else if (props.propData.name === 'Record') {
+      setActionType('Record');
+      setStructureType('');
+      setActions(Record_Names);
+    } else if (props.propData.name === 'Custom') {
+      setActionType('Custom');
+      setStructureType('');
+      setActions(Custom_Names); 
+    } else if (props.propData.name === 'Branch') {
+      setStructureType('Branch');
+      setActionType('');
+      setCriteriaNames(Criteria_Names);
+    } else if (props.propData.name === 'Filter') {
+      setStructureType('Filter');
+      setActionType('');
+    }
+    else setActions([]);
   }, [props]);
+
+  const customDropdownRenderer = useCallback(({ methods, state, props }) => {
+    const regexp = new RegExp(state.search, 'i');
+    // const items =  actions;
+  
+    return (
+      <AutoSizer style={{ height: '200px' }}>
+        {({width, height}) => (
+          <StyledList
+            height={height}
+            rowCount={actions.length}
+            rowHeight={40}
+            width={width - 2}
+            rowRenderer={({ index, style, key }) => (
+              <Item key={key}
+                    style={style}
+                    onClick={() => methods.addItem(actions[index])}
+              >
+                {actions[index].name}
+              </Item>
+            )}
+          />
+    )}
+      </AutoSizer>
+    );
+  }, [actions]);
 
   const handleOpen = () => {
     setOpen(false);
@@ -123,12 +182,12 @@ const PropWrap = (props: PropWrapProps) => {
   }
 
   const onSave = () => {
-    props.onSave(selectedName, inputData);
+    props.onSave(selectedOptions, inputData);
   }
 
   const onCancel = () => {
     setInputData(props.propData.template);
-    setSelectedName(props.propData.selectedOptions);
+    setSelectedOptions(props.propData.selectedOptions);
   }
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -192,10 +251,6 @@ const PropWrap = (props: PropWrapProps) => {
     props.onSaveFilter([...newFilters, tempFilter]);
   }
 
-  // const editFilter = (id: number) => {
-
-  // }
-
   const deleteFilter = (id: number) => {
     const newFilters = [...filters];
     const resultFilters = newFilters.filter((filter) => filter.id !== id);
@@ -210,7 +265,6 @@ const PropWrap = (props: PropWrapProps) => {
     setSelectedFilterValue('');
     setOpenModal(!openModal);
   }
-
   
   return (
     <div id="propwrap" className="itson">
@@ -227,178 +281,70 @@ const PropWrap = (props: PropWrapProps) => {
               <span className="inputlabelValue">{propCard?.name}</span>
             </div>
             <div style={{margin: 10, marginLeft: 0}}>
-            <span className="inputlabel">Description: </span>
-            <span className="inputlabelValue">{propCard?.desc}</span>
+              <span className="inputlabel">Description: </span>
+              <span className="inputlabelValue">{propCard?.desc}</span>
             </div>
             {
-              isElicit ? (
+              (actionType !== '' && propCard) && (
                 <>
-                  <p className="inputlabel">Select one or more findings:</p>
-                  <Select
-                    multi
-                    options={elicitNames}
-                    values={selectedName}
-                    onChange={(values) => {
-                      setSelectedName(values);
-                    }}
-                    labelField="name"
-                    valueField="id"
-                  />
+                  <p className="inputlabel">{propCard.templateTitle}</p>
+                  {
+                    actionType === 'Custom' && (
+                      <TextareaAutosize
+                        className="inputcomponent"
+                        aria-label="minimum height"
+                        minRows={3}
+                        placeholder="Write custom text here..."
+                        value={inputData}
+                        onChange={(event) => handleTextChange(event)}
+                      />
+                    )
+                  }
+                  {
+                    propCard.isMulti ? (
+                      <Select
+                        className="addbranch"
+                        dropdownRenderer={ customDropdownRenderer }
+                        values={selectedOptions}
+                        multi
+                        onChange={ (values) => {setSelectedOptions(values);} }
+                        labelField="name"
+                        valueField="id"
+                      />
+                    ) : (
+                      <Select
+                        className="addbranch"
+                        dropdownRenderer={ customDropdownRenderer }
+                        values={selectedOptions}
+                        onChange={ (values) => {setSelectedOptions(values);} }
+                        labelField="name"
+                        valueField="id"
+                      />
+                    )
+                  }                  
                   <div className="custombutton">
                     <Button variant="text" onClick={() => onCancel()}>cancel</Button>
                     <Button variant="text" onClick={() => onSave()}>save</Button>
                   </div>
-                </>
-              ) : isSchedule ? (
-                <>
-                  <p className="inputlabel">Select a specialty:</p>
-                  <Select
-                    options={scheduleNames}
-                    values={selectedName}
-                    onChange={(value) => {
-                      setSelectedName(value);
-                    }}
-                    labelField="name"
-                    valueField="id"
-                  />
-                  <div className="custombutton">
-                    <Button variant="text" onClick={() => onCancel()}>cancel</Button>
-                    <Button variant="text" onClick={() => onSave()}>save</Button>
-                  </div>
-                </>
-              ) : isPrescribe ? (
-                <>
-                  <p className="inputlabel">Select one or more dosages:</p>
-                  <Select
-                    multi
-                    options={prescribeNames}
-                    values={selectedName}
-                    onChange={(values) => {
-                      setSelectedName(values);
-                    }}
-                    labelField="name"
-                    valueField="id"
-                  />
-                  <div className="custombutton">
-                    <Button variant="text" onClick={() => onCancel()}>cancel</Button>
-                    <Button variant="text" onClick={() => onSave()}>save</Button>
-                  </div>
-                  <div>
-                  <PathwayThemeProvider>
-                    <DbProvider db={collectedDb}>
-                      <Drug drugId="recsIaI9dkRGGpNKr"/>
-                    </DbProvider>
-                                  </PathwayThemeProvider>  
-                  </div>
-                </>
-              ) : isOrder ? (
-                <>
-                  <p className="inputlabel">Select one or more tests:</p>
-                  <Select
-                    multi
-                    options={orderNames}
-                    values={selectedName}
-                    onChange={(values) => {
-                      setSelectedName(values);
-                    }}
-                    labelField="name"
-                    valueField="id"
-                  />
-                  <div className="custombutton">
-                    <Button variant="text" onClick={() => onCancel()}>cancel</Button>
-                    <Button variant="text" onClick={() => onSave()}>save</Button>
-                  </div>
-                </>
-              ) : isApply ? (
-                <>
-                  <p className="inputlabel">Select a keypoint:</p>
-                  <Select
-                    options={applyNames}
-                    values={selectedName}
-                    onChange={(value) => {
-                      setSelectedName(value);
-                    }}
-                    labelField="name"
-                    valueField="id"
-                  />
-                  <div className="custombutton">
-                    <Button variant="text" onClick={() => onCancel()}>cancel</Button>
-                    <Button variant="text" onClick={() => onSave()}>save</Button>
-                  </div>
-                </>
-              ) : isLink ? (
-                <>
-                  <p className="inputlabel">Select a pathway:</p>
-                  <Select
-                    options={linkNames}
-                    values={selectedName}
-                    onChange={(value) => {
-                      setSelectedName(value);
-                    }}
-                    labelField="name"
-                    valueField="id"
-                  />
-                  <div className="custombutton">
-                    <Button variant="text" onClick={() => onCancel()}>cancel</Button>
-                    <Button variant="text" onClick={() => onSave()}>save</Button>
-                  </div>
-                  <p className="header2">Preview</p>
-                  <div className="previewwrapper">
-                  <PathwayThemeProvider>
-                    <DbProvider db={collectedDb}>
-                      <Pathway pathwayId="recAP0OHwkL3dhAso"/>
-                    </DbProvider>
-                  </PathwayThemeProvider>  
-                  </div>
-                </>
-              ) : isUse ? (
-                <>
-                  <p className="inputlabel">Select a calculator:</p>
-                  <Select
-                    options={useNames}
-                    values={selectedName}
-                    onChange={(value) => {
-                      setSelectedName(value);
-                    }}
-                    labelField="name"
-                    valueField="id"
-                  />
-                  <div className="custombutton">
-                    <Button variant="text" onClick={() => onCancel()}>cancel</Button>
-                    <Button variant="text" onClick={() => onSave()}>save</Button>
-                  </div>
-                  { (selectedName && selectedName[0]) ? (
-                    <div>
-                      <p className="header2">Preview</p>
-                      <div className="previewwrapper">
-                        <PathwayThemeProvider>
-                          <DbProvider db={collectedDb}>
-                            <Calculator calculatorId={selectedName[0].id} onStateChange={() => {}}/>
-                        </DbProvider>
-                        </PathwayThemeProvider>
-                      </div>
-                    </div> ) : (<div></div>) 
+                  { 
+                    (actionType === 'Use' && selectedOptions && selectedOptions[0]) && (
+                      <div>
+                        <p className="header2">Preview</p>
+                        <div className="previewwrapper">
+                          <PathwayThemeProvider>
+                            <DbProvider db={collectedDb}>
+                              <Calculator calculatorId={selectedOptions[0].id} onStateChange={() => {}}/>
+                          </DbProvider>
+                          </PathwayThemeProvider>
+                        </div>
+                      </div> 
+                    )
                   }
                 </>
-              ) : isRecord ? (
-                <>
-                  <p className="inputlabel">Select one or more diseases:</p>
-                  <Select
-                    multi
-                    options={recordNames}
-                    values={selectedName}
-                    onChange={(values) => {
-                      setSelectedName(values);
-                    }}
-                    labelField="name"
-                    valueField="id"
-                  />
-                  <div className="custombutton">
-                    <Button variant="text" onClick={() => onCancel()}>cancel</Button>
-                    <Button variant="text" onClick={() => onSave()}>save</Button>
-                  </div>
-                </>
-              ) : isBranch ? (
+              )
+            }
+            {
+              structureType === 'Branch' ? (
                 <>
                   <p className="inputlabel">Add a branch:</p>
                   {
@@ -439,32 +385,7 @@ const PropWrap = (props: PropWrapProps) => {
                     )
                   }
                 </>
-              ) : isCustom ? (
-                <>
-                  <p className="inputlabel">Select one or more references:</p>
-                  <TextareaAutosize
-                    className="inputcomponent"
-                    aria-label="minimum height"
-                    minRows={3}
-                    placeholder="Write custom text here..."
-                    value={inputData}
-                    onChange={(event) => handleTextChange(event)}
-                  />
-                  <Select
-                    options={referenceNames}
-                    values={selectedName}
-                    onChange={(value) => {
-                      setSelectedName(value);
-                    }}
-                    labelField="name"
-                    valueField="id"
-                  />
-                  <div className="custombutton">
-                    <Button variant="text" onClick={() => onCancel()}>cancel</Button>
-                    <Button variant="text" onClick={() => onSave()}>save</Button>
-                  </div>
-                </>
-              ) : isFilter ? (
+              ) : structureType === 'Filter' && (
                 <>
                   <p className="inputlabel">Add one or more conditions: </p>
                   {
@@ -537,13 +458,6 @@ const PropWrap = (props: PropWrapProps) => {
                       </>
                     )
                   }
-                </>
-              ) : (
-                <>
-                  <p className="inputlabel">Template</p>
-                  <div className="dropme">
-                    {propCard?.template}
-                  </div>
                 </>
               )
             }

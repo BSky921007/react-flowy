@@ -362,7 +362,7 @@ color: #C9C9D5;
 }
 .branchlist {
   display: flex;
-  margin-bottom: 5px;
+  margin-bottom: 15px;
   height: 24px;
 }
 .branchlist img {
@@ -701,7 +701,7 @@ color: #C9C9D5;
   color: #253134;
 }
 .inputcomponent {
-  width: 98%;
+  width: calc(100% - 37px);
 }
 .custombutton {
   display: flex;

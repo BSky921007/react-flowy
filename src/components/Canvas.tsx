@@ -203,8 +203,10 @@ const Canvas = (props: CanvasProps) => {
                     name: Right_Card[activeData.id-1].name, 
                     lefticon: Right_Card[activeData.id-1].lefticon, 
                     desc: Right_Card[activeData.id-1].desc, 
+                    templateTitle: Right_Card[activeData.id-1].templateTitle, 
                     template: Right_Card[activeData.id-1].template, 
                     begin: Right_Card[activeData.id-1].begin, 
+                    isMulti: Right_Card[activeData.id-1].isMulti, 
                     selectedOptions: [], 
                     selectedBranches: [], 
                     selectedFilters: [], 
@@ -244,8 +246,10 @@ const Canvas = (props: CanvasProps) => {
                         name: Right_Card[activeData.id-1].name, 
                         lefticon: Right_Card[activeData.id-1].lefticon, 
                         desc: Right_Card[activeData.id-1].desc, 
+                        templateTitle: Right_Card[activeData.id-1].templateTitle, 
                         template: Right_Card[activeData.id-1].template, 
                         begin: Right_Card[activeData.id-1].begin, 
+                        isMulti: Right_Card[activeData.id-1].isMulti, 
                         selectedOptions: [], 
                         selectedBranches: [], 
                         selectedFilters: [], 
@@ -465,7 +469,6 @@ const Canvas = (props: CanvasProps) => {
             setIsCanvasClicking(false);
         }
     }, [isCanvasClicking]);
-
 
     return (
         <div 

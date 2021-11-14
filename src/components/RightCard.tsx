@@ -13,6 +13,7 @@ const RightCard = (props: RightCardProps) => {
 
     const handleDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
+        console.log('rightcard drag over');
         const offsetY = event.pageY - position.y;
         if (offsetY < 121)  setIsAddBranch(true);
         else                setIsAddBranch(false);
