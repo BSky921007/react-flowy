@@ -115,7 +115,7 @@ const RightCard = (props: RightCardProps) => {
                 <div className='blockyinfo'>
                     <span className='blockyinfoTextLabel'>{begin}</span>
                     { 
-                        templateIsDefault ?
+                        templateIsDefault ? 
                             <span className='blockyinfoTextLabel'>[...]</span> 
                         :
                             <span className='blockyinfoTextValue'>{template}</span> 

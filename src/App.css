@@ -432,6 +432,9 @@ color: #C9C9D5;
 .addfilterinput {
   height: auto !important;
 }
+.filterinput {
+  width: 190px;
+}
 .buttonaddfilter {
   text-transform: initial;
 }
@@ -892,4 +895,40 @@ color: #C9C9D5;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.branches {
+  display: inline-flex;
+  margin-bottom: 5px;
+}
+.branches * {
+  margin-right: -1px;
+  border-radius: 0px;
+}
+.branchname {
+  margin: auto;
+  text-align: left;
+  width: 75px;
+}
+.branches input {
+  width: 175px;
+  border: 1px solid #ccc;
+}
+.branches > :first-child {
+  margin-right: 5px;
+  display: inline-flex;
+  align-items: center;
+}
+.branches > :last-child {
+  margin-right: 16px;
+}
+.branches svg {
+  height: 15px;
+  width: 24px;
+}
+.branches button {
+  padding: 3px 5px;
+  text-transform: initial;
+  border-radius: 0px;
+  border: 1px solid #ccc;
 }

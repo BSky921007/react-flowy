@@ -5,7 +5,7 @@ import Header from './components/Header';
 import LeftTab from './components/LeftTab';
 import Canvas from './components/Canvas';
 import PropWrap from './components/PropWrap';
-import { BranchProps, FilterProps, CardData, SelectTypes } from './types';
+import { BranchProps, FilterProps, CardData, SelectTypes, BranchTypes } from './types';
 import { arrayToString } from './Globals';
 
 export const App = () => {
@@ -96,9 +96,35 @@ export const App = () => {
 
   const saveFilter = (action: FilterProps[]) => {
     if (index > -1) {
+      console.log(action);
       const newCards = [...rightCards];
       const selectedCard = newCards[index];
       selectedCard.selectedFilters = action;
+      selectedCard.template = '';
+      for (let i = 0; i < action.length; i ++) {
+        selectedCard.template += `${action[i].data.condition[0].name} ${action[i].data.name[0].name} ${action[i].data.filter[0].name} ${action[i].data.value} `;
+        selectedCard.template = selectedCard.template.replace("...", "");
+      }
+      // console.log(selectedCard.template);
+      setRightCards(newCards);
+    }
+  }
+
+  const saveFilterName = (action: any) => {
+    // if (action) {
+    //   const newCards = [...rightCards];
+    //   const selectedCard = newCards[index];
+    //   setRightCards(newCards);
+    // }
+  }
+
+  const saveBranchPoint = (action: BranchTypes[]) => {
+    console.log(action);
+    if (action) {
+      const newCards = [...rightCards];
+      const selectedCard = newCards[index];
+      selectedCard.selectedBranchPoint = action;
+      selectedCard.template = 'depending on ' + action[0].name;
       setRightCards(newCards);
     }
   }
@@ -114,6 +140,8 @@ export const App = () => {
         onSave={saveCard} 
         onSaveBranch={saveBranch} 
         onSaveFilter={saveFilter}
+        onSaveFilterName={saveFilterName}
+        onSaveBranchPoint={saveBranchPoint}
       />
       <Canvas 
         isOpenProp={isOpenProp} 

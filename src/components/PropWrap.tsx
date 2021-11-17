@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, ReactComponentElement } from 'react';
+import React, { useEffect, useState, useCallback, CSSProperties } from 'react';
 import Select from 'react-dropdown-select';
 import styled from '@emotion/styled';
 import { List, AutoSizer, ListProps } from 'react-virtualized';
@@ -17,8 +17,8 @@ import Prescribe_Names from '../data/dosages.json';
 import Order_Names from '../data/tests.json';
 import Custom_Names from '../data/references.json';
 import Criteria_Names from '../data/criterias.json';
-import { base_url, Filter_Conditions, Filter_Names, Filter_Filters } from '../Globals';
-import { PropWrapProps, SelectTypes, BranchData, BranchProps, FilterProps } from '../types';
+import { base_url, Filter_Conditions, Filter_Names, Filter_Age_Filters, Filter_Sex_Filters, Filter_PastMedicalHistory_Filters, Filter_LastFollowUp_Filters } from '../Globals';
+import { PropWrapProps, SelectTypes, BranchTypes, BranchData, BranchProps, FilterProps } from '../types';
 
 import {
   DbProvider,
@@ -30,37 +30,9 @@ import {
 } from '@pathwaymd/pathway-ui2'
 
 import untypedCollectedDb from '../data/parsed.test.json'
+import { View, ViewComponent } from 'react-native';
 
 const collectedDb = (untypedCollectedDb.objects as unknown) as Database;
-const options = ['label_id', 'Squash and merge', 'Rebase and merge'];
-
-const Title = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-`;
-
-const StyledList = styled<ReactComponentElement>(List)`
-  overflow: auto;
-  height: 200px;
-  max-height: 200px;
-`;
-
-const Item = styled.div`
-  display: flex;
-  padding: 0 10px;
-  align-items: center;
-  cursor: pointer;
-  width: 480px;
-  height: 40px;
-  display: inline-block;
-  white-space: nowrap;
-  
-  &:hover {
-    background: #f2f2f2;
-  }  
-`;
-  // ${({ disabled }) => disabled && 'text-decoration: line-through;'}
 
 const PropWrap = (props: PropWrapProps) => {
   const [selectedOptions, setSelectedOptions] = useState<SelectTypes[]>([]);
@@ -69,13 +41,16 @@ const PropWrap = (props: PropWrapProps) => {
   const [actions, setActions] = useState<SelectTypes[]>([]);
   const [selectedBranchName, setSelectedBranchName] = useState<BranchData[]>([]);
   const [branches, setBranches] = useState<BranchProps[]>([]);
+  // const [branches, setBranches] = useState<FilterProps[]>([]);
   const [filters, setFilters] = useState<FilterProps[]>([]);
-  const [criteriaNames, setCriteriaNames] = useState<BranchData[]>([]);
+  // const [criteriaNames, setCriteriaNames] = useState<BranchData[]>([]);
 
   const [selectedFilterCondition, setSelectedFilterCondition] = useState<SelectTypes[]>([]);
   const [selectedFilterName, setSelectedFilterName] = useState<SelectTypes[]>([]);
   const [selectedFilterFilter, setSelectedFilterFilter] = useState<SelectTypes[]>([]);
   const [selectedFilterValue, setSelectedFilterValue] = useState<string>('');
+  const [selectableFilters, setSelectableFilters] = useState<SelectTypes[]>([]);
+  const [selectedBranchPoint, setSelectedBranchPoint] = useState<SelectTypes[]>([]);
 
   const [open, setOpen] = useState(props.data);
   const [openModal, setOpenModal] = useState(false);
@@ -92,6 +67,7 @@ const PropWrap = (props: PropWrapProps) => {
     setPropCard(props.propData);
     setInputData(props.propData.template);
     setSelectedOptions(props.propData.selectedOptions);
+    setSelectedBranchPoint(props.propData.selectedBranchPoint);
     setBranches(props.propData.selectedBranches);
     setFilters(props.propData.selectedFilters);
     setSelectedBranchName([]);
@@ -135,7 +111,6 @@ const PropWrap = (props: PropWrapProps) => {
     } else if (props.propData.name === 'Branch') {
       setStructureType('Branch');
       setActionType('');
-      setCriteriaNames(Criteria_Names);
     } else if (props.propData.name === 'Filter') {
       setStructureType('Filter');
       setActionType('');
@@ -144,27 +119,28 @@ const PropWrap = (props: PropWrapProps) => {
   }, [props]);
 
   const customDropdownRenderer = useCallback(({ methods, state, props }) => {
-    const regexp = new RegExp(state.search, 'i');
-    // const items =  actions;
-  
     return (
       <AutoSizer style={{ height: '200px' }}>
-        {({width, height}) => (
-          <StyledList
-            height={height}
-            rowCount={actions.length}
-            rowHeight={40}
-            width={width - 2}
-            rowRenderer={({ index, style, key }) => (
-              <Item key={key}
-                    style={style}
-                    onClick={() => methods.addItem(actions[index])}
-              >
-                {actions[index].name}
-              </Item>
-            )}
-          />
-    )}
+        {({width, height}) => {
+          return (
+            <List
+              style={{overflow: 'auto', height: '200px', maxHeight: '200px'}}
+              height={height}
+              rowCount={actions.length}
+              rowHeight={40}
+              width={width - 2}
+              rowRenderer={({ index, style, key }: { index: number, style: CSSProperties, key: string }) => (
+                  <Item key={key}
+                        style={style}
+                        onClick={() => methods.addItem(actions[index])}
+                  >
+                    {actions[index].name}
+                  </Item>
+                )
+              }
+            />
+          )
+        }}
       </AutoSizer>
     );
   }, [actions]);
@@ -200,21 +176,30 @@ const PropWrap = (props: PropWrapProps) => {
 
   const onBranchSave = () => {
     const newBranches = [...branches];
-    if (selectedBranchName.length === 0) {
-      return;
-    }
+    console.log(selectedFilterFilter);
+    console.log(selectedFilterValue);
+
+    let temp = newBranches.length === 0 ? 0 : newBranches[newBranches.length-1].id;
     const tempBranch = {
-      id: newBranches.length + 1, 
-      data: selectedBranchName[0]
+      id: temp + 1, 
+      data: {
+        filter: selectedFilterFilter, 
+        value: selectedFilterValue, 
+      }
     }
     setBranches([...newBranches, tempBranch]);
-    setSelectedBranchName([]);
+    // setSelectedFilterCondition([]);
+    // setSelectedFilterName([]);
+    setSelectedFilterFilter([]);
+    setSelectedFilterValue('');
     setOpenModal(!openModal);
     props.onSaveBranch([...newBranches, tempBranch]);
   }
   
   const deleteBranch = (id: number) => {
+    console.log(id);
     const newBranches = [...branches];
+    console.log(newBranches);
     const resultBranches = newBranches.filter((branch) => branch.id !== id);
     setBranches(resultBranches);
     props.onSaveBranch(resultBranches);
@@ -223,6 +208,35 @@ const PropWrap = (props: PropWrapProps) => {
   const onBranchCancel = () => {
     setSelectedBranchName([]);
     setOpenModal(!openModal);
+  }
+
+  const changeFilterName = (value: any) => {
+    setSelectedFilterFilter([]);
+    console.log(value);
+    if (value && value.length > 0) {
+      switch (value[0].type) {
+        case 'number': 
+          setSelectableFilters(Filter_Age_Filters);
+          break;
+        case 'string': 
+          setSelectableFilters(Filter_Sex_Filters);
+          break;
+        case 'datetime': 
+          setSelectableFilters(Filter_LastFollowUp_Filters);
+          break;
+        case 'array': 
+          setSelectableFilters(Filter_PastMedicalHistory_Filters);
+          break;
+        default: 
+          setSelectableFilters([]);
+      }
+      // props.onSaveFilterName(value[0]);
+    }
+  }
+
+  const changeBranchPoint = (value: any) => {
+    setSelectedFilterFilter([]);
+    props.onSaveBranchPoint(value);
   }
 
   const onFilterSave = () => {
@@ -278,7 +292,13 @@ const PropWrap = (props: PropWrapProps) => {
           <div id="proplist">
             <div style={{margin: 10, marginLeft: 0}}>
               <span className="inputlabel">Type: </span>
-              <span className="inputlabelValue">{propCard?.name}</span>
+              {
+                propCard?.name === 'Branch' ? (
+                  <span className="inputlabelValue">Filter</span>
+                ) : (
+                  <span className="inputlabelValue">{propCard?.name}</span>
+                )
+              }
             </div>
             <div style={{margin: 10, marginLeft: 0}}>
               <span className="inputlabel">Description: </span>
@@ -306,6 +326,7 @@ const PropWrap = (props: PropWrapProps) => {
                         className="addbranch"
                         dropdownRenderer={ customDropdownRenderer }
                         values={selectedOptions}
+                        options={[]}
                         multi
                         onChange={ (values) => {setSelectedOptions(values);} }
                         labelField="name"
@@ -316,6 +337,7 @@ const PropWrap = (props: PropWrapProps) => {
                         className="addbranch"
                         dropdownRenderer={ customDropdownRenderer }
                         values={selectedOptions}
+                        options={[]}
                         onChange={ (values) => {setSelectedOptions(values);} }
                         labelField="name"
                         valueField="id"
@@ -346,37 +368,56 @@ const PropWrap = (props: PropWrapProps) => {
             {
               structureType === 'Branch' ? (
                 <>
-                  <p className="inputlabel">Add a branch:</p>
+                  <p className="inputlabel">Select a branch point: </p>
+                  <Select
+                    className="addfilterselect"
+                    style={{width: '112px'}}
+                    options={Filter_Names}
+                    values={selectedBranchPoint}
+                    onChange={(value) => {
+                      setSelectedBranchPoint(value);
+                      changeBranchPoint(value);
+                      changeFilterName(value);
+                    }}
+                    labelField="name"
+                    valueField="id"
+                  />
+                  <p className="inputlabel">Define branches: </p>                  
                   {
                     branches.length > 0 && (
                       branches.map((branch) => {
                         return (
-                          <BranchList key={branch.id} data={branch} deleteBranch={deleteBranch}/>
+                          <BranchList key={branch.id} data={branch} deleteBranch={deleteBranch} selectableFilter={selectableFilters}/>
                         )
                       })
                     )
                   }
-                  <div className="branch">
+                  <div className="condition">
                     <Button 
-                      variant="contained"
+                      className="buttonaddfilter"
+                      variant="outlined"
                       onClick={openNew}>
                       <img src={`${base_url}/assets/plus_circle.svg`} alt="NO"/>
-                      New branch
+                      Add a new condition
                     </Button>
                   </div>
                   {
                     openModal && (
                       <>
-                        <Select
-                          className="addbranch"
-                          options={criteriaNames}
-                          values={selectedBranchName}
-                          onChange={(value) => {
-                            setSelectedBranchName(value);
-                          }}
-                          labelField="name"
-                          valueField="criteria_id"
-                        />
+                        <div className="selectgroup">
+                          <Select
+                            className="addfilterselect"
+                            style={{width: '200px'}}
+                            options={selectableFilters}
+                            values={selectedFilterFilter}
+                            onChange={(value) => {
+                              setSelectedFilterFilter(value);
+                            }}
+                            labelField="name"
+                            valueField="id"
+                          />
+                          <input className="filterinput" type="text" onChange={(event) => handleChange(event)}/>                    
+                        </div>
                         <div className="custombutton">
                           <Button variant="text" onClick={() => onBranchCancel()}>cancel</Button>
                           <Button variant="text" onClick={() => onBranchSave()}>save</Button>
@@ -434,6 +475,7 @@ const PropWrap = (props: PropWrapProps) => {
                             values={selectedFilterName}
                             onChange={(value) => {
                               setSelectedFilterName(value);
+                              changeFilterName(value);
                             }}
                             labelField="name"
                             valueField="id"
@@ -441,7 +483,7 @@ const PropWrap = (props: PropWrapProps) => {
                           <Select
                             className="addfilterselect"
                             style={{width: '172px'}}
-                            options={Filter_Filters}
+                            options={selectableFilters}
                             values={selectedFilterFilter}
                             onChange={(value) => {
                               setSelectedFilterFilter(value);
@@ -474,3 +516,19 @@ const PropWrap = (props: PropWrapProps) => {
 }
 
 export default PropWrap;
+
+const Item = styled.div`
+  display: flex;
+  padding: 0 10px;
+  align-items: center;
+  cursor: pointer;
+  width: 480px;
+  height: 40px;
+  display: inline-block;
+  white-space: nowrap;
+  
+  &:hover {
+    background: #f2f2f2;
+  }  
+`;
+  // ${({ disabled:boolean }) => disabled && 'text-decoration: line-through;'}

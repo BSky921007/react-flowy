@@ -2,7 +2,7 @@ import React, { DragEvent, MouseEvent, useState, useCallback, useEffect } from '
 import RightCard from './RightCard';
 import Arrow from './Arrow';
 import { Right_Card, cardWidth, paddingX, paddingLeft, paddingTop, cardHeight } from '../Globals';
-import { ArrowData, CardData, Position, CanvasProps } from '../types';
+import { ArrowData, CardData, Position, CanvasProps, BranchTypes } from '../types';
 
 const Canvas = (props: CanvasProps) => {
     // console.log(props.data);
@@ -208,6 +208,7 @@ const Canvas = (props: CanvasProps) => {
                     begin: Right_Card[activeData.id-1].begin, 
                     isMulti: Right_Card[activeData.id-1].isMulti, 
                     selectedOptions: [], 
+                    selectedBranchPoint: [], 
                     selectedBranches: [], 
                     selectedFilters: [], 
                     isBranch: false, 
@@ -251,6 +252,7 @@ const Canvas = (props: CanvasProps) => {
                         begin: Right_Card[activeData.id-1].begin, 
                         isMulti: Right_Card[activeData.id-1].isMulti, 
                         selectedOptions: [], 
+                        selectedBranchPoint: [], 
                         selectedBranches: [], 
                         selectedFilters: [], 
                         isBranch: childToUpdate.name === 'Branch' ? true : false, 
@@ -282,7 +284,7 @@ const Canvas = (props: CanvasProps) => {
                 const childToUpdate = newChilds.find(({id}) => id === parentId);
                 if (childToUpdate) {
                     if (childToUpdate.isBranch === true) {
-                        childToUpdate.addedBranch = activeBranchData.data.name;
+                        childToUpdate.addedBranch = activeBranchData.data.filter[0].name + ' ' + activeBranchData.data.value;
                         childToUpdate.isBranch = true;
                         setRightCards(newChilds);
                         setParentId(-1);

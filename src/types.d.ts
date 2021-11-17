@@ -10,16 +10,27 @@ export type SelectTypes = {
     id: string
 }
 
-export type BranchData = {
+export type BranchTypes = {
+    id: string, 
     name: string, 
-    criteria_id: string, 
-    source: string, 
-    mapper: string, 
-    field: string, 
-    operator: string, 
-    target: string, 
-    units: string, 
-    care_bundles: string
+    type: string, 
+}
+
+// export type BranchData = {
+//     name: string, 
+//     criteria_id: string, 
+//     source: string, 
+//     mapper: string, 
+//     field: string, 
+//     operator: string, 
+//     target: string, 
+//     units: string, 
+//     care_bundles: string
+// }
+
+export type BranchData = {
+    filter: SelectTypes[], 
+    value: string | undefined, 
 }
 
 export type BranchProps = {
@@ -58,12 +69,13 @@ export type CardData = {
     begin: string, 
     isMulti: boolean, 
     selectedOptions: SelectTypes[], 
+    selectedBranchPoint: BranchTypes[], 
     selectedBranches: BranchProps[], 
     selectedFilters: FilterProps[], 
     position: Position, 
     parentId: number,
     children: number[], 
-    childrenCnt: number,
+    childrenCnt: number, 
     isOpenProps: Boolean,
     isBranch: boolean, 
     addedBranch: string, 
@@ -116,6 +128,8 @@ export type PropWrapProps = {
     onSave: Function, 
     onSaveBranch: Function, 
     onSaveFilter: Function, 
+    onSaveFilterName: Function, 
+    onSaveBranchPoint: Function
 }
 
 export type CanvasProps = {

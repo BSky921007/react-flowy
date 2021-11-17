@@ -3,7 +3,7 @@ import Select from 'react-dropdown-select';
 import ToggleButton from '@mui/material/ToggleButton';
 import { ReactComponent as DeleteIcon} from '../delete_icon.svg';
 import { ReactComponent as VerticalIcon} from '../grip_vertical_icon.svg';
-import { Filter_Conditions, Filter_Names, Filter_Filters } from '../Globals';
+import { Filter_Conditions, Filter_Names, Filter_Age_Filters, Filter_Sex_Filters, Filter_LastFollowUp_Filters, Filter_PastMedicalHistory_Filters } from '../Globals';
 import { FilterProps, SelectTypes } from '../types';
 
 type ConditionType = {
@@ -24,10 +24,32 @@ const FilterList = (props: FilterPropsType) => {
     const [selectedCondition, setSelectedCondition] = useState<SelectTypes[]>(data.data.condition);
     const [selectedValue, setSelectedValue] = useState<string | undefined>(data.data.value);
     const [selectedFilter, setSelectedFilter] = useState<SelectTypes[]>(data.data.filter);
+    const [selectableFilters, setSelectableFilters] = useState<SelectTypes[]>([]);
 
     const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         console.log(event.target.value);
     }
+
+    const changeFilterName = (value: any) => {
+        setSelectedFilter([]);
+        switch (value[0].type) {
+            case 'number': 
+            setSelectableFilters(Filter_Age_Filters);
+            break;
+            case 'string': 
+            setSelectableFilters(Filter_Sex_Filters);
+            break;
+            case 'datetime': 
+            setSelectableFilters(Filter_LastFollowUp_Filters);
+            break;
+            case 'array': 
+            setSelectableFilters(Filter_PastMedicalHistory_Filters);
+            break;
+            default: 
+            setSelectableFilters([]);
+        }
+    }
+        
     const deleteFilter = () => {
         props.deleteFilter(data.id);
     }
@@ -54,20 +76,20 @@ const FilterList = (props: FilterPropsType) => {
                 style={{width: '112px'}}
                 options={Filter_Names}
                 values={selectedName}
-                onChange={() => {}}
+                onChange={(value) => {changeFilterName(value);}}
                 labelField="name"
                 valueField="id"
             />
             <Select
                 className="addfilterselect"
                 style={{width: '104px'}}
-                options={Filter_Filters}
+                options={selectableFilters}
                 values={selectedFilter}
                 onChange={() => {}}
                 labelField="name"
                 valueField="id"
             />
-            <input className="filterinput" type="text" value={selectedValue} onChange={handleTextChange}/>                    
+            <input className="filterinput" type="text" value={selectedValue} onChange={handleTextChange}/>
             <ToggleButton value="left" aria-label="left aligned" onClick={deleteFilter}>
                 <DeleteIcon />
             </ToggleButton>

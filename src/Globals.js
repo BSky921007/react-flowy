@@ -1,3 +1,5 @@
+import { SelectTypes } from './types.d.ts';
+
 export const base_url = window.location.origin;
 export const paddingLeft = 363;
 export const paddingTop = 73;
@@ -161,7 +163,8 @@ export const Right_Card = [
         template: "When ${condition} is met", 
         begin: "", 
         isMulti: false, 
-        selectedOptions: [], 
+        selectedOptions: [],
+        selectedBranchPoint: [], 
         selectedBranches: [],  
         selectedFilters: [], 
         position: {
@@ -179,6 +182,7 @@ export const Right_Card = [
         begin: "", 
         isMulti: false, 
         selectedOptions: [], 
+        selectedBranchPoint: [], 
         selectedBranches: [],  
         selectedFilters: [], 
         position: {
@@ -196,6 +200,7 @@ export const Right_Card = [
         begin: "", 
         isMulti: false, 
         selectedOptions: [], 
+        selectedBranchPoint: [], 
         selectedBranches: [],  
         selectedFilters: [], 
         position: {
@@ -213,6 +218,7 @@ export const Right_Card = [
         begin: "", 
         isMulti: false, 
         selectedOptions: [], 
+        selectedBranchPoint: [], 
         selectedBranches: [],  
         selectedFilters: [], 
         position: {
@@ -230,6 +236,7 @@ export const Right_Card = [
         begin: "Elicit the following findings: ", 
         isMulti: true, 
         selectedOptions: [], 
+        selectedBranchPoint: [], 
         selectedBranches: [],  
         selectedFilters: [], 
         position: {
@@ -247,6 +254,7 @@ export const Right_Card = [
         begin: "Write the following prescriptions: ", 
         isMulti: true, 
         selectedOptions: [], 
+        selectedBranchPoint: [], 
         selectedBranches: [],  
         selectedFilters: [], 
         position: {
@@ -263,7 +271,8 @@ export const Right_Card = [
         template: "${tests}", 
         begin: "Order the following tests: ", 
         isMulti: true, 
-        selectedOptions: [], 
+        selectedOptions: [],
+        selectedBranchPoint: [], 
         selectedBranches: [],  
         selectedFilters: [], 
         position: {
@@ -281,6 +290,7 @@ export const Right_Card = [
         begin: "Record the following diagnoses: ", 
         isMulti: true, 
         selectedOptions: [], 
+        selectedBranchPoint: [], 
         selectedBranches: [],  
         selectedFilters: [], 
         position: {
@@ -297,7 +307,8 @@ export const Right_Card = [
         template: "${keypoints}",  
         begin: "Apply the following guidelines: ", 
         isMulti: false, 
-        selectedOptions: [], 
+        selectedOptions: [],
+        selectedBranchPoint: [], 
         selectedBranches: [],  
         selectedFilters: [], 
         position: {
@@ -314,7 +325,8 @@ export const Right_Card = [
         template: "${visits}", 
         begin: "Schedule the following visits: ", 
         isMulti: false, 
-        selectedOptions: [], 
+        selectedOptions: [],
+        selectedBranchPoint: [], 
         selectedBranches: [],  
         selectedFilters: [], 
         position: {
@@ -332,6 +344,7 @@ export const Right_Card = [
         begin: "Link to this care bundle: ", 
         isMulti: false, 
         selectedOptions: [], 
+        selectedBranchPoint: [], 
         selectedBranches: [],  
         selectedFilters: [], 
         position: {
@@ -349,6 +362,7 @@ export const Right_Card = [
         begin: "Use this calculator: ", 
         isMulti: false, 
         selectedOptions: [], 
+        selectedBranchPoint: [], 
         selectedBranches: [],  
         selectedFilters: [], 
         position: {
@@ -366,6 +380,7 @@ export const Right_Card = [
         begin: "", 
         isMulti: true, 
         selectedOptions: [], 
+        selectedBranchPoint: [], 
         selectedBranches: [],  
         selectedFilters: [], 
         position: {
@@ -382,7 +397,8 @@ export const Right_Card = [
         template: "Begin care process", 
         begin: "", 
         isMulti: false, 
-        selectedOptions: [], 
+        selectedOptions: [],
+        selectedBranchPoint: [], 
         selectedBranches: [],  
         selectedFilters: [], 
         position: {
@@ -400,6 +416,7 @@ export const Right_Card = [
         begin: "", 
         isMulti: false, 
         selectedOptions: [], 
+        selectedBranchPoint: [], 
         selectedBranches: [], 
         selectedFilters: [],  
         position: {
@@ -411,12 +428,13 @@ export const Right_Card = [
         id: 16, 
         name: "Branch", 
         lefticon: `${base_url}/assets/branch.svg`, 
-        desc: "Branch on a specific condition.", 
+        desc: "Continue only if a specific condition is met. ", 
         templateTitle: '', 
-        template: "Branch on ${condition}", 
+        template: '', 
         begin: "", 
         isMulti: false, 
         selectedOptions: [], 
+        selectedBranchPoint: [], 
         selectedBranches: [], 
         selectedFilters: [],  
         position: {
@@ -433,7 +451,8 @@ export const Right_Card = [
         template: "End of care process", 
         begin: "", 
         isMulti: false, 
-        selectedOptions: [], 
+        selectedOptions: [],
+        selectedBranchPoint: [], 
         selectedBranches: [], 
         selectedFilters: [], 
         position: {
@@ -457,23 +476,54 @@ export const Filter_Conditions = [
 export const Filter_Names = [
     {
         'id': '1', 
-        'name': 'label_id', 
+        'name': 'age', 
+        'type': 'number', 
     }, 
     {
         'id': '2', 
-        'name': 'age', 
+        'name': 'sex', 
+        'type': 'string', 
     }, 
     {
         'id': '3', 
-        'name': 'sex', 
+        'name': 'suspected diagnoses', 
+        'type': 'array', 
     }, 
     {
         'id': '4', 
-        'name': 'hemoglobin', 
+        'name': 'last-follow up', 
+        'type': 'datetime', 
     }
 ];
 
-export const Filter_Filters = [
+export const Filter_Age_Filters = [
+    {
+        'id': '1', 
+        'name': '='
+    }, 
+    {
+        'id': '2', 
+        'name': '≠'
+    }, 
+    {
+        'id': '3', 
+        'name': '<'
+    }, 
+    {
+        'id': '4', 
+        'name': '>'
+    }, 
+    {
+        'id': '5', 
+        'name': '≤'
+    }, 
+    {
+        'id': '6', 
+        'name': '≥'
+    }
+];
+
+export const Filter_Sex_Filters = [
     {
         'id': '1', 
         'name': 'contains...'
@@ -484,18 +534,56 @@ export const Filter_Filters = [
     }, 
     {
         'id': '3', 
-        'name': 'is...'
-    }, 
-    {
-        'id': '4', 
-        'name': 'is not...'
-    }, 
-    {
-        'id': '5', 
         'name': 'is empty'
     }, 
     {
+        'id': '4', 
+        'name': 'is not empty'
+    }, 
+];
+
+export const Filter_LastFollowUp_Filters = [
+    {
+        'id': '1', 
+        'name': 'is...'
+    }, 
+    {
+        'id': '2', 
+        'name': 'is within...'
+    }, 
+    {
+        'id': '3', 
+        'name': 'is before...'
+    }, 
+    {
+        'id': '4', 
+        'name': 'is after...'
+    }, 
+    {
+        'id': '5', 
+        'name': 'is on or before...'
+    }, 
+    {
         'id': '6', 
+        'name': 'is on or after'
+    }
+];
+
+export const Filter_PastMedicalHistory_Filters = [
+    {
+        'id': '1', 
+        'name': 'contains...'
+    }, 
+    {
+        'id': '2', 
+        'name': 'does not contain...'
+    }, 
+    {
+        'id': '3', 
+        'name': 'is empty'
+    }, 
+    {
+        'id': '4', 
         'name': 'is not empty'
     }
 ];

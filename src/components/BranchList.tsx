@@ -1,18 +1,33 @@
-import React, { DragEvent } from 'react';
+import React, { DragEvent, useState } from 'react';
+import Select from 'react-dropdown-select';
 import IconButton from '@mui/material/Button';
+import ToggleButton from '@mui/material/ToggleButton';
+import { ReactComponent as DeleteIcon} from '../delete_icon.svg';
 import { base_url } from '../Globals';
-import { BranchProps } from '../types';
+import { BranchProps, SelectTypes } from '../types';
+
+// type BranchPropsType = {
+//     data: BranchProps, 
+//     deleteBranch: Function
+// }
 
 type BranchPropsType = {
     data: BranchProps, 
+    selectableFilter: SelectTypes[], 
     deleteBranch: Function
 }
 
 const BranchList = (props: BranchPropsType) => {
-    const { data } = props;
+    const { data, selectableFilter } = props;    
+    const [selectedValue, setSelectedValue] = useState<string | undefined>(data.data.value);
+    const [selectedFilter, setSelectedFilter] = useState<SelectTypes[]>(data.data.filter);
+    const [selectableFilters, setSelectableFilters] = useState<SelectTypes[]>([]);
 
     const handleDragStart = (event: DragEvent<HTMLDivElement>) => {
         event.dataTransfer.setData('activeBranch', JSON.stringify(data));
+    }
+    
+    const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     }
 
     const deleteBranch = () => {
@@ -20,13 +35,21 @@ const BranchList = (props: BranchPropsType) => {
     }
    
     return (
-        <div draggable={true} onDragStart={handleDragStart}>
-            <div className="branchlist" key={data.id}> 
-                <IconButton className="crossbutton" color="primary" onClick={deleteBranch}>
-                    <img src={`${base_url}/assets/cross_circle.svg`} alt="NO" />
-                </IconButton>
-                Branch {data.id} : {data.data.name}
-            </div>
+        <div className="branches" draggable={true} onDragStart={handleDragStart}>
+            <ToggleButton value="left" aria-label="left aligned" onClick={deleteBranch}>
+                <DeleteIcon />
+            </ToggleButton>
+            <span className="branchname">Branch {data.id}</span>
+            <Select
+                className="addfilterselect"
+                style={{width: '104px'}}
+                options={selectableFilter}
+                values={selectedFilter}
+                onChange={() => {}}
+                labelField="name"
+                valueField="id"
+            />
+            <input className="filterinput" type="text" value={selectedValue} onChange={handleTextChange}/>
         </div>
     )
 }
