@@ -1,18 +1,23 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import './index.css'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
-import PathwayWrapper from './components/PathwayWrapper'
+import App from './App'
+import PathwayWrapper from './PathwayWrapper'
+import Protocol from './Protocol'
+import Manager from './Manager'
 
 ReactDOM.render(
   <React.StrictMode>
-    {/* <ExamplePathway pathwayId="fake for demo" /> */}
-    <App />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<App />}></Route>
+        <Route path="/protocols/:protocolId" element={<Protocol />} />
+        <Route path="/pathways/:pathwayId" element={<PathwayWrapper />} />
+        <Route path="/manager/:patientId" element={<Manager />} />
+      </Routes>
+    </BrowserRouter>
   </React.StrictMode>,
-  document.getElementById('root')
-);
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+  document.getElementById('root'),
+)

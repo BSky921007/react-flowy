@@ -16,18 +16,6 @@ export type BranchTypes = {
     type: string, 
 }
 
-// export type BranchData = {
-//     name: string, 
-//     criteria_id: string, 
-//     source: string, 
-//     mapper: string, 
-//     field: string, 
-//     operator: string, 
-//     target: string, 
-//     units: string, 
-//     care_bundles: string
-// }
-
 export type BranchData = {
     filter: SelectTypes[], 
     value: string | undefined, 
@@ -50,35 +38,28 @@ export type FilterProps = {
     data: FilterData
 }
 
-export type PreviewModalData = {
-    pathway_id: string, 
-}
-
-export type PreviewModalProps = {
-    data: RenderedPathwayData,
-    onClose: () => void
-}
-
 export type CardData = {
-    id: number,
+    id: number, 
     name: string, 
     lefticon: string, 
-    desc: string, 
-    templateTitle: string, 
-    template: string, 
-    begin: string, 
-    isMulti: boolean, 
-    selectedOptions: SelectTypes[], 
-    selectedBranchPoint: BranchTypes[], 
-    selectedBranches: BranchProps[], 
-    selectedFilters: FilterProps[], 
-    position: Position, 
-    parentId: number,
-    children: number[], 
-    childrenCnt: number, 
-    isOpenProps: Boolean,
-    isBranch: boolean, 
-    addedBranch: string, 
+    desc: string, // description of left card
+    templateTitle: string, // which variable is related with the card and it is multi or single selection
+    template: string, // description of right card
+    begin: string, // begin words of action cards
+    hasSelectInput: boolean,  // enable or selecting
+    isMulti: boolean, // toggle single or multi selecting
+    hasTextInput: boolean, // enable or unable text inputs
+    selectedOptions: SelectTypes[], // selected options for action cards
+    selectedBranchPoint: BranchTypes[], // selected branch point for the branch cards
+    selectedBranches: BranchProps[], // added branches for the branch cards
+    selectedFilters: FilterProps[], // added filters for the filter cards
+    position: Position, // position of the right cards
+    parentId: number, // parent's id
+    children: number[], // contains children's id
+    childrenCnt: number, // children's cnt
+    isOpenProps: Boolean, // the propwrap window is opened or closed
+    isBranch: boolean, // parent card is branch or not
+    addedBranch: string, // displayed on the branch's left-top data, e.g, =18, contains male, ...
 }
 
 export type CardProps = {
@@ -105,7 +86,7 @@ export type LeftCardProps = {
     name: string, 
     desc: string, 
     selectType: string, 
-    targetResource: string
+    targetResource?: string
 }
 
 export type ArrowData = {
@@ -122,19 +103,58 @@ export type ArrowProps = {
 }
 
 export type PropWrapProps = {
-    data: Boolean, 
+    data: boolean, 
+    isGlobal: boolean, 
+    bundles: BundleType[], 
+    protocols: ProtocolType[], 
+    selBundle: BundleType|undefined, 
+    selProtocol: ProtocolType|undefined, 
     propData: CardData, 
     onDelete: Function, 
     onSave: Function, 
     onSaveBranch: Function, 
     onSaveFilter: Function, 
     onSaveFilterName: Function, 
-    onSaveBranchPoint: Function
+    onSaveBranchPoint: Function, 
+    onGlobalSave: Function
+}
+
+export type GlobalWrapProps = {
+    data: boolean, 
+    title: string, 
+    subTitle: string
 }
 
 export type CanvasProps = {
     isOpenProp: Boolean, 
     onPropsView: Function, 
-    data: CardData[]
+    onCanvasDrop: Function, 
+    data: CardData[], 
+    onDeleteCard: Function
 }
 
+export type GlobalData = {
+    properties: {
+        bundle: BundleType, 
+        protocol: ProtocolType
+    }, 
+    blocks: CardData[]
+}
+
+export type BundleType = {
+    createdTime: string, 
+    fields: {
+        name: string, 
+        protocols: string[]
+    }, 
+    id: string
+}
+
+export type ProtocolType = {
+    createdTime: string, 
+    fields: {
+        name: string, 
+        bundles: string[]
+    }, 
+    id: string
+}

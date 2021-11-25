@@ -11,11 +11,11 @@ export const cardHeight = 122
 export const CardList_Triggers = [
     {
         id: 1, 
-        name: "Time elapsed", 
-        desc: "Trigger care process at a set time after an event.", 
+        name: "Repeat timer", 
+        desc: "Trigger care process at a set recurring period.", 
         lefticon: `${base_url}/assets/time_elapsed.svg`, 
-        selectType: '', 
-        targetResource: '', 
+        selectType: 'single', 
+        targetResource: 'periods', 
     }, 
     {
         id: 2, 
@@ -35,8 +35,8 @@ export const CardList_Triggers = [
     }, 
     {
         id: 4, 
-        name: "New Data", 
-        desc: "Trigger care process when new data is recorded.", 
+        name: "Await result", 
+        desc: "Trigger care process when new result is recorded.", 
         lefticon: `${base_url}/assets/new_data.svg`, 
         selectType: '', 
         targetResource: '', 
@@ -115,7 +115,14 @@ export const CardList_Actions = [
         lefticon: `${base_url}/assets/custom.svg`, 
         selectType: 'multi', 
         targetResource: 'references', 
-    }
+    },
+    {
+        id: 18, 
+        name: "Note", 
+        desc: "Add a text field for the user to enter a note.", 
+        lefticon: `${base_url}/assets/record.svg`, 
+        selectType: '', 
+    },
 ];
 
 export const CardList_Structure = [
@@ -129,7 +136,7 @@ export const CardList_Structure = [
     }, 
     {
         id: 15, 
-        name: "Filter", 
+        name: "Include", 
         desc: "Continue only if a specific condition is met.", 
         lefticon: `${base_url}/assets/filter.svg`, 
         selectType: '', 
@@ -156,13 +163,15 @@ export const CardList_Structure = [
 export const Right_Card = [
     {
         id: 1, 
-        name: "Time elapsed", 
-        lefticon: `${base_url}/assets/time_elapsed.svg`, 
-        desc: "Trigger care process at a set time after an event.", 
+        name: "Repeat timer", 
+        lefticon: `${base_url}/assets/time_elapsed_blue.svg`, 
+        desc: "Trigger care process at a set recurring period.", 
         templateTitle: '',
-        template: "When ${condition} is met", 
-        begin: "", 
+        template: "${period}", 
+        begin: 'Every ', 
         isMulti: false, 
+        hasSelectInput: true,
+        hasTextInput: false,
         selectedOptions: [],
         selectedBranchPoint: [], 
         selectedBranches: [],  
@@ -175,12 +184,14 @@ export const Right_Card = [
     {
         id: 2, 
         name: "New patient", 
-        lefticon: `${base_url}/assets/new_patient_info.svg`, 
+        lefticon: `${base_url}/assets/new_patient_info_blue.svg`, 
         desc: "Trigger care process when a new patient is created.", 
         templateTitle: '',
         template: "When a new patient is created", 
         begin: "", 
         isMulti: false, 
+        hasSelectInput: true,
+        hasTextInput: false,
         selectedOptions: [], 
         selectedBranchPoint: [], 
         selectedBranches: [],  
@@ -193,283 +204,207 @@ export const Right_Card = [
     {
         id: 3, 
         name: "New action", 
-        lefticon: `${base_url}/assets/new_action.svg`, 
+        lefticon: `${base_url}/assets/new_action_blue.svg`, 
         desc: "Trigger care process when a new action is performed.", 
         template: "When ${condition} is met", 
         templateTitle: '', 
         begin: "", 
-        isMulti: false, 
-        selectedOptions: [], 
-        selectedBranchPoint: [], 
-        selectedBranches: [],  
-        selectedFilters: [], 
-        position: {
-            x: 0,
-            y: 0
-        }
+        isMulti: false,
+        hasTextInput: false,
+        hasSelectInput: false,
     }, 
     {
         id: 4, 
-        name: "New data", 
-        lefticon: `${base_url}/assets/new_data.svg`, 
-        desc: "Trigger care process when new data is recorded.", 
+        name: "Await result", 
+        lefticon: `${base_url}/assets/new_data_blue.svg`, 
+        desc: "Trigger care process when a new result is available.", 
         templateTitle: '', 
         template: "When ${condition} is met", 
         begin: "", 
-        isMulti: false, 
-        selectedOptions: [], 
-        selectedBranchPoint: [], 
-        selectedBranches: [],  
-        selectedFilters: [], 
-        position: {
-            x: 0,
-            y: 0
-        }
+        isMulti: false,
+        hasTextInput: false,
+        hasSelectInput: false,
     }, 
     {
         id: 5, 
         name: "Elicit", 
-        lefticon: `${base_url}/assets/elicit.svg`, 
+        lefticon: `${base_url}/assets/elicit_blue.svg`, 
         desc: "Elicit a set of clinical findings from a patient.", 
         templateTitle: 'Select one or more findings:', 
         template: "${findings}", 
         begin: "Elicit the following findings: ", 
-        isMulti: true, 
-        selectedOptions: [], 
-        selectedBranchPoint: [], 
-        selectedBranches: [],  
-        selectedFilters: [], 
-        position: {
-            x: 0,
-            y: 0
-        }
+        isMulti: true,
+        hasTextInput: false,
+        hasSelectInput: true,
     }, 
     {
         id: 6, 
         name: "Prescribe", 
-        lefticon: `${base_url}/assets/prescribe.svg`, 
+        lefticon: `${base_url}/assets/prescribe_blue.svg`, 
         desc: "Prescribe one or more medications.", 
         templateTitle: 'Select one or more dosages:', 
         template: "${dosages}", 
         begin: "Write the following prescriptions: ", 
-        isMulti: true, 
-        selectedOptions: [], 
-        selectedBranchPoint: [], 
-        selectedBranches: [],  
-        selectedFilters: [], 
-        position: {
-            x: 0,
-            y: 0
-        }
+        isMulti: true,
+        hasTextInput: false,
+        hasSelectInput: true,
     }, 
     {
         id: 7, 
         name: "Order", 
-        lefticon: `${base_url}/assets/order.svg`, 
+        lefticon: `${base_url}/assets/order_blue.svg`, 
         desc: "Order a test for a patient.", 
         templateTitle: 'Select one or more tests:', 
         template: "${tests}", 
         begin: "Order the following tests: ", 
-        isMulti: true, 
-        selectedOptions: [],
-        selectedBranchPoint: [], 
-        selectedBranches: [],  
-        selectedFilters: [], 
-        position: {
-            x: 0,
-            y: 0
-        }
+        isMulti: true,
+        hasTextInput: false,
+        hasSelectInput: true,
     }, 
     {
         id: 8, 
         name: "Record", 
-        lefticon: `${base_url}/assets/record.svg`, 
+        lefticon: `${base_url}/assets/record_blue.svg`, 
         desc: "Record one or more diagnoses.", 
         templateTitle: 'Select one or more diseases:', 
         template: "${diseases}", 
         begin: "Record the following diagnoses: ", 
-        isMulti: true, 
-        selectedOptions: [], 
-        selectedBranchPoint: [], 
-        selectedBranches: [],  
-        selectedFilters: [], 
-        position: {
-            x: 0,
-            y: 0
-        }
+        isMulti: true,
+        hasTextInput: false,
+        hasSelectInput: true,
     }, 
     {
         id: 9, 
         name: "Apply", 
-        lefticon: `${base_url}/assets/apply.svg`, 
+        lefticon: `${base_url}/assets/apply_blue.svg`, 
         desc: "Apply a guideline recommendation.", 
         templateTitle: 'Select a keypoint:', 
         template: "${keypoints}",  
         begin: "Apply the following guidelines: ", 
-        isMulti: false, 
-        selectedOptions: [],
-        selectedBranchPoint: [], 
-        selectedBranches: [],  
-        selectedFilters: [], 
-        position: {
-            x: 0,
-            y: 0
-        }
+        isMulti: false,
+        hasTextInput: false,
+        hasSelectInput: true,
     }, 
     {
         id: 10, 
         name: "Schedule", 
-        lefticon: `${base_url}/assets/schedule.svg`, 
+        lefticon: `${base_url}/assets/schedule_blue.svg`, 
         desc: "Schedule a follow-up visit.", 
         templateTitle: 'Select a specialty:', 
         template: "${visits}", 
         begin: "Schedule the following visits: ", 
-        isMulti: false, 
-        selectedOptions: [],
-        selectedBranchPoint: [], 
-        selectedBranches: [],  
-        selectedFilters: [], 
-        position: {
-            x: 0,
-            y: 0
-        }
+        isMulti: false,
+        hasTextInput: false,
+        hasSelectInput: true,
     }, 
     {
         id: 11, 
         name: "Link", 
-        lefticon: `${base_url}/assets/link.svg`, 
+        lefticon: `${base_url}/assets/link_blue.svg`, 
         desc: "Link to another care bundle.", 
         templateTitle: 'Select a pathway:', 
         template: "${bundle}", 
         begin: "Link to this care bundle: ", 
-        isMulti: false, 
-        selectedOptions: [], 
-        selectedBranchPoint: [], 
-        selectedBranches: [],  
-        selectedFilters: [], 
-        position: {
-            x: 0,
-            y: 0
-        }
+        isMulti: false,
+        hasTextInput: false,
+        hasSelectInput: true,
     }, 
     {
         id: 12, 
         name: "Use", 
-        lefticon: `${base_url}/assets/use.svg`, 
+        lefticon: `${base_url}/assets/use_blue.svg`, 
         desc: "Use a clinical calculator.", 
         templateTitle: 'Select a calculator:', 
         template: "${calculator}", 
         begin: "Use this calculator: ", 
-        isMulti: false, 
-        selectedOptions: [], 
-        selectedBranchPoint: [], 
-        selectedBranches: [],  
-        selectedFilters: [], 
-        position: {
-            x: 0,
-            y: 0
-        }
+        isMulti: false,
+        hasTextInput: false,
+        hasSelectInput: true,
     }, 
     {
         id: 13, 
         name: "Custom", 
-        lefticon: `${base_url}/assets/custom.svg`, 
+        lefticon: `${base_url}/assets/custom_blue.svg`, 
         desc: "Write a block with custom text.", 
-        templateTitle: 'Select one or more references:', 
-        template: "${references}", 
+        templateTitle: 'Custom text:', 
+        template: "", 
         begin: "", 
-        isMulti: true, 
-        selectedOptions: [], 
-        selectedBranchPoint: [], 
-        selectedBranches: [],  
-        selectedFilters: [], 
-        position: {
-            x: 0,
-            y: 0
-        }
+        isMulti: true,
+        hasTextInput: true,
+        hasSelectInput: true,
     }, 
     {
         id: 14, 
         name: "Start", 
-        lefticon: `${base_url}/assets/start.svg`, 
+        lefticon: `${base_url}/assets/start_blue.svg`, 
         desc: "Begin care process.", 
         templateTitle: '', 
         template: "Begin care process", 
         begin: "", 
-        isMulti: false, 
-        selectedOptions: [],
-        selectedBranchPoint: [], 
-        selectedBranches: [],  
-        selectedFilters: [], 
-        position: {
-            x: 0,
-            y: 0
-        }
+        isMulti: false,
+        hasTextInput: false,
+        hasSelectInput: false,
     }, 
     {
         id: 15, 
-        name: "Filter", 
-        lefticon: `${base_url}/assets/filter.svg`, 
+        name: "Include", 
+        lefticon: `${base_url}/assets/filter_blue.svg`, 
         desc: "Continue only if a specific condition is met.", 
         templateTitle: '', 
-        template: "When ${condition} is met",
-        begin: "", 
-        isMulti: false, 
-        selectedOptions: [], 
-        selectedBranchPoint: [], 
-        selectedBranches: [], 
-        selectedFilters: [],  
-        position: {
-            x: 0,
-            y: 0
-        }
+        template: "${condition}",
+        begin: "If ", 
+        isMulti: false,
+        hasTextInput: false,
+        hasSelectInput: true,
     }, 
     {
         id: 16, 
         name: "Branch", 
-        lefticon: `${base_url}/assets/branch.svg`, 
+        lefticon: `${base_url}/assets/branch_blue.svg`, 
         desc: "Continue only if a specific condition is met. ", 
         templateTitle: '', 
-        template: '', 
+        template: 'Branch on ${expression}', 
         begin: "", 
-        isMulti: false, 
-        selectedOptions: [], 
-        selectedBranchPoint: [], 
-        selectedBranches: [], 
-        selectedFilters: [],  
-        position: {
-            x: 0,
-            y: 0
-        }
+        isMulti: false,
+        hasSelectInput: true,
+        hasTextInput: false,
     }, 
     {
         id: 17, 
         name: "End", 
-        lefticon: `${base_url}/assets/end.svg`, 
+        lefticon: `${base_url}/assets/end_blue.svg`, 
         desc: "End care process.", 
         templateTitle: '', 
         template: "End of care process", 
         begin: "", 
-        isMulti: false, 
-        selectedOptions: [],
-        selectedBranchPoint: [], 
-        selectedBranches: [], 
-        selectedFilters: [], 
-        position: {
-            x: 0,
-            y: 0
-        }
-    }
+        isMulti: false,
+        hasSelectInput: false,
+        hasTextInput: false,
+    },
+    {
+        id: 18, 
+        name: "Note", 
+        desc: "Enter a block with custom text.", 
+        lefticon: `${base_url}/assets/custom.svg`, 
+        templateTitle: '', 
+        template: "", 
+        begin: "Text input will be placed here: ",
+        selectType: '', 
+        targetResource: '', 
+        isMulti: false,
+        hasTextInput: true,
+        hasSelectInput: false,
+    },
 ];
 
 export const Filter_Conditions = [
     {
         'id': '1', 
-        'name': 'Where', 
+        'name': 'and', 
     }, 
     {
         'id': '2', 
-        'name': 'and', 
+        'name': 'or', 
     }
 ];
 
@@ -526,11 +461,11 @@ export const Filter_Age_Filters = [
 export const Filter_Sex_Filters = [
     {
         'id': '1', 
-        'name': 'contains...'
+        'name': 'is...'
     }, 
     {
         'id': '2', 
-        'name': 'does not contain...'
+        'name': 'is not...'
     }, 
     {
         'id': '3', 

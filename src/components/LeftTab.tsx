@@ -53,7 +53,7 @@ export default function LeftTab() {
 	};
 
 	return (
-		<div id="leftcard">
+		<div id="leftcard" style={{paddingRight: `${open ? '20px' : '0px'}`, paddingLeft: `${open ? '20px' : '0px'}`}}>
 			{
 				open ? (
 					<div id="closecard">

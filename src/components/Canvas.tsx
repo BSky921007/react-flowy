@@ -5,13 +5,12 @@ import { Right_Card, cardWidth, paddingX, paddingLeft, paddingTop, cardHeight } 
 import { ArrowData, CardData, Position, CanvasProps, BranchTypes } from '../types';
 
 const Canvas = (props: CanvasProps) => {
-    // console.log(props.data);
     const [hasFirstCard, setHasFirstCard] = useState(false);
     const [isMoving, setIsMoving] = useState(false);
     const [isRealMoving, setIsRealMoving] = useState(false);
     const [isCanvasClicking, setIsCanvasClicking] = useState(false);
     const [moveFirstChild, setMoveFirstChild] = useState(false);
-    const [cnt, setCnt] = useState(1);
+    const [cnt, setCnt] = useState(0);
     const [parentId, setParentId] = useState(-1);
     const [selectedId, setSelectedId] = useState(-1);
     const [updatedId, setUpdatedId] = useState(-1);
@@ -28,7 +27,7 @@ const Canvas = (props: CanvasProps) => {
             let line, triangle;
             if (tempParent && tempSelf) {
                 line = `M${tempParent!.position.x+159} ${tempParent!.position.y+122} L${tempParent!.position.x+159} ${tempParent!.position.y+162} L${tempSelf!.position.x+159} ${tempParent!.position.y+162} L${tempSelf!.position.x+159} ${tempParent!.position.y+202}`;
-                triangle = `M${tempSelf!.position.x+159} ${tempParent!.position.y+200} L${tempSelf!.position.x+154} ${tempParent!.position.y+195} L${tempSelf!.position.x+164} ${tempParent!.position.y+195} Z`;
+                triangle = `M${tempSelf!.position.x+159} ${tempParent!.position.y+200} L${tempSelf!.position.x+154} ${tempParent!.position.y+196} L${tempSelf!.position.x+164} ${tempParent!.position.y+196} Z`;
             } else {
                 line = '';
                 triangle = '';
@@ -46,11 +45,12 @@ const Canvas = (props: CanvasProps) => {
 
     const getElementWidth = useCallback((elementId: number, elements: CardData[]): number => {
         const tempCard = elements.find(({id}) => id === elementId);
-        const childrenIds = tempCard?.children;
-        if (!childrenIds || childrenIds?.length === 0) return 1;
+        if (!tempCard) return 0;
+        const childrenIds = tempCard.children;
+        if (!childrenIds || childrenIds.length === 0) return 1;
         let childWidth = 0;
 
-        for (let i = 0; i < childrenIds!.length ; i++) {
+        for (let i = 0; i < childrenIds.length ; i++) {
             const child = childrenIds[i];
             childWidth += getElementWidth(child, elements);
         }
@@ -87,7 +87,7 @@ const Canvas = (props: CanvasProps) => {
             const width = getElementWidth(1, newCards);
             const offset = (paddingX + cardWidth) * (width - 1) / 2;
             if (offset > rootElement.position.x) {
-                rootElement.position.x = (paddingX + cardWidth) * (width - 1) / 2;
+                rootElement.position.x = offset;
             }
             addPositionToChildren(1, rootElement.position, newCards);
         }
@@ -97,10 +97,20 @@ const Canvas = (props: CanvasProps) => {
 
     useEffect(() => {
         const newCards = rearrange(props.data);
-        if (newCards.length === 0) {
-            setHasFirstCard(false);
-        }
+        if (newCards.length === 0)  setHasFirstCard(false);
+        else                        setHasFirstCard(true);
         setRightCards(newCards);
+        let tempId = 0;
+        if (newCards.length === 1) tempId = newCards[0].id;
+        else {
+            for (let i = 0; i < newCards.length; i ++) {
+                for (let j = i + 1; j < newCards.length; j ++) {
+                    if (newCards[i].id > newCards[j].id)    tempId = newCards[i].id;
+                    else                                    tempId = newCards[j].id;
+                }
+            }
+        }
+        setCnt(tempId+1);
         const newArrows = drawArrows(newCards);
         setArrows(newArrows);
     }, [props.data, drawArrows, rearrange]);
@@ -159,6 +169,7 @@ const Canvas = (props: CanvasProps) => {
                     setCnt(1);
                 }
                 setSelectedId(-1);
+                props.onDeleteCard(nonSelectedCards);
             }
         }
     }
@@ -187,7 +198,7 @@ const Canvas = (props: CanvasProps) => {
     const handleDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
     }, []);
-    
+
     const handleDrop = useCallback((event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         const { pageX, pageY, dataTransfer } = event;
@@ -206,7 +217,9 @@ const Canvas = (props: CanvasProps) => {
                     templateTitle: Right_Card[activeData.id-1].templateTitle, 
                     template: Right_Card[activeData.id-1].template, 
                     begin: Right_Card[activeData.id-1].begin, 
+                    hasSelectInput: Right_Card[activeData.id-1].hasSelectInput,
                     isMulti: Right_Card[activeData.id-1].isMulti, 
+                    hasTextInput: Right_Card[activeData.id-1].hasTextInput, 
                     selectedOptions: [], 
                     selectedBranchPoint: [], 
                     selectedBranches: [], 
@@ -226,13 +239,13 @@ const Canvas = (props: CanvasProps) => {
                 setParentId(0);
                 setUpdatedId(-1);
                 setRightCards([...rightCards, data]);
+                props.onCanvasDrop([...rightCards, data]);
             } else if (parentId > 0) {
                 const newChilds = [...rightCards];
                 const childToUpdate = newChilds.find(({id}) => id === parentId);
-                
                 if(childToUpdate) {
                     const childrenCount = childToUpdate.childrenCnt;
-                    for (let i = 0; i < childToUpdate.children.length; i ++) {
+                    for (let i = 0; i < childrenCount; i ++) {
                         const childs = newChilds.find(({id}) => id === childToUpdate.children[i]);
                         if (childs) {
                             childs.position.x -= 169;
@@ -250,7 +263,9 @@ const Canvas = (props: CanvasProps) => {
                         templateTitle: Right_Card[activeData.id-1].templateTitle, 
                         template: Right_Card[activeData.id-1].template, 
                         begin: Right_Card[activeData.id-1].begin, 
+                        hasSelectInput: Right_Card[activeData.id-1].hasSelectInput, 
                         isMulti: Right_Card[activeData.id-1].isMulti, 
+                        hasTextInput: Right_Card[activeData.id-1].hasTextInput, 
                         selectedOptions: [], 
                         selectedBranchPoint: [], 
                         selectedBranches: [], 
@@ -270,22 +285,28 @@ const Canvas = (props: CanvasProps) => {
                     const newCards = rearrange([...newChilds, data]);
                     const newArrows = drawArrows(newCards);
                     
+                    console.log(newCards);
                     setCnt(cnt+1);
                     setRightCards(newCards);               
                     setArrows([...newArrows]);
                     setParentId(-1);
                     setUpdatedId(-1);
+                    props.onCanvasDrop(newCards);
                 }
             }
         } else if (activeBranch) {
             const activeBranchData = JSON.parse(activeBranch);
+            console.log(rightCards);
             if (hasFirstCard && parentId > 0) {
                 const newChilds = [...rightCards];
+                console.log(newChilds);
+                console.log(activeBranchData);
                 const childToUpdate = newChilds.find(({id}) => id === parentId);
                 if (childToUpdate) {
                     if (childToUpdate.isBranch === true) {
-                        childToUpdate.addedBranch = activeBranchData.data.filter[0].name + ' ' + activeBranchData.data.value;
+                        childToUpdate.addedBranch = activeBranchData.data.filter[0].name.replace('...', '') + ' ' + activeBranchData.data.value;
                         childToUpdate.isBranch = true;
+                        console.log(newChilds);
                         setRightCards(newChilds);
                         setParentId(-1);
                         setUpdatedId(-1);
@@ -296,7 +317,7 @@ const Canvas = (props: CanvasProps) => {
             setParentId(-1);
             setUpdatedId(-1);
         }
-    }, [cnt, hasFirstCard, parentId, rightCards, drawArrows, rearrange]);
+    }, [cnt, hasFirstCard, props, parentId, rightCards, drawArrows, rearrange]);
     // }, [hasFirstCard, parentId]);
 
     const handleMouseDown = (selId: number) => {
