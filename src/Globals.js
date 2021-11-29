@@ -117,17 +117,18 @@ export const CardList_Actions = [
         targetResource: 'references', 
     },
     {
-        id: 18, 
+        id: 14, 
         name: "Note", 
         desc: "Add a text field for the user to enter a note.", 
-        lefticon: `${base_url}/assets/record.svg`, 
+        lefticon: `${base_url}/assets/note.svg`, 
         selectType: '', 
+        targetResource: '', 
     },
 ];
 
 export const CardList_Structure = [
     {
-        id: 14, 
+        id: 15, 
         name: "Start", 
         desc: "Begin care process.", 
         lefticon: `${base_url}/assets/start.svg`, 
@@ -135,7 +136,7 @@ export const CardList_Structure = [
         targetResource: '', 
     }, 
     {
-        id: 15, 
+        id: 16, 
         name: "Include", 
         desc: "Continue only if a specific condition is met.", 
         lefticon: `${base_url}/assets/filter.svg`, 
@@ -143,7 +144,7 @@ export const CardList_Structure = [
         targetResource: '', 
     }, 
     {
-        id: 16, 
+        id: 17, 
         name: "Branch", 
         desc: "Branch on a specific condition.", 
         lefticon: `${base_url}/assets/branch.svg`, 
@@ -151,7 +152,7 @@ export const CardList_Structure = [
         targetResource: '', 
     }, 
     {
-        id: 17, 
+        id: 18, 
         name: "End", 
         desc: "End care process.", 
         lefticon: `${base_url}/assets/end.svg`, 
@@ -162,27 +163,19 @@ export const CardList_Structure = [
 
 export const Right_Card = [
     {
-        id: 1, 
+        id: 'recfpahhLXHEx0QVN', 
         name: "Repeat timer", 
         lefticon: `${base_url}/assets/time_elapsed_blue.svg`, 
         desc: "Trigger care process at a set recurring period.", 
         templateTitle: '',
-        template: "${period}", 
+        template: '${period}', 
         begin: 'Every ', 
         isMulti: false, 
         hasSelectInput: true,
         hasTextInput: false,
-        selectedOptions: [],
-        selectedBranchPoint: [], 
-        selectedBranches: [],  
-        selectedFilters: [], 
-        position: {
-            x: 0,
-            y: 0
-        }
     }, 
     {
-        id: 2, 
+        id: 'recaAkqkKkiiUHVv5', 
         name: "New patient", 
         lefticon: `${base_url}/assets/new_patient_info_blue.svg`, 
         desc: "Trigger care process when a new patient is created.", 
@@ -192,17 +185,9 @@ export const Right_Card = [
         isMulti: false, 
         hasSelectInput: true,
         hasTextInput: false,
-        selectedOptions: [], 
-        selectedBranchPoint: [], 
-        selectedBranches: [],  
-        selectedFilters: [], 
-        position: {
-            x: 0,
-            y: 0
-        }
     }, 
     {
-        id: 3, 
+        id: 'recHqQFciHIqVO2ew', 
         name: "New action", 
         lefticon: `${base_url}/assets/new_action_blue.svg`, 
         desc: "Trigger care process when a new action is performed.", 
@@ -214,7 +199,7 @@ export const Right_Card = [
         hasSelectInput: false,
     }, 
     {
-        id: 4, 
+        id: 'recGLJ1YRkapykt4U', 
         name: "Await result", 
         lefticon: `${base_url}/assets/new_data_blue.svg`, 
         desc: "Trigger care process when a new result is available.", 
@@ -226,7 +211,7 @@ export const Right_Card = [
         hasSelectInput: false,
     }, 
     {
-        id: 5, 
+        id: 'rec3sM2TfHS7VIhJg', 
         name: "Elicit", 
         lefticon: `${base_url}/assets/elicit_blue.svg`, 
         desc: "Elicit a set of clinical findings from a patient.", 
@@ -238,7 +223,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 6, 
+        id: 'recSzM5HiqHpCHy29', 
         name: "Prescribe", 
         lefticon: `${base_url}/assets/prescribe_blue.svg`, 
         desc: "Prescribe one or more medications.", 
@@ -250,7 +235,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 7, 
+        id: 'rechpNeoJ4l99qpV1', 
         name: "Order", 
         lefticon: `${base_url}/assets/order_blue.svg`, 
         desc: "Order a test for a patient.", 
@@ -262,7 +247,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 8, 
+        id: 'reca9htmvyVbsawOo', 
         name: "Record", 
         lefticon: `${base_url}/assets/record_blue.svg`, 
         desc: "Record one or more diagnoses.", 
@@ -274,7 +259,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 9, 
+        id: 'rec7TNaavHMeZD3LR', 
         name: "Apply", 
         lefticon: `${base_url}/assets/apply_blue.svg`, 
         desc: "Apply a guideline recommendation.", 
@@ -286,7 +271,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 10, 
+        id: 'rec8VkmoRHEwW08P6', 
         name: "Schedule", 
         lefticon: `${base_url}/assets/schedule_blue.svg`, 
         desc: "Schedule a follow-up visit.", 
@@ -298,7 +283,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 11, 
+        id: 'reci5wpCzWLbmFhzi', 
         name: "Link", 
         lefticon: `${base_url}/assets/link_blue.svg`, 
         desc: "Link to another care bundle.", 
@@ -310,7 +295,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 12, 
+        id: 'rec8gbL4jMW4g4XxL', 
         name: "Use", 
         lefticon: `${base_url}/assets/use_blue.svg`, 
         desc: "Use a clinical calculator.", 
@@ -322,7 +307,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 13, 
+        id: 'recJOAwaQf279Asvp', 
         name: "Custom", 
         lefticon: `${base_url}/assets/custom_blue.svg`, 
         desc: "Write a block with custom text.", 
@@ -334,7 +319,19 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 14, 
+        id: 'recFoQkbUBFZsUaUD', 
+        name: "Note", 
+        desc: "Enter a block with custom text.", 
+        lefticon: `${base_url}/assets/note_blue.svg`, 
+        templateTitle: "", 
+        template: "", 
+        begin: "Text input will be placed here: ",
+        isMulti: false,
+        hasTextInput: true,
+        hasSelectInput: false,
+    },
+    {
+        id: 'rec5LaYloNDn0SDGW', 
         name: "Start", 
         lefticon: `${base_url}/assets/start_blue.svg`, 
         desc: "Begin care process.", 
@@ -346,19 +343,19 @@ export const Right_Card = [
         hasSelectInput: false,
     }, 
     {
-        id: 15, 
+        id: 'recXg8637oB5oCy5M', 
         name: "Include", 
         lefticon: `${base_url}/assets/filter_blue.svg`, 
         desc: "Continue only if a specific condition is met.", 
         templateTitle: '', 
-        template: "${condition}",
+        template: 'When ${condition} is met',
         begin: "If ", 
         isMulti: false,
         hasTextInput: false,
         hasSelectInput: true,
     }, 
     {
-        id: 16, 
+        id: 'recUk31UrCDrLsFVi', 
         name: "Branch", 
         lefticon: `${base_url}/assets/branch_blue.svg`, 
         desc: "Continue only if a specific condition is met. ", 
@@ -370,7 +367,7 @@ export const Right_Card = [
         hasTextInput: false,
     }, 
     {
-        id: 17, 
+        id: 'rec7Fh2BNtNcOKqgP', 
         name: "End", 
         lefticon: `${base_url}/assets/end_blue.svg`, 
         desc: "End care process.", 
@@ -380,21 +377,7 @@ export const Right_Card = [
         isMulti: false,
         hasSelectInput: false,
         hasTextInput: false,
-    },
-    {
-        id: 18, 
-        name: "Note", 
-        desc: "Enter a block with custom text.", 
-        lefticon: `${base_url}/assets/custom.svg`, 
-        templateTitle: '', 
-        template: "", 
-        begin: "Text input will be placed here: ",
-        selectType: '', 
-        targetResource: '', 
-        isMulti: false,
-        hasTextInput: true,
-        hasSelectInput: false,
-    },
+    }
 ];
 
 export const Filter_Conditions = [

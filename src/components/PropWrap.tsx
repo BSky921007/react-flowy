@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useCallback, CSSProperties, Suspense } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Select from 'react-dropdown-select';
 import styled from '@emotion/styled';
 import { List, AutoSizer, ListProps } from 'react-virtualized';
-import IconButton from '@mui/material/IconButton';
-import Button from '@mui/material/Button';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import BranchList from './BranchList';
 import FilterList from './FilterList';
@@ -16,10 +15,12 @@ import Elicit_Names from '../data/findings.json';
 import Prescribe_Names from '../data/dosages.json';
 import Order_Names from '../data/tests.json';
 import Custom_Names from '../data/references.json';
-import Criteria_Names from '../data/criterias.json';
 import Period_Names from '../data/periods.json';
 import { base_url, Filter_Conditions, Filter_Names, Filter_Age_Filters, Filter_Sex_Filters, Filter_PastMedicalHistory_Filters, Filter_LastFollowUp_Filters } from '../Globals';
 import { PropWrapProps, SelectTypes, BranchTypes, BranchData, BranchProps, FilterProps, BundleType, ProtocolType } from '../types';
+
+import { ThemeProvider, CSSReset, Grid, Link, Input, Button, Box, FormControl, Icon,IconButton, InputGroup, Image, Text, Heading } from '@chakra-ui/react'
+import theme from '../styles/theme'
 
 import {
   DbProvider,
@@ -37,15 +38,16 @@ import untypedCollectedDb from '../data/parsed.test.json'
 const collectedDb = (untypedCollectedDb.objects as unknown) as Database;
 
 const PropWrap = (props: PropWrapProps) => {
-  const { bundles, protocols, selBundle, selProtocol } = props;
+  const navigate = useNavigate();
+
+  const { bundles, protocols, selBundle, selProtocol, selableProtocols } = props;
+
   const [selectedOptions, setSelectedOptions] = useState<SelectTypes[]>([]);
   const [actionType, setActionType] = useState<string>('');
   const [structureType, setStructureType] = useState<string>('');
   const [actions, setActions] = useState<SelectTypes[]>([]);
-  const [selectedBranchName, setSelectedBranchName] = useState<BranchData[]>([]);
   const [branches, setBranches] = useState<BranchProps[]>([]);
   const [filters, setFilters] = useState<FilterProps[]>([]);
-
   
   const [selectedFilterCondition, setSelectedFilterCondition] = useState<SelectTypes[]>([]);
   const [selectedFilterName, setSelectedFilterName] = useState<SelectTypes[]>([]);
@@ -56,15 +58,21 @@ const PropWrap = (props: PropWrapProps) => {
   
   const [open, setOpen] = useState(false);
   const [isGlobal, setIsGlobal] = useState(props.isGlobal);
+  const [isHeader, setIsHeader] = useState(props.isHeader);
   const [selectedBundle, setSelectedBundle] = useState<BundleType>();
   const [selectedProtocol, setSelectedProtocol] = useState<ProtocolType>();
-  const [protocolName, setProtocolName] = useState<string>('');
+  const [selectedHeaderBundle, setSelectedHeaderBundle] = useState<BundleType>();
+  const [selectableProtocols, setSelectableProtocols] = useState<ProtocolType[]>(selableProtocols);
+  const [selectedHeaderProtocol, setSelectedHeaderProtocol] = useState<ProtocolType>();
   const [openModal, setOpenModal] = useState(false);
   const [propCard, setPropCard] = useState(props.propData);
   const [inputData, setInputData] = useState('');
 
+  console.log(selableProtocols, selectedHeaderProtocol);
+
   useEffect(() => {
     setIsGlobal(props.isGlobal);
+    setIsHeader(props.isHeader);
     if (!props.propData) {
       setOpen(false);
       return;
@@ -77,7 +85,6 @@ const PropWrap = (props: PropWrapProps) => {
     setSelectedBranchPoint(props.propData.selectedBranchPoint);
     setBranches(props.propData.selectedBranches);
     setFilters(props.propData.selectedFilters);
-    setSelectedBranchName([]);
 
     if (props.propData.name === 'Repeat timer') {
       setActionType('Repeat timer');
@@ -134,12 +141,13 @@ const PropWrap = (props: PropWrapProps) => {
 
   useEffect(() => {
     setSelectedBundle(selBundle ? selBundle : bundles[0]);
-  }, [bundles, selBundle]);
+    setSelectedHeaderBundle(selBundle ? selBundle : bundles[0]);
+  }, [bundles, selBundle, protocols, selProtocol]);
 
   useEffect(() => {
-    setSelectedProtocol(selProtocol ? selProtocol : protocols[0]);
-    setProtocolName(selProtocol ? selProtocol.fields.name : protocols[0]?.fields?.name);
-  }, [protocols, selProtocol]);
+    setSelectedProtocol(selProtocol);
+    setSelectedHeaderProtocol(selProtocol);
+  }, [selProtocol]);
 
   const customDropdownRenderer = useCallback(({ methods, state, props }) => {
     return (
@@ -153,14 +161,13 @@ const PropWrap = (props: PropWrapProps) => {
               rowHeight={40}
               width={width - 2}
               rowRenderer={({ index, style, key }: { index: number, style: CSSProperties, key: string }) => (
-                  <Item key={key}
-                        style={style}
-                        onClick={() => methods.addItem(actions[index])}
-                  >
-                    {actions[index].name}
-                  </Item>
-                )
-              }
+                <Item key={key}
+                      style={style}
+                      onClick={() => methods.addItem(actions[index])}
+                >
+                  {actions[index].name}
+                </Item>
+              )}
             />
           )
         }}
@@ -171,6 +178,8 @@ const PropWrap = (props: PropWrapProps) => {
   const handleOpen = () => {
     setOpen(false);
     setIsGlobal(false);
+    setIsHeader(false);
+    props.onCloseProperties();
 	}
 
   const openNew = () => {
@@ -190,32 +199,43 @@ const PropWrap = (props: PropWrapProps) => {
     setSelectedOptions(props.propData.selectedOptions);
   }
 
-  const changeBundle = (event: BundleType[]) => {
-    setSelectedBundle(event[0]);
-    if (protocols) {
-      const tempProtocol = protocols.find(({ id }) => id === event[0].fields.protocols[0]);
-      if (tempProtocol) {
-        setSelectedProtocol(tempProtocol);
-        setProtocolName(tempProtocol.fields.name);
+  const onGlobalSave = () => {
+    if (selectedProtocol && selectedBundle) {
+      if (selectedProtocol.fields.bundles.includes(selectedBundle.id) || 
+          selectedBundle.fields.protocols.includes(selectedProtocol.id)) {
+        props.onGlobalSave(selectedBundle, selectedProtocol, false);
+        return;
       }
+      
+      const tempProtocol = selectedProtocol;            
+      if (!(selectedProtocol.fields.bundles)) {
+        tempProtocol.fields.bundles = [];
+      }
+      tempProtocol.fields.bundles.push(selectedBundle.id);
+
+      const tempBundle = selectedBundle;
+      if (!(selectedBundle.fields.protocols)) {
+        tempBundle.fields.protocols = [];
+      }
+      tempBundle.fields.protocols.push(selectedProtocol.id);
+
+      props.onGlobalSave(tempBundle, tempProtocol, true);
     }
   }
 
-  const changeProtocol = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setProtocolName(event.target.value);
-  }
-
-  const onGlobalSave = () => {
-    const tempProtocol = selectedProtocol;
-    if (tempProtocol) {
-      tempProtocol.fields.name = protocolName;
-      props.onGlobalSave(selectedBundle, tempProtocol);
+  const onHeaderOpen = () => {
+    if (selectedHeaderProtocol) {
+      props.onHeaderOpen(selectedHeaderBundle, selectedHeaderProtocol);
+      const targetUrl = `/builder/${selectedHeaderProtocol.id}`;
+      navigate(targetUrl);
     }
   }
 
   const onGlobalCancel = () => {
-    setSelectedBundle(bundles[0]);
-    setSelectedProtocol(protocols[0]);
+    setSelectedBundle(selBundle ? selBundle : bundles[0]);
+    setSelectedProtocol(selProtocol ? selProtocol : protocols[0]);
+    setSelectedHeaderBundle(selBundle ? selBundle : bundles[0]);
+    setSelectedHeaderProtocol(selProtocol ? selProtocol : protocols[0]);
   }
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -223,20 +243,22 @@ const PropWrap = (props: PropWrapProps) => {
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target.value);
     setSelectedFilterValue(event.target.value);
   }
 
   const onBranchSave = () => {
-    const newBranches = [...branches];
+    const newBranches: BranchProps[] = [...branches];
 
     let temp = newBranches.length === 0 ? 0 : newBranches[newBranches.length-1].id;
-    const tempBranch = {
+    const tempBranch: BranchProps = {
       id: temp + 1, 
       data: {
         filter: selectedFilterFilter, 
         value: selectedFilterValue, 
       }
     }
+    console.log(tempBranch);
     setBranches([...newBranches, tempBranch]);
     setSelectedFilterFilter([]);
     setSelectedFilterValue('');
@@ -252,7 +274,6 @@ const PropWrap = (props: PropWrapProps) => {
   }
 
   const onBranchCancel = () => {
-    setSelectedBranchName([]);
     setOpenModal(!openModal);
   }
 
@@ -281,6 +302,20 @@ const PropWrap = (props: PropWrapProps) => {
   const changeBranchPoint = (value: any) => {
     setSelectedFilterFilter([]);
     props.onSaveBranchPoint(value);
+  }
+
+  const changeHeaderBundle = (value: BundleType) => {
+    setSelectedHeaderBundle(value);
+    const tempProtocols: ProtocolType[] = [];
+    if (protocols.length > 0 && value.fields.protocols) {
+      for (let i = 0; i < value.fields.protocols.length; i ++) {
+        const tempProtocol = protocols.find(({ id }) => id === value.fields.protocols[i]);
+        if (tempProtocol)
+          tempProtocols.push(tempProtocol);
+      }
+      setSelectableProtocols(tempProtocols);
+      setSelectedHeaderProtocol(tempProtocols[0]);
+    }
   }
 
   const onFilterSave = () => {
@@ -324,299 +359,344 @@ const PropWrap = (props: PropWrapProps) => {
     setOpenModal(!openModal);
   }
 
-
   return (
-    <div id="propwrap" className="itson">
-      <div id="properties" className={`${(open || isGlobal)&&'expanded'}`}>
-        <div id="close">
-          <IconButton aria-label="delete" size="large" onClick={() => handleOpen()}>
-            <img src={`${base_url}/assets/close.svg`} alt="NO"/>
-          </IconButton>                    
-        </div>
-        <p id="header2">Properties</p>
-        {
-          isGlobal ? (
-            <>
-              <div id="proplist">
-                <div style={{margin: 10, marginLeft: 0}}>
-                  <span className="inputlabel">Name: </span>
-                  {
-                    (selectedBundle && bundles.length > 0) && (
-                      <Select
-                        className="addbranch"
-                        options={bundles}
-                        values={[selectedBundle]}
-                        onChange={(value) => {
-                          changeBundle(value);
-                        }}
-                        labelField="fields.name"
-                        valueField="id"
-                      />
-                    )
-                  }
-                </div>
-                <div style={{margin: 10, marginLeft: 0}}>
-                  <span className="inputlabel">Disease: </span>
-                  {
-                    selectedProtocol && (
-                      <input className="globalinput" type="text" value={protocolName} onChange={(event) => changeProtocol(event)}/>
-                    )
-                  }
-                </div>
-                <div className="custombutton">
-                  <Button variant="text"  onClick={() => onGlobalCancel()}>cancel</Button>
-                  <Button variant="text"  onClick={() => onGlobalSave()}>save</Button>
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <div id="proplist">
-                <div style={{margin: 10, marginLeft: 0}}>
-                  <span className="inputlabel">Type: </span>
-                  {
-                    propCard?.name === 'Branch' ? (
-                      <span className="inputlabelValue">Filter</span>
-                    ) : (
-                      <span className="inputlabelValue">{propCard?.name}</span>
-                    )
-                  }
-                </div>
-                <div style={{margin: 10, marginLeft: 0}}>
-                  <span className="inputlabel">Description: </span>
-                  <span className="inputlabelValue">{propCard?.desc}</span>
-                </div>
-                {
-                  (actionType !== '' && propCard) && (
-                    <>
-                      <p className="inputlabel">{propCard.templateTitle}</p>
-                      {
-                        propCard.hasTextInput && (
-                          <TextareaAutosize
-                            className="inputcomponent"
-                            aria-label="minimum height"
-                            minRows={3}
-                            placeholder="Write custom text here..."
-                            value={inputData}
-                            onChange={(event) => handleTextChange(event)}
-                          />
-                        )
-                      }
-                      {
-                        propCard.hasSelectInput && propCard.isMulti ? (
-                          <Select
-                            className="addbranch"
-                            dropdownRenderer={ customDropdownRenderer }
-                            values={selectedOptions}
-                            options={[]}
-                            multi
-                            onChange={ (values) => {setSelectedOptions(values);} }
-                            labelField="name"
-                            valueField="id"
-                          />
-                        ) : (
-                          <Select
-                            className="addbranch"
-                            dropdownRenderer={ customDropdownRenderer }
-                            values={selectedOptions}
-                            options={[]}
-                            onChange={ (values) => {setSelectedOptions(values);} }
-                            labelField="name"
-                            valueField="id"
-                          />
-                        )
-                      }                  
-                      <div className="custombutton">
-                        <Button variant="text" onClick={() => onCancel()}>cancel</Button>
-                        <Button variant="text" onClick={() => onSave()}>save</Button>
-                      </div>
-                      { 
-                        (actionType === 'Elicit' && selectedOptions && selectedOptions[0]) && (
-                          <div>
-                            <p className="header2">Preview</p>
-                            <div className="previewwrapper">
-                              
-                              <PathwayThemeProvider>
-                                <DbProvider db={collectedDb}>
-                                  <Suspense fallback={null}>
-                                    <NoteEditor findingIds={selectedOptions.map((x) => x.id)} onButtonStateChange={() => {}}/>
-                                  </Suspense>
-                              </DbProvider>
-                              </PathwayThemeProvider>
-                            </div>
-                          </div> 
-                        )
-                      }
-                      { 
-                        (actionType === 'Use' && selectedOptions && selectedOptions[0]) && (
-                          <div>
-                            <p className="header2">Preview</p>
-                            <div className="previewwrapper">
-                              <PathwayThemeProvider>
-                                <DbProvider db={collectedDb}>
-                                  <Calculator calculatorId={selectedOptions[0].id} onStateChange={() => {}}/>
-                              </DbProvider>
-                              </PathwayThemeProvider>
-                            </div>
-                          </div> 
-                        )
-                      }
-                    </>
-                  )
-                }
-                {
-                  structureType === 'Branch' ? (
-                    <>
-                      <div>
-                        <p className="inputlabel">Select a branch point: </p>
+    <ThemeProvider theme={theme}>
+      <CSSReset/>
+      <div id="propwrap" className="itson">
+        <div id="properties" className={`${(open || isGlobal || isHeader) && 'expanded'}`}>
+          <div id="close">
+            <IconButton aria-label="delete" size="sm" onClick={() => handleOpen()}>
+              <img src={`${base_url}/assets/close.svg`} alt="NO"/>
+            </IconButton>                    
+          </div>
+          <p id="header2">Properties</p>
+          {
+            isHeader ? (
+              <>
+                <div id="proplist">
+                  <div style={{margin: '10px 0px'}}>
+                    <span className="inputlabel">Bundle: </span>
+                    {
+                      (selectedHeaderBundle && bundles.length > 0) && (
                         <Select
-                          className="addfilterselect"
-                          style={{width: '400px'}}
-                          options={Filter_Names}
-                          values={selectedBranchPoint}
+                          className="addbranch"
+                          options={bundles}
+                          values={[selectedHeaderBundle]}
                           onChange={(value) => {
-                            setSelectedBranchPoint(value);
-                            changeBranchPoint(value);
-                            changeFilterName(value);
+                            changeHeaderBundle(value[0]);
                           }}
-                          labelField="name"
+                          labelField="fields.name"
                           valueField="id"
                         />
-                      </div>
-                      <p className="inputlabel">Define branches: </p>                  
-                      {
-                        branches.length > 0 && (
-                          branches.map((branch) => {
-                            return (
-                              <BranchList key={branch.id} data={branch} deleteBranch={deleteBranch} selectableFilter={selectableFilters}/>
-                            )
-                          })
-                        )
-                      }
-                      <div className="condition">
-                        <Button 
-                          className="buttonaddfilter"
-                          variant="outlined"
-                          onClick={openNew}>
-                          <img src={`${base_url}/assets/plus_circle.svg`} alt="NO"/>
-                          Add a new condition
-                        </Button>
-                      </div>
-                      {
-                        openModal && (
-                          <>
-                            <div className="selectgroup">
-                              <Select
-                                className="addfilterselect"
-                                style={{width: '200px'}}
-                                options={selectableFilters}
-                                values={selectedFilterFilter}
-                                onChange={(value) => {
-                                  setSelectedFilterFilter(value);
-                                }}
-                                labelField="name"
-                                valueField="id"
-                              />
-                              <input className="filterinput" type="text" style={{width: '190px'}} onChange={(event) => handleChange(event)}/>                    
+                      )
+                    }
+                  </div>
+                  <div style={{margin: '10px 0px'}}>
+                    <span className="inputlabel">Protocol: </span>
+                    {
+                      (selectedHeaderProtocol && selableProtocols.length > 0) && (
+                        <Select
+                          className="addbranch"
+                          options={selableProtocols}
+                          values={[selectedHeaderProtocol]}
+                          onChange={(value) => {
+                            setSelectedHeaderProtocol(value[0]);
+                          }}
+                          labelField="fields.name"
+                          valueField="id"
+                        />
+                      )
+                    }
+                  </div>
+                  <Box display="flex" float="right" mt="4">
+                    <Button colorScheme="gray" onClick={() => onGlobalCancel()}>Cancel</Button>
+                    <Button colorScheme="blue" ml="4" onClick={() => onHeaderOpen()}>Open</Button>
+                  </Box>
+                </div>
+              </>
+            ) : isGlobal ? (
+              <>
+                <div id="proplist">
+                  <div style={{margin: '10px 0px'}}>
+                    <span className="inputlabel">Bundle: </span>
+                    {
+                      (selectedBundle && bundles.length > 0) && (
+                        <Select
+                          className="addbranch"
+                          options={bundles}
+                          values={[selectedBundle]}
+                          onChange={(value) => {
+                            setSelectedBundle(value[0]);
+                          }}
+                          labelField="fields.name"
+                          valueField="id"
+                        />
+                      )
+                    }
+                  </div>
+                  <div style={{margin: '10px 0px'}}>
+                    <span className="inputlabel">Name: </span>
+                    {
+                      selectedProtocol && (
+                        <p className="globalinput">{selectedProtocol.fields.name}</p>
+                      )
+                    }
+                  </div>
+                  <Box display="flex" float="right" mt="4">
+                    <Button colorScheme="gray" onClick={() => onGlobalCancel()}>Cancel</Button>
+                    <Button colorScheme="blue" ml="4" onClick={() => onGlobalSave()}>Save</Button>
+                  </Box>
+                </div>
+              </>
+            ) : (
+              <>
+                <div id="proplist">
+                  <div style={{margin: 10, marginLeft: 0}}>
+                    <span className="inputlabel">Type: </span>
+                    {
+                      propCard?.name === 'Branch' ? (
+                        <span className="inputlabelValue">Filter</span>
+                      ) : (
+                        <span className="inputlabelValue">{propCard?.name}</span>
+                      )
+                    }
+                  </div>
+                  <div style={{margin: 10, marginLeft: 0}}>
+                    <span className="inputlabel">Description: </span>
+                    <span className="inputlabelValue">{propCard?.desc}</span>
+                  </div>
+                  {
+                    (actionType !== '' && propCard) && (
+                      <>
+                        <p className="inputlabel">{propCard.templateTitle}</p>
+                        {
+                          propCard.hasTextInput && (
+                            <TextareaAutosize
+                              className="inputcomponent"
+                              aria-label="minimum height"
+                              minRows={3}
+                              placeholder="Write custom text here..."
+                              value={inputData}
+                              onChange={(event) => handleTextChange(event)}
+                            />
+                          )
+                        }
+                        {
+                          propCard.hasSelectInput && propCard.isMulti ? (
+                            <Select
+                              className="addbranch"
+                              dropdownRenderer={ customDropdownRenderer }
+                              values={selectedOptions}
+                              options={[]}
+                              multi
+                              onChange={ (values) => {setSelectedOptions(values);} }
+                              labelField="name"
+                              valueField="id"
+                            />
+                          ) : (
+                            <Select
+                              className="addbranch"
+                              dropdownRenderer={ customDropdownRenderer }
+                              values={selectedOptions}
+                              options={[]}
+                              onChange={ (values) => {setSelectedOptions(values);} }
+                              labelField="name"
+                              valueField="id"
+                            />
+                          )
+                        }                  
+                        <Box display="flex" float="right" mt="4">
+                          <Button colorScheme="gray" onClick={() => onCancel()}>Cancel</Button>
+                          <Button colorScheme="blue" ml="4" onClick={() => onSave()}>Save</Button>
+                        </Box>
+                        { 
+                          (actionType === 'Elicit' && selectedOptions && selectedOptions[0]) && (
+                            <Box mt="24">
+                              <Heading as="h2" size="md">Preview</Heading>
+                              <Box class="previewwrapper" mt="4">                                
+                                <PathwayThemeProvider>
+                                  <DbProvider db={collectedDb}>
+                                    <Suspense fallback={null}>
+                                      <NoteEditor findingIds={selectedOptions.map((x) => x.id)} onButtonStateChange={() => {}}/>
+                                    </Suspense>
+                                </DbProvider>
+                                </PathwayThemeProvider>
+                              </Box>
+                            </Box> 
+                          )
+                        }
+                        { 
+                          (actionType === 'Use' && selectedOptions && selectedOptions[0]) && (
+                            <div>
+                              <p className="header2">Preview</p>
+                              <div className="previewwrapper">
+                                <PathwayThemeProvider>
+                                  <DbProvider db={collectedDb}>
+                                    <Calculator calculatorId={selectedOptions[0].id} onStateChange={() => {}}/>
+                                </DbProvider>
+                                </PathwayThemeProvider>
+                              </div>
+                            </div> 
+                          )
+                        }
+                      </>
+                    )
+                  }
+                  {
+                    structureType === 'Branch' ? (
+                      <>
+                        <Box mt="4">
+                          <Text className="inputlabel">Select a branch point: </Text>
+                          <Select
+                            className="addfilterselect"
+                            border-radius="6px"
+                            options={Filter_Names}
+                            values={selectedBranchPoint}
+                            onChange={(value) => {
+                              setSelectedBranchPoint(value);
+                              changeBranchPoint(value);
+                              changeFilterName(value);
+                            }}
+                            labelField="name"
+                            valueField="id"
+                          />
+                        </Box>
+                        <Box mt="4">
+                        <Text className="inputlabel">Define branches: </Text>                  
+                        {
+                          branches.length > 0 && (
+                            branches.map((branch) => {
+                              return (
+                                <BranchList key={branch.id} data={branch} deleteBranch={deleteBranch} selectableFilter={selectableFilters}/>
+                              )
+                            })
+                          )
+                        }
+                        </Box>
+                        <Box mt="4">
+                          <Button
+                            style={{width: '100%'}}
+                            colorScheme="blue" 
+                            onClick={openNew}>
+                            <Image src={`${base_url}/assets/plus_circle.svg`} alt="NO"/>
+                            <Text ml="4">Add a new condition</Text>
+                          </Button>
+                        </Box>
+                        {
+                          openModal && (
+                            <div className="addmodal">
+                              <Box display="flex">
+                                <Select
+                                  style={{width: '175px'}}
+                                  options={selectableFilters}
+                                  values={selectedFilterFilter}
+                                  onChange={(value) => {
+                                    setSelectedFilterFilter(value);
+                                  }}
+                                  labelField="name"
+                                  valueField="id"
+                                />
+                                <input type="text" className="branchinput" onChange={(event) => handleChange(event)}/>                    
+                              </Box>
+                              <Box display="flex" float="right" mt="4">
+                                <Button colorScheme="blue" onClick={() => onBranchCancel()}>Cancel</Button>
+                                <Button colorScheme="gray" onClick={() => onBranchSave()}>Save</Button>
+                              </Box>
                             </div>
-                            <div className="custombutton">
-                              <Button variant="text" onClick={() => onBranchCancel()}>cancel</Button>
-                              <Button variant="text" onClick={() => onBranchSave()}>save</Button>
-                            </div>
-                          </>
-                        )
-                      }
-                    </>
-                  ) : structureType === 'Include' && (
-                    <>
-                      <p className="inputlabel">Add one or more conditions: </p>
-                      {
-                        filters.length > 0 && (
-                          filters.map((filter) => {
-                            return (
-                              <FilterList key={filter.id} data={filter} deleteFilter={deleteFilter}/>
-                            )
-                          })
-                        )
-                      }
-                      <div className="condition">
-                        <Button 
-                          className="buttonaddfilter"
-                          variant="outlined"
-                          onClick={openNew}>
-                          <img src={`${base_url}/assets/plus_circle.svg`} alt="NO"/>
-                          Add a new condition
-                        </Button>
-                      </div>
-                      {
-                        openModal && (
-                          <>
-                            <div className="selectgroup">
-                              {
-                                filters.length === 0 ? (
-                                  <span className="addfilterstatic">Where</span>
-                                ) : (
-                                  <Select
-                                    className="addfilterselect"
-                                    style={{width: '73px'}}
-                                    options={Filter_Conditions}
-                                    values={selectedFilterCondition}
-                                    onChange={(value) => {
-                                      setSelectedFilterCondition(value);
-                                    }}
-                                    labelField="name"
-                                    valueField="id"
-                                  />
-                                )
-                              }
-                              <Select
-                                className="addfilterselect"
-                                style={{width: '112px'}}
-                                options={Filter_Names}
-                                values={selectedFilterName}
-                                onChange={(value) => {
-                                  setSelectedFilterName(value);
-                                  changeFilterName(value);
-                                }}
-                                labelField="name"
-                                valueField="id"
-                              />
-                              <Select
-                                className="addfilterselect"
-                                style={{width: '172px'}}
-                                options={selectableFilters}
-                                values={selectedFilterFilter}
-                                onChange={(value) => {
-                                  setSelectedFilterFilter(value);
-                                }}
-                                labelField="name"
-                                valueField="id"
-                              />
-                              <input className="filterinput" type="text" onChange={(event) => handleChange(event)}/>                    
-                            </div>
-                            <div className="custombutton">
-                              <Button variant="text" onClick={() => onFilterCancel()}>cancel</Button>
-                              <Button variant="text" onClick={() => onFilterSave()}>save</Button>
-                            </div>
-                          </>
-                        )
-                      }
-                    </>
-                  )
-                }
-              </div>  
-              <div className="removeblockwrapper">
-                <p className="header2">Delete this block</p>
-                <div id="removeblock">
-                  <Button variant="text" onClick={() => deleteBlock()}>Delete block</Button>
-                </div>   
-              </div>
-            </>
-          )
-        }
-        
+                          )
+                        }
+                      </>
+                    ) : structureType === 'Include' && (
+                      <>
+                        <p className="inputlabel">Add one or more conditions: </p>
+                        {
+                          filters.length > 0 && (
+                            filters.map((filter) => {
+                              return (
+                                <FilterList key={filter.id} data={filter} deleteFilter={deleteFilter}/>
+                              )
+                            })
+                          )
+                        }
+                        <Box mt="4">
+                          <Button
+                            style={{width: '100%'}}
+                            colorScheme="blue" 
+                            onClick={openNew}>
+                            <Image src={`${base_url}/assets/plus_circle.svg`} alt="NO"/>
+                            <Text ml="4">Add a new condition</Text>
+                          </Button>
+                        </Box>
+                        {
+                          openModal && (
+                            <>
+                              <div className="selectgroup">
+                                {
+                                  filters.length === 0 ? (
+                                    <span className="addfilterstatic">Where</span>
+                                  ) : (
+                                    <Select
+                                      className="addfilterselect"
+                                      style={{width: '53px'}}
+                                      options={Filter_Conditions}
+                                      values={selectedFilterCondition}
+                                      onChange={(value) => {
+                                        setSelectedFilterCondition(value);
+                                      }}
+                                      labelField="name"
+                                      valueField="id"
+                                    />
+                                  )
+                                }
+                                <Select
+                                  className="addfilterselect"
+                                  style={{width: '112px'}}
+                                  options={Filter_Names}
+                                  values={selectedFilterName}
+                                  onChange={(value) => {
+                                    setSelectedFilterName(value);
+                                    changeFilterName(value);
+                                  }}
+                                  labelField="name"
+                                  valueField="id"
+                                />
+                                <Select
+                                  className="addfilterselect"
+                                  style={{width: '125px'}}
+                                  options={selectableFilters}
+                                  values={selectedFilterFilter}
+                                  onChange={(value) => {
+                                    setSelectedFilterFilter(value);
+                                  }}
+                                  labelField="name"
+                                  valueField="id"
+                                />
+                                <input type="text" onChange={(event) => handleChange(event)}/>                    
+                              </div>
+                              <Box display="flex" float="right" mt="4">
+                                <Button colorScheme="gray" onClick={() => onFilterCancel()}>Cancel</Button>
+                                <Button colorScheme="blue" ml="4" onClick={() => onFilterSave()}>Save</Button>
+                              </Box>
+                            </>
+                          )
+                        }
+                      </>
+                    )
+                  }
+                </div>  
+                <Box className="removeblockwrapper">
+                  <Text className="header2">Delete this block</Text>
+                  <Box id="removeblock" mt="4">
+                    <Button variant="text" onClick={() => deleteBlock()}>Delete block</Button>
+                  </Box>   
+                </Box>
+              </>
+            )
+          }
+          
+        </div>
       </div>
-    </div>
+    </ThemeProvider>
   )
 }
 
@@ -635,5 +715,5 @@ const Item = styled.div`
   &:hover {
     background: #f2f2f2;
   }  
-`;
-  // ${({ disabled:boolean }) => disabled && 'text-decoration: line-through;'}
+  `;
+  // ${({ disabled }: {disabled: boolean}) => disabled && 'text-decoration: line-through;'}

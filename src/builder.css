@@ -75,9 +75,14 @@
   margin-top: 5px;
 }
 #leftside {
-  display: inline-block;
+  display: inline-flex;
+  justify-content: space-between;
   vertical-align: middle;
   margin-left: 20px;
+  width: 338px;
+}
+#details :hover {
+  cursor: pointer;
 }
 #centerswitch {
   position: absolute;
@@ -166,7 +171,6 @@
   border: 1px solid #E8E8EF;
   box-sizing: border-box;
   border-bottom: none;
-  padding-top: 85px;
   padding-left: 20px;
   position: absolute;
   z-index: 2;
@@ -358,9 +362,9 @@ color: #C9C9D5;
 .branch button {
   width: calc(100% - 32px);
 }
-.addbranch {
+/* .addbranch {
   width: calc(100% - 32px) !important;
-}
+} */
 .branchlist {
   display: flex;
   margin-bottom: 15px;
@@ -371,26 +375,24 @@ color: #C9C9D5;
   margin-right: 12px;
 }
 .branchlist .crossbutton {
-  /* width: 20px; */
   margin-right: -15px;
   margin-left: -15px;
 }
 .selectgroup {
+  width: 370px;
   display: inline-flex;
-  /* height: 36px; */
+  margin-top: 15px;
 }
 .selectgroup * {
   margin-right: -1px;
   border-radius: 0px;
 }
 .selectgroup input {
-  /* height: 30px; */
-  width: 92px;
+  width: 85px;
   border: 1px solid #ccc;
 }
 .selectgroup > :first-child {
-  margin-right: 5px;
-  /* height: 36px; */
+  /* margin-right: 5px; */
   display: inline-flex;
   align-items: center;
 }
@@ -403,11 +405,12 @@ color: #C9C9D5;
 }
 .selectgroup button {
   /* width: 38px; */
+  height: auto;
   padding: 3px 5px;
   text-transform: initial;
   border-radius: 0px;
   border-left: 0px;
-  border-color: #ccc;
+  border: 1px solid #ccc;
 }
 .conditioninput {
   border: 1px solid #ccc;
@@ -418,7 +421,8 @@ color: #C9C9D5;
   border: 0px solid #217CE8 !important;
 }
 .addfilterstatic {
-  width: 73px;
+  margin-right: 5px;
+  width: 60px;
   justify-content: center;
 }
 .addfilterselect {
@@ -434,14 +438,20 @@ color: #C9C9D5;
   height: auto !important;
 }
 .filterinput {
-  width: 190px;
+  width: 55px !important;
+}
+.branchinput {
+  width: 201px;
+  border: 1px solid #ccc;
 }
 .globalinput {
-  width: 440px;
-  height: 30px;
-  font-size: 17px;
+  /* width: 330px; */
+  height: 36px;
+  border: 1px solid #CDCDCD;
+  font-size: 18px;
   margin-top: 5px;
   margin-bottom: 10px;
+  padding: 5px;
 }
 .buttonaddfilter {
   text-transform: initial;
@@ -451,11 +461,10 @@ color: #C9C9D5;
   overflow: auto;
 }
 #proplist {
-  position: absolute;
-  left: 0px;
   width: 100%;
   min-height: 500px;
-  margin-left: 16px;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 .blockin {
   padding-left: 10px;
@@ -512,12 +521,13 @@ color: #C9C9D5;
 }
 #closecard {
   position: absolute;
-  margin-left: 338px;
+  margin-top: 32px;
+  margin-left: 350px;
   background-color: #FFF;
   border-radius: 0px 5px 5px 0px;
-  border-bottom: 1px solid #E8E8EF;
-  border-right: 1px solid #E8E8EF;
-  border-top: 1px solid #E8E8EF;
+  border-bottom: 1px solid #CCC;
+  border-right: 1px solid #CCC;
+  border-top: 1px solid #CCC;
   width: 53px;
   height: 53px;
   text-align: center; 
@@ -530,7 +540,7 @@ color: #C9C9D5;
 #canvas {
   position: absolute;
   width: calc(100% - 361px);
-  height: calc(100% - 71px);
+  height: calc(100% - 100px);
   top: 71px;
   left: 361px;
   z-index: 0;
@@ -546,6 +556,16 @@ color: #C9C9D5;
   left: 0;
 }
 
+.addmodal {
+  margin-top: 15px;
+}
+.addmodal * {
+  height: inherit;
+  margin-left: -1px;
+}
+.addmodal span {
+  margin-right: 3px;
+}
 #pathway {
   background-color: white;
   margin: 10rem;
@@ -575,27 +595,29 @@ color: #C9C9D5;
   height: 24px;
   padding: 4px;
 }
-
+#lefttab {
+  height: 100%;
+}
 #propwrap {
   position: absolute;
   right: 0;
-  top: 0;
-  width: 500px;
+  top: 76px;
+  width: 460px;
   height: 100%;
   padding-left: 20px;
   z-index: -2;
 }
 #properties {
-  position: absolute;
   height: 100%;
   width: 450px;
   padding-left: 25px;
   padding-right: 25px;
   background-color: #FFF;
+  border-left: 1px solid #ccc;
   right: -150px;
   opacity: 0;
   z-index: 2;
-  top: 0px;
+  padding-top: 24px;
   box-shadow: -4px 0px 40px rgba(26, 26, 73, 0);
   padding-left: 20px;
   transition: all .25s cubic-bezier(.05,.03,.35,1);
@@ -615,7 +637,6 @@ color: #C9C9D5;
   font-family: Roboto;
   font-weight: bold;
   color: #393C44;
-  margin-top: 101px;
 }
 .header2 {
   font-size: 20px;
@@ -624,7 +645,6 @@ color: #C9C9D5;
   color: #393C44;
 }
 #close {
-  margin-top: 100px;
   position: absolute;
   right: 20px;
   z-index: 9999;
@@ -770,13 +790,15 @@ color: #C9C9D5;
 }
 .removeblockwrapper {
   background-color: white;
-  width: 100%;
+  width: 424px;
   border-top: 1px solid lightgray;
+  border-left: 1px solid lightgray;
   position: absolute;
   height: 130px;
   bottom: 0;
-  left: 0;
-  padding-left: 16px;
+  right: 0;
+  margin-right: 16px;
+  padding: 16px;
 }
 #removeblock {
   border-radius: 5px;
@@ -821,7 +843,7 @@ color: #C9C9D5;
   vertical-align: middle;
   margin-right: 20px;
   width: 43px;
-  height: 51px;
+  height: 48px;
   border-radius: 5px;
   text-align: center; 
   background-color: #FFF;
@@ -918,13 +940,14 @@ color: #C9C9D5;
   width: 75px;
 }
 .branches input {
-  width: 175px;
+  width: 150px;
   border: 1px solid #ccc;
 }
 .branches > :first-child {
   margin-right: 5px;
   display: inline-flex;
   align-items: center;
+  height: auto;
 }
 .branches > :last-child {
   margin-right: 16px;

@@ -1,12 +1,35 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Head from 'next/head'
 import { Box, Text } from '@chakra-ui/react'
 
-const responsivePadding = { base: '1rem', md: '1.5rem' }
+function getWindowDimensions() {
+  const { innerWidth: width, innerHeight: height } = window;
+  return {
+    width,
+    height
+  };
+}
+function useWindowDimensions() {
+  const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowDimensions(getWindowDimensions());
+    }
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return windowDimensions;
+}
 
 function BareLayout({ children }: { children: React.ReactNode }) {
+
+  const { width, height } = useWindowDimensions()
+
   return (
-    <>
+    <Box height={height}>
       <Head>
         <title key="title">Pathway</title>
 
@@ -24,8 +47,10 @@ function BareLayout({ children }: { children: React.ReactNode }) {
         ></link>
       </Head>
 
-      <Box padding={responsivePadding} maxW="1000px" mx="auto">{children}</Box>
-    </>
+      <Box pl="16px" pr="16px" width="100%" height="100%" mx="auto">
+        {children}
+      </Box>
+    </Box>
   )
 }
 

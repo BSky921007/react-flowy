@@ -2,9 +2,10 @@ import React, { DragEvent, MouseEvent, useState, useCallback, useEffect } from '
 import RightCard from './RightCard';
 import Arrow from './Arrow';
 import { Right_Card, cardWidth, paddingX, paddingLeft, paddingTop, cardHeight } from '../Globals';
-import { ArrowData, CardData, Position, CanvasProps, BranchTypes } from '../types';
+import { ArrowData, CardData, Position, CanvasProps, BranchTypes, BlockData } from '../types';
 
 const Canvas = (props: CanvasProps) => {
+    const { selBundle, selProtocol } = props;
     const [hasFirstCard, setHasFirstCard] = useState(false);
     const [isMoving, setIsMoving] = useState(false);
     const [isRealMoving, setIsRealMoving] = useState(false);
@@ -16,6 +17,8 @@ const Canvas = (props: CanvasProps) => {
     const [updatedId, setUpdatedId] = useState(-1);
     const [selectedCards, setSelectedCards] = useState<CardData[]>([]);
     const [rightCards, setRightCards] = useState<CardData[]>(props.data);
+    const [selectedBlocks, setSelectedBlocks] = useState<BlockData[]>([]);
+    const [blocks, setBlocks] = useState<BlockData[]>(props.block);
     const [arrows, setArrows] = useState<ArrowData[]>([]);
     const [selectedArrows, setSelectedArrows] = useState<ArrowData[]>([]);
 
@@ -235,10 +238,18 @@ const Canvas = (props: CanvasProps) => {
                     childrenCnt: 0,
                     isOpenProps: false
                 }
+                const blockData = {
+                    id: Right_Card[activeData.id-1].id, 
+                    bundle_name: selBundle.fields.name, 
+                    block_id: Right_Card[activeData.id-1].id, 
+                    _text_template: Right_Card[activeData.id-1].template, 
+                    protocol: [selProtocol.id]
+                }
                 setCnt(2);
                 setParentId(0);
                 setUpdatedId(-1);
                 setRightCards([...rightCards, data]);
+                props.onSaveBlock(blockData);
                 props.onCanvasDrop([...rightCards, data]);
             } else if (parentId > 0) {
                 const newChilds = [...rightCards];
@@ -285,7 +296,6 @@ const Canvas = (props: CanvasProps) => {
                     const newCards = rearrange([...newChilds, data]);
                     const newArrows = drawArrows(newCards);
                     
-                    console.log(newCards);
                     setCnt(cnt+1);
                     setRightCards(newCards);               
                     setArrows([...newArrows]);

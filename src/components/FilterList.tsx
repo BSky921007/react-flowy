@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Select from 'react-dropdown-select';
-import ToggleButton from '@mui/material/ToggleButton';
+import { IconButton } from '@chakra-ui/react';
 import { ReactComponent as DeleteIcon} from '../delete_icon.svg';
 import { ReactComponent as VerticalIcon} from '../grip_vertical_icon.svg';
 import { Filter_Conditions, Filter_Names, Filter_Age_Filters, Filter_Sex_Filters, Filter_LastFollowUp_Filters, Filter_PastMedicalHistory_Filters } from '../Globals';
@@ -55,14 +55,14 @@ const FilterList = (props: FilterPropsType) => {
     }
 
     return (
-        <div className="selectgroup" style={{marginBottom: '5px'}}>
+        <div className="selectgroup" style={{marginTop: '5px'}}>
             {
                 data.id === 1 ? (
                     <span className="addfilterstatic">Where</span>
                 ) : (
                     <Select
                         className="addfilterselect"
-                        style={{width: '73px'}}
+                        style={{width: '53px'}}
                         options={Filter_Conditions}
                         values={selectedCondition}
                         onChange={() => {}}
@@ -73,7 +73,7 @@ const FilterList = (props: FilterPropsType) => {
             }
             <Select
                 className="addfilterselect"
-                style={{width: '112px'}}
+                style={{width: '102px'}}
                 options={Filter_Names}
                 values={selectedName}
                 onChange={(value) => {changeFilterName(value);}}
@@ -82,7 +82,7 @@ const FilterList = (props: FilterPropsType) => {
             />
             <Select
                 className="addfilterselect"
-                style={{width: '104px'}}
+                style={{width: '102px'}}
                 options={selectableFilters}
                 values={selectedFilter}
                 onChange={() => {}}
@@ -90,12 +90,16 @@ const FilterList = (props: FilterPropsType) => {
                 valueField="id"
             />
             <input className="filterinput" type="text" value={selectedValue} onChange={handleTextChange}/>
-            <ToggleButton value="left" aria-label="left aligned" onClick={deleteFilter}>
-                <DeleteIcon />
-            </ToggleButton>
-            <ToggleButton value="center" aria-label="left aligned">
-                <VerticalIcon />
-            </ToggleButton>
+            <IconButton
+                aria-label=""
+                icon={<DeleteIcon style={{width: 24, height: 24}} />}
+                onClick={deleteFilter}>
+            </IconButton>
+            <IconButton
+                aria-label=""
+                icon={<VerticalIcon style={{width: 24, height: 24}} />}
+                onClick={deleteFilter}>
+            </IconButton>
         </div>
     )
 }

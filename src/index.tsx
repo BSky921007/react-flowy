@@ -3,17 +3,19 @@ import ReactDOM from 'react-dom'
 import './index.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
-import App from './App'
+import Builder from './Builder'
 import PathwayWrapper from './PathwayWrapper'
-import Protocol from './Protocol'
+import Bundle from './Bundle'
 import Manager from './Manager'
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App />}></Route>
-        <Route path="/protocols/:protocolId" element={<Protocol />} />
+        <Route path="/" element={<Manager params={{patientId: 'rec23rwd23232'}}/>} />
+        <Route path="/builder/:protocolId" element={<Builder />}></Route>
+        <Route path="/bundles/:bundleId/protocols/:protocolId" element={<Bundle />} />
+        <Route path="/bundles/:bundleId" element={<Bundle />} />
         <Route path="/pathways/:pathwayId" element={<PathwayWrapper />} />
         <Route path="/manager/:patientId" element={<Manager />} />
       </Routes>

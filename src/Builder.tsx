@@ -1,14 +1,15 @@
 import React, { useCallback, useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom'
 import axios from 'axios';
-import './App.css';
+import './builder.css';
 import './flowy.css';
 import Header from './components/Header';
 import LeftTab from './components/LeftTab';
 import Canvas from './components/Canvas';
 import PropWrap from './components/PropWrap';
-import GlobalWrap from './components/GlobalWrap';
-import { BranchProps, FilterProps, CardData, SelectTypes, BranchTypes, GlobalData, BundleType, ProtocolType } from './types';
+import { BranchProps, FilterProps, CardData, SelectTypes, BranchTypes, GlobalData, BundleType, ProtocolType, BlockData } from './types';
 import { arrayToString } from './Globals';
+import BareLayout from './BareLayout'
 
 const token = 'keymneuuZO7FHj0i3';
 const options = {
@@ -17,17 +18,19 @@ const options = {
   }
 };
 
-export const App = () => {
+export const Builder = () => {
+  const { protocolId } = useParams();
   const [isOpenProp, setIsOpenProp] = useState(false);
   const [isOpenGlobal, setIsOpenGlobal] = useState(false);
-  const [title, setTitle] = useState('');
-  const [subTitle, setSubTitle] = useState('');
+  const [isOpenHeader, setIsOpenHeader] = useState(false);
   const [bundles, setBundles] = useState<BundleType[]>([]);
   const [protocols, setProtocols] = useState<ProtocolType[]>([]);
   const [selectedBundle, setSelectedBundle] = useState<BundleType>();
   const [selectedProtocol, setSelectedProtocol] = useState<ProtocolType>();
+  const [selectableProtocols, setSelectableProtocols] = useState<ProtocolType[]>([]);
 
   const [rightCards, setRightCards] = useState<CardData[]>([]);
+  const [blocks, setBlocks] = useState<BlockData[]>([]);
   const [index, setIndex] = useState(0);
 
   const getElements = useCallback((elementId: number, elements: CardData[]): number[] => {
@@ -50,6 +53,20 @@ export const App = () => {
   const canvasDrop = (cards: CardData[]) => {
     setRightCards(cards);
   }
+
+  const saveBlock = async(block: any) => {
+    const data = {
+      records: [{ fields: block }]
+    };
+
+    await axios.post('https://api.airtable.com/v0/appJ6LHBEjhaorG0k/Blocks', data, options)
+    .then((res: any) => {
+      console.log(res.data);
+    })
+    .catch((err: any) => {
+      console.log(err);
+    });
+  }
   
   const onViewProps = (propCards: CardData[], id: number) => {
     let flag = false;
@@ -62,7 +79,10 @@ export const App = () => {
       }
     } 
     setIsOpenProp(flag);
-    if (flag) setIsOpenGlobal(!flag);
+    if (flag) {
+      setIsOpenGlobal(!flag);
+      setIsOpenHeader(!flag);
+    }
   }
 
   const deleteCardFromCanvas = (action: CardData[]) => {
@@ -144,7 +164,6 @@ export const App = () => {
       selectedCard.selectedBranchPoint = action;
       selectedCard.begin = 'Branch on ';
       selectedCard.template = action[0].name;
-      console.log(newCards);
       setRightCards(newCards);
     }
   }
@@ -157,17 +176,32 @@ export const App = () => {
     }
   }
 
-  const viewGlobal = (tempTitle: string, tempSubTitle: string) => {
+  const viewGlobal = () => {
     const newCards = [...rightCards];
     for (let i = 0; i < newCards.length; i ++) {
       newCards[i].isOpenProps = false;
     }
     setRightCards(newCards);
-    if (!isOpenGlobal) setIsOpenProp(false);
+    if (!isOpenGlobal) {
+      setIsOpenProp(false);
+      setIsOpenHeader(false);
+    }
     setIsOpenGlobal(!isOpenGlobal);
-    setTitle(tempTitle);
-    setSubTitle(tempSubTitle);
   } 
+
+  const viewHeader = () => {
+    console.log(isOpenHeader);
+    const newCards = [...rightCards];
+    for (let i = 0; i < newCards.length; i ++) {
+      newCards[i].isOpenProps = false;
+    }
+    setRightCards(newCards);
+    if (!isOpenHeader) {
+      setIsOpenProp(false);
+      setIsOpenGlobal(false);
+    }
+    setIsOpenHeader(!isOpenHeader);
+  }
 
   const getBundles = async() => {
     await axios.get('https://api.airtable.com/v0/appJ6LHBEjhaorG0k/Bundles?maxRecords=3&view=Grid%20view', options)
@@ -205,11 +239,14 @@ export const App = () => {
     await axios.patch('https://api.airtable.com/v0/appJ6LHBEjhaorG0k/Protocols', data, options)
     .then((res: any) => {
       const tempProtocols = [...protocols];
-      const temp = tempProtocols.find(({ id }) => id === tempProtocol.id);
+      const temp = tempProtocols.find(({ id }) => id === res.data.records[0].id);
       if (temp) {
         temp.createdTime = res.data.records[0].createdTime;
         temp.id = res.data.records[0].id;
         temp.fields = res.data.records[0].fields;
+        temp.fields.id = res.data.records[0].id;
+        console.log(temp);
+        setSelectedProtocol(temp);
       }
       setProtocols(tempProtocols);
     })
@@ -217,10 +254,57 @@ export const App = () => {
       console.log(err);
     });
   }
-  const globalSave = (tempBundle: BundleType, tempProtocol: ProtocolType) => {
-    patchProtocol(tempProtocol);
+
+  const patchBundle = async(tempBundle: BundleType) => {
+    const data = {
+      records: [
+        {
+          fields: {
+            name: tempBundle.fields.name, 
+            protocols: tempBundle.fields.protocols
+          }, 
+          id: tempBundle.id
+        }
+      ]
+    };
+
+    await axios.patch('https://api.airtable.com/v0/appJ6LHBEjhaorG0k/Bundles', data, options)
+    .then((res: any) => {
+      const tempBundles = [...bundles];
+      const temp = tempBundles.find(({ id }) => id === res.data.records[0].id);
+      if (temp) {
+        temp.createdTime = res.data.records[0].createdTime;
+        temp.id = res.data.records[0].id;
+        temp.fields = res.data.records[0].fields;
+        console.log(temp);
+        setSelectedBundle(temp);
+      }
+      setBundles(tempBundles);
+    })
+    .catch((err: any) => {
+      console.log(err);
+    });
+  }
+
+  const globalSave = (tempBundle: BundleType, tempProtocol: ProtocolType, isChange: boolean) => {
+    if (isChange) {
+      patchProtocol(tempProtocol);
+      patchBundle(tempBundle);
+    } else {
+      setSelectedBundle(tempBundle);
+      setSelectedProtocol(tempProtocol);
+    }
+  }
+
+  const headerOpen = (tempBundle: BundleType, tempProtocol: ProtocolType) => {
     setSelectedBundle(tempBundle);
     setSelectedProtocol(tempProtocol);
+  }
+
+  const closeProperties = () => {
+    setIsOpenHeader(false);
+    setIsOpenGlobal(false);
+    setIsOpenProp(false);
   }
 
   useEffect(() => {
@@ -228,9 +312,37 @@ export const App = () => {
     getProtocols();
   }, []);
 
+  useEffect(() => {
+    const tempProtocol = protocols.find(({ id }) => id === protocolId);
+    if (tempProtocol) {
+      setSelectedProtocol(tempProtocol);
+
+      if (selectedBundle) return;
+
+      const tempBundle = bundles.find(({ id }) => id === tempProtocol.fields.bundles[0]);
+      if (tempBundle) {
+        setSelectedBundle(tempBundle);
+      }
+    }
+  }, [protocols, bundles, protocolId, selectedBundle]);
+
+  useEffect(() => {
+    if (selectedBundle && protocols.length > 0) {
+      const tempProtocols: ProtocolType[] = [];
+      for (let i = 0; i < protocols.length; i ++) {
+        if (protocols[i].fields.bundles.includes(selectedBundle.id)) {
+          tempProtocols.push(protocols[i]);
+        }
+      }
+      setSelectableProtocols(tempProtocols); 
+    }
+  }, [selectedBundle, protocols]);
+
   return (
     <div className="App">
+      <BareLayout>
       <Header 
+        isOpenHeader={isOpenHeader}
         data={rightCards} 
         bundles={bundles}
         protocols={protocols}
@@ -238,15 +350,18 @@ export const App = () => {
         selProtocol={selectedProtocol}
         onLoad={loadFromJson} 
         onViewGlobal={viewGlobal}
+        onViewHeader={viewHeader}
       />
       <LeftTab />
       <PropWrap 
         data={isOpenProp} 
         isGlobal={isOpenGlobal}
+        isHeader={isOpenHeader}
         bundles={bundles}
         protocols={protocols}
         selBundle={selectedBundle}
         selProtocol={selectedProtocol}
+        selableProtocols={selectableProtocols}
         propData={rightCards[index]} 
         onDelete={deleteCard} 
         onSave={saveCard} 
@@ -255,16 +370,23 @@ export const App = () => {
         onSaveFilterName={saveFilterName}
         onSaveBranchPoint={saveBranchPoint}
         onGlobalSave={globalSave}
+        onHeaderOpen={headerOpen}
+        onCloseProperties={closeProperties}
       />
       <Canvas 
         isOpenProp={isOpenProp} 
+        data={rightCards} 
+        block={blocks}
+        selBundle={selectedBundle}
+        selProtocol={selectedProtocol}
         onPropsView={onViewProps} 
         onCanvasDrop={canvasDrop}
-        data={rightCards} 
+        onSaveBlock={saveBlock}
         onDeleteCard={deleteCardFromCanvas}
       />
+      </BareLayout>
     </div>
   );
 }
 
-export default App;
+export default Builder;

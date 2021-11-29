@@ -1,7 +1,7 @@
 import React, { DragEvent, useState } from 'react';
 import Select from 'react-dropdown-select';
-import IconButton from '@mui/material/Button';
-import ToggleButton from '@mui/material/ToggleButton';
+import { IconButton } from '@chakra-ui/react';
+// import ToggleButton from '@mui/material/ToggleButton';
 import { ReactComponent as DeleteIcon} from '../delete_icon.svg';
 import { base_url } from '../Globals';
 import { BranchProps, SelectTypes } from '../types';
@@ -36,9 +36,11 @@ const BranchList = (props: BranchPropsType) => {
    
     return (
         <div className="branches" draggable={true} onDragStart={handleDragStart}>
-            <ToggleButton value="left" aria-label="left aligned" onClick={deleteBranch}>
-                <DeleteIcon />
-            </ToggleButton>
+            <IconButton
+                aria-label=""
+                icon={<DeleteIcon style={{width: 24, height: 24}} />}
+                onClick={deleteBranch}>
+            </IconButton>
             <span className="branchname">Branch {data.id}</span>
             <Select
                 className="addfilterselect"

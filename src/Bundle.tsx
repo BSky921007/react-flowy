@@ -1,8 +1,10 @@
-import './Protocol.css';
+import './Bundle.css';
+import {base_url} from './Globals';
 
 import React, { useState, useMemo, useContext, useEffect, useRef, Suspense } from 'react'
 
 import {
+  Image,
   Heading,
   Button,
   Box,
@@ -42,11 +44,10 @@ import {
 
 import {  ArrowForwardIcon } from '@chakra-ui/icons'
 import { FocusableElement, } from '@chakra-ui/utils'
-import { ThemeProvider, CSSReset, theme } from '@chakra-ui/react'
+import { ThemeProvider, CSSReset, theme, Link } from '@chakra-ui/react'
 
-import NextLink from 'next/link'
 import dynamic from 'next/dynamic'
-import { useParams } from 'react-router-dom'
+import { useParams, Link as RouteLink } from 'react-router-dom'
 
 import { BlobProvider } from '@react-pdf/renderer'
 
@@ -58,6 +59,7 @@ import { Icon, Database, Pathway, Evidence,
   DbProvider, PathwayThemeProvider } from '@pathwaymd/pathway-ui2'
 
 import untypedCollectedDb from './data/parsed.test.json'
+import { StringIterator } from 'lodash';
 const collectedDb = (untypedCollectedDb.objects as unknown) as Database;
 
 const customTheme = {
@@ -88,7 +90,7 @@ const ProtocolReport = dynamic(() => import('./components/ProtocolReport'), {
   ssr: false,
 })
 
-const PageContext = React.createContext({})
+const PageContext = React.createContext(null)
 
 /*function EvidenceReviewDrawer({ evidence }) {
   const { assessments, setEvidence } = useContext(PageContext)
@@ -121,7 +123,8 @@ const PageContext = React.createContext({})
   )
 }*/
 
-function PathwayStateBadge(pathwayState: any) {
+function PathwayStateBadge({ pathwayState } : { pathwayState: null }) {
+  
   if (pathwayState && pathwayState.isComplete) {
     return (
       <Badge variant="solid" colorScheme="green" mb="0.5rem">
@@ -129,7 +132,6 @@ function PathwayStateBadge(pathwayState: any) {
       </Badge>
     )
   }
-
   if (pathwayState && !pathwayState.isComplete) {
     return (
       <Badge variant="outline" colorScheme="green" mb="0.5rem">
@@ -304,50 +306,39 @@ function SignButton({ pathwayState: any, protocol: any, pathway: any } : { }) {
   )
 }*/
 
-export default function Protocol() {
+export default function Bundle() {
 
-  const { protocolId } = useParams()
+  let { bundleId, protocolId } : { bundleId: string; protocolId: string } = useParams() as { bundleId: string; protocolId: string }
 
-  const protocol = {
-    id: 'acute-appendicitis',
+  const bundle: {
+    id: string, name: string, protocols: { id: string, name: string }[]
+  } = {
+    id: 'recfTPwyzRqM3dk0I',
     name: 'Acute appendicitis',
-    pathways: [
+    protocols: [
       { id: 'recXTk08zFJaYRb0m', name: 'Emergency room evaluation' },
       { id: 'recVgF9M7WjQB6hZq', name: 'As needed medications' },
       { id: 'recrYanGocrkXIF8C', name: 'Antibiotic treatment' },
       { id: 'recEYsUbey3PbAIlY', name: 'Nonoperative management' },
       { id: 'recOSd2rC7DAa1kSf', name: 'Operative management' },
-      {
-        id: 'recooGtEyv9gxW85e',
-        name: 'Preoperative orders',
-      },
+      { id: 'recooGtEyv9gxW85e', name: 'Preoperative orders', },
       { id: 'reco0mAGEFY2WNfq4', name: 'Postoperative orders' },
       { id: 'recL7F1EUkhCA5kCw', name: 'Postoperative follow-up' },
       { id: 'recZ5grhMnqaMZIMx', name: 'Hospital discharge' },
     ],
   }
 
-  const pathwayId = protocol.pathways[0].id
-
-  //const assessments = api.Assessment.elements
-
-  /*const pathway = useMemo(
-    () => api.Pathway.elements.find((pathway) => pathway.id === pathwayId),
-    [pathwayId],
-  )
-  */
+  protocolId = protocolId ?? (bundle.protocols[0].id)
 
   const [evidence, setEvidence] = useState(null)
 
-  // useEffect(() => {
-  //   if (typeof window === 'undefined') return
-  //   window.api = api
-  // }, [])
-
-  const storageKey = `protocol-v10-${protocol.id}-autosaved`
+  const storageKey = `bundle-v11-${bundle.id}-autosaved`
 
   const [autosaved, setAutosaved] = useState(null)
   const [loaded, setLoaded] = useState(false)
+
+  console.log(autosaved)
+
 
   useEffect(() => {
     try {
@@ -358,16 +349,11 @@ export default function Protocol() {
   }, [])
 
   const save = (pathwayState: any) => {
-    const value = { ...(autosaved ?? {}), [pathwayId]: pathwayState }
+    const value = { ...(autosaved ?? {}), [protocolId]: pathwayState }
     localStorage.setItem(storageKey, JSON.stringify(value))
-    //setAutosaved(value)
+    console.log(value)
+    setAutosaved(value)
   }
-  
-  // const save = throttle((pathwayState) => {
-  //   const value = { ...(autosaved ?? {}), [pathwayId]: pathwayState }
-  //   localStorage.setItem(storageKey, JSON.stringify(value))
-  //   setAutosaved(value)
-  // }, 1000)
 
   const [lastResetTime, setLastResetTime] = useState(Date.now())
 
@@ -381,153 +367,133 @@ export default function Protocol() {
 
   const pageContextValue = useMemo(() => {
     return {
-      protocol,
-      pathwayId,
+      bundle,
+      protocolId,
       setEvidence,
       autosaved,
     }
-  }, [pathwayId])
+  }, [protocolId])
 
   return (
     <BareLayout>
-    <ThemeProvider theme={customTheme}>
-      <CSSReset />
-
-    
-    <PageContext.Provider value={pageContextValue}>
-      <ResetDialog openState={resetDialogOpenState} onReset={reset} />
-
-      <Box
-        position="sticky"
-        top="0"
-        zIndex={1}
-        left="0"
-        borderBottom="1px"
-        borderColor="gray.200"
-        bg="white"
-        py="1.5rem"
-        mt="-1.5rem"
-      >
-        {/* <ProtocolBreadcrumbs /> */}
-
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <Stack direction="row" alignItems="center">
-            <Heading as="h1" size="lg">
-              {protocol.name}
-            </Heading>
-
-          </Stack>
-
-          <Stack direction="row">
-            <Box display="flex" alignItems="center">
-              <Text>
-                Patient ID: <b>MCA9298BD</b>
-              </Text>
-            </Box>
-
-            <Button
-              colorScheme="gray"
-              variant="ghost"
-              onClick={() => setResetDialogOpen(true)}
-              visibility={autosaved?.[pathwayId] ? 'visible' : 'hidden'}
+      <ThemeProvider theme={customTheme}>
+        <CSSReset />      
+        <PageContext.Provider value={pageContextValue}>
+          <ResetDialog openState={resetDialogOpenState} onReset={reset} />
+          <Box
+            position="sticky"
+            top="0"
+            zIndex={1}
+            left="0"
+            borderBottom="1px"
+            borderColor="gray.200"
+            bg="white"
+            py="1.5rem"
+            mt="-1.5rem"
+          >
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
             >
-              Reset
-            </Button>
-
-            {/*<SignButton
-              pathwayState={autosaved?.[pathwayId]}
-              protocol={protocol}
-              pathway={pathway}
-            />*/}
-          </Stack>
-        </Stack>
-
-        <Box h="1rem" />
-
-        <Box overflowX="auto" overflowY="hidden" whiteSpace="nowrap">
-          {protocol.pathways.map((pathway: any, i: number) => (
-            <Box
-              key={pathway.id}
-              display="inline-flex"
-              ml={i > 0 ? '0.5rem' : '0'}
-            >
-              <Box>
-                <PathwayStateBadge pathwayState={autosaved?.[pathway.id]} />
-
-                <NextLink
-                  href="/protocols/[protocolId]/pathways/[pathwayId]"
-                  as={`/protocols/${protocol.id}/pathways/${pathway.id}`}
-                  passHref
-                  prefetch={false}
+              <Stack direction="row" alignItems="center">
+                <Box align="left" w="100%" display="flex">
+                  <Image src={`${base_url}/assets/logo_small.png`} alt="NO"/>
+                  <Heading as="h1" size="lg">
+                    {bundle.name}
+                  </Heading>
+                </Box>
+              </Stack>
+              <Stack direction="row">
+                <Box display="flex" alignItems="center">
+                  <Text>
+                    Patient ID: <b>MCA9298BD</b>
+                  </Text>
+                </Box>
+                <Button
+                  colorScheme="gray"
+                  variant="ghost"
+                  onClick={() => setResetDialogOpen(true)}
+                  visibility={autosaved?.[protocolId] ? 'visible' : 'hidden'}
                 >
-                  <Button
-                    as="a"
-                    display="flex"
-                    colorScheme="pathway"
-                    size="sm"
-                    variant={pathway.id === pathwayId ? 'solid' : 'outline'}
-                    color={pathway.id === pathwayId ? 'white' : 'pathway.400'}
-                    justifyContent="space-between"
-                    py="0.75rem"
-                    rightIcon={<ArrowForwardIcon />}
-                    height="auto"
-                    width="24rem"
-                    whiteSpace="normal"
-                  >
-                    <Box>
-                      <Text display="block" fontWeight="normal">
-                        Pathway #{i + 1}
-                      </Text>
-                      <Heading
-                        as="h3"
-                        display="block"
-                        fontSize="md"
-                        mt="0.15em"
-                      >
-                        {pathway.name}
-                      </Heading>
-                    </Box>
-                  </Button>
-                </NextLink>
-              </Box>
+                  Reset
+                </Button>
+                {/*<SignButton
+                  pathwayState={autosaved?.[protocolId]}
+                  protocol={protocol}
+                  pathway={pathway}
+                />*/}
+              </Stack>
+            </Stack>
+            <Box h="1rem" />
+            <Box overflowX="auto" overflowY="hidden" whiteSpace="nowrap">
+              {bundle.protocols.map((protocol: { name: string, id: string }, i: number) => (
+                <Box
+                  key={protocol.id}
+                  display="inline-flex"
+                  ml={i > 0 ? '0.5rem' : '0'}
+                >
+                  <Box>
+                    <PathwayStateBadge pathwayState={autosaved?.[protocol.id]} />
+                    <RouteLink to={`/bundles/${bundle.id}/protocols/${protocol.id}`} target="_blank">
+                      <Link>
+                        <Button
+                          as="a"
+                          display="flex"
+                          colorScheme="pathway"
+                          size="sm"
+                          variant={protocol.id === protocolId ? 'solid' : 'outline'}
+                          color={protocol.id === protocolId ? 'white' : 'pathway.400'}
+                          justifyContent="space-between"
+                          py="0.75rem"
+                          rightIcon={<ArrowForwardIcon />}
+                          height="auto"
+                          width="24rem"
+                          whiteSpace="normal"
+                        >
+                          <Box>
+                            <Text display="block" fontWeight="normal">
+                              Pathway #{i + 1}
+                            </Text>
+                            <Heading
+                              as="h3"
+                              display="block"
+                              fontSize="md"
+                              mt="0.15em"
+                            >
+                              {protocol.name}
+                            </Heading>
+                          </Box>
+                        </Button>
+                      </Link>
+                    </RouteLink>
+                  </Box>
+                </Box>
+              ))}
             </Box>
-          ))}
-        </Box>
-      </Box>
-
-      <Box h="2rem" />
-
-      <Box maxWidth="40em" mx="auto">
-        {loaded ? (
-          <PathwayThemeProvider>
-            <DbProvider db={collectedDb}>
-              <Suspense fallback={null}>
-              { pathwayId && <Pathway pathwayId={pathwayId} onAssessmentClick={(data: any) => {}} />}
-              </Suspense>
-            </DbProvider>
-          </PathwayThemeProvider>
-        ) : (
-          <Text>'Loading'</Text>
-        )}
-      </Box>
-      {/*<Pathway
-            pathwayId={}
-            key={`${pathwayId}-${lastResetTime}`}
-            pathway={pathway}
-            maxNodes={Infinity}
-            onAssessmentClick={(evidence) => setEvidence(evidence)}
-            followDefaultPath={false}
-            initial={autosaved?.[pathwayId]?.serialized ?? null}
-            onChange={({ serialized, visibleSerialized, isComplete }) =>
-              save({ serialized, visibleSerialized, isComplete })
-            }
-          />*/}
-    </PageContext.Provider>
-    </ThemeProvider>
+          </Box>
+          <Box h="2rem" />
+          <Box maxWidth="40em" mx="auto">
+            {loaded ? (
+              <PathwayThemeProvider>
+                <DbProvider db={collectedDb}>
+                  <Suspense fallback={null}>
+                  { protocolId && <Pathway pathwayId={protocolId} 
+                    onAssessmentClick={(data: any) => {}} 
+                    maxNodes={Infinity}
+                    followDefaultPath={false}
+                    initial={autosaved?.[protocolId]?.serialized ?? null}
+                    onChange={({ serialized, visibleSerialized, isComplete }) =>
+                      save({ serialized, visibleSerialized, isComplete })}/>}
+                  </Suspense>
+                </DbProvider>
+              </PathwayThemeProvider>
+            ) : (
+              <Text>'Loading'</Text>
+            )}
+          </Box>
+        </PageContext.Provider>
+      </ThemeProvider>
     </BareLayout>
   )
 }

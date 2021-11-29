@@ -1,44 +1,10 @@
 import * as React from 'react';
 import { base_url } from '../Globals'
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
 import LeftCard from './LeftCard';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
 import {CardList_Actions, CardList_Triggers, CardList_Structure} from '../Globals';
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <div>
-          {children}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function a11yProps(index: number) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
+import { ThemeProvider, CSSReset, Box, Heading, Text, Image, Input, Divider, Tabs, Tab, TabList, TabPanels, TabPanel, IconButton } from '@chakra-ui/react'
+import theme from '../styles/theme'
 
 export default function LeftTab() {
 	const [open, setOpen] = React.useState(true);
@@ -53,90 +19,99 @@ export default function LeftTab() {
 	};
 
 	return (
-		<div id="leftcard" style={{paddingRight: `${open ? '20px' : '0px'}`, paddingLeft: `${open ? '20px' : '0px'}`}}>
-			{
-				open ? (
-					<div id="closecard">
-						<IconButton aria-label="delete" size="large" onClick={() => handleOpen()}>
-							<img src={`${base_url}/assets/closeleft.svg`} alt="NO"/>	
-						</IconButton>
-					</div>
-				) : (
-					<div id="opencard">
-						<IconButton aria-label="delete" size="large" onClick={() => handleOpen()}>
-							<img src={`${base_url}/assets/openright.svg`} alt="NO"/>	
-						</IconButton>
-					</div>
-				)
-			}
-			{
-				open && (
-					<>
-						<p id="header">Blocks</p>
-						<div id="search">
-							<img src={`${base_url}/assets/search.svg`} alt="NO"/>
-							<input type="text" placeholder="Search blocks" />
-						</div>
-						<div id="subnav" >
-							<Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-								<Tab label="Trigger" {...a11yProps(0)} />
-								<Tab label="Action" {...a11yProps(1)} />
-								<Tab label="Structure" {...a11yProps(2)} />
-							</Tabs>
-						</div>	
-						<TabPanel value={value} index={0}>
-							<div id="blocklist">
-								{
-									CardList_Triggers.map((trigger) => {
-										return <LeftCard key={trigger.id} data={trigger} open={open}/>
-									})
-								}
-							</div>
-						</TabPanel>
-						<TabPanel value={value} index={1}>
-							<div id="blocklist">
-								{
-									CardList_Actions.map((trigger) => {
-										return <LeftCard key={trigger.id} data={trigger} open={open}/>
-									})
-								}
-							</div>
-						</TabPanel>
-						<TabPanel value={value} index={2}>
-							<div id="blocklist">
-								{
-									CardList_Structure.map((trigger) => {
-										return <LeftCard key={trigger.id} data={trigger} open={open}/>
-									})
-								}
-							</div>
-						</TabPanel>
-					</>
-				)
-			}
-			{
-				!open && (
-					<div id="blocklist">
-						{
-							CardList_Triggers.map((trigger) => {
-								return <LeftCard key={trigger.id} data={trigger} open={open}/>
-							})
-						}
-						<Divider style={{width: '40px', marginLeft: '9px', marginTop: '10px'}}/>
-						{
-							CardList_Actions.map((trigger) => {
-								return <LeftCard key={trigger.id} data={trigger} open={open}/>
-							})
-						}
-						<Divider style={{width: '40px', marginLeft: '9px', marginTop: '10px'}}/>
-						{
-							CardList_Structure.map((trigger) => {
-								return <LeftCard key={trigger.id} data={trigger} open={open}/>
-							})
-						}
-					</div>
-				)
-			}
-		</div>    
+		<ThemeProvider theme={theme}>
+			<CSSReset />
+			<Box id="lefttab" w="fixed" bg="#FFF" box-sizing="border-box" position="absolute" z-index="2">
+				{
+					open ? (
+						<Box id="closecard" pt="10px">
+							<IconButton aria-label="delete" size="large" onClick={() => handleOpen()}>
+								<img src={`${base_url}/assets/closeleft.svg`} alt="NO"/>	
+							</IconButton>
+						</Box>
+					) : (
+						<Box ml="12px" mt="40px">
+							<IconButton aria-label="delete" size="large" onClick={() => handleOpen()}>
+								<img src={`${base_url}/assets/openright.svg`} alt="NO"/>	
+							</IconButton>
+						</Box>
+					)
+				}
+				{
+					open && (
+						<Box borderRight="1px solid lightgray" pt="4" h="100%">
+							<Box w="100%" mt="2">
+								<Heading as="h2" size="md">Blocks</Heading>
+								<Box id="search" mt="2">
+									<Image src={`${base_url}/assets/search.svg`} alt="Search"/>
+									<Input type="text" placeholder="Search blocks" />
+								</Box>
+							</Box>
+							<Box w="100%" mt="8">
+								<Tabs value={value} onChange={handleChange} size="md" variant="soft-rounded">
+									<TabList>
+										<Tab>Trigger</Tab>
+										<Tab>Action</Tab>
+										<Tab>Structure</Tab>
+									</TabList>
+									<TabPanels>
+										<TabPanel value={value} index={0}>
+											<Box id="blocklist">
+											{
+												CardList_Triggers.map((trigger) => {
+													return <LeftCard key={trigger.id} data={trigger} open={open}/>
+												})
+											}
+											</Box>
+										</TabPanel>
+										<TabPanel value={value} index={1}>
+											<Box id="blocklist">
+												{
+													CardList_Actions.map((trigger) => {
+														return <LeftCard key={trigger.id} data={trigger} open={open}/>
+													})
+												}
+											</Box>
+										</TabPanel>
+										<TabPanel value={value} index={2}>
+											<Box id="blocklist">
+												{
+													CardList_Structure.map((trigger) => {
+														return <LeftCard key={trigger.id} data={trigger} open={open}/>
+													})
+												}
+											</Box>
+										</TabPanel>
+									</TabPanels>
+								</Tabs>
+							</Box>							
+						</Box>
+					)
+				}
+				{
+					!open && (
+						<Box id="blocklist">
+							{
+								CardList_Triggers.map((trigger) => {
+									return <LeftCard key={trigger.id} data={trigger} open={open}/>
+								})
+							}
+							<Divider style={{width: '40px', marginLeft: '9px', marginTop: '10px'}}/>
+							{
+								CardList_Actions.map((trigger) => {
+									return <LeftCard key={trigger.id} data={trigger} open={open}/>
+								})
+							}
+							<Divider style={{width: '40px', marginLeft: '9px', marginTop: '10px'}}/>
+							{
+								CardList_Structure.map((trigger) => {
+									return <LeftCard key={trigger.id} data={trigger} open={open}/>
+								})
+							}
+						</Box>
+					)
+				}
+			</Box>    
+		</ThemeProvider>
   );
 }

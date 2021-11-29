@@ -2,6 +2,7 @@ import React, { DragEvent, MouseEvent, useCallback, useState } from 'react';
 import IconButton from '@mui/material/IconButton';
 import { RightCardProps } from '../types';
 import {base_url, paddingLeft, paddingTop} from '../Globals';
+import { Box } from '@chakra-ui/react'
 
 const RightCard = (props: RightCardProps) => {
     const { id, lefticon, name, template, addedBranch, begin, position, isOpenProps } = props.data;
@@ -85,11 +86,11 @@ const RightCard = (props: RightCardProps) => {
     var offsetYTemp = document.getElementById(`block-${id}`)?.offsetHeight ? document.getElementById(`block-${id}`)!.offsetHeight-122 : 0;
 
     return (
-        <>
-            <div className="branchinfo" style={{left: position.x, top: position.y-30}}>
+        <Box>
+            <Box className="branchinfo" style={{left: position.x, top: position.y-30}}>
                 {addedBranch}
-            </div>
-            <div id={`block-${id}`} 
+            </Box>
+            <Box id={`block-${id}`} 
                 className="blockelem noselect block rightcard"
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -99,19 +100,19 @@ const RightCard = (props: RightCardProps) => {
                 onMouseUp={handleMouseUp}
                 style={{left: position?.x, top: position?.y, opacity: `${props.isSelected? 0.5:1}`, border: `2px solid ${isOpenProps ? '#217CE8' : '#C5CCD0' }`}}
             >
-                <div className='blockyleft'>
+                <Box className='blockyleft'>
                     <IconButton aria-label="delete" size="large">
                         <img src={lefticon} alt="NO" style={{width: '24px'}}/>
                     </IconButton>
                     <p className='blockyname'>{name}</p>
-                </div>
-                <div className='blockyright'>
+                </Box>
+                <Box className='blockyright'>
                     <IconButton aria-label="delete" size="large">
                         <img src={`${base_url}/assets/close.svg`} alt="NO"/>
                     </IconButton>
-                </div>
-                <div className='blockydiv'></div>
-                <div className='blockyinfo'>
+                </Box>
+                <Box className='blockydiv'></Box>
+                <Box className='blockyinfo'>
                     <span className='blockyinfoTextLabel'>{begin}</span>
                     { 
                         templateIsDefault ? 
@@ -119,16 +120,16 @@ const RightCard = (props: RightCardProps) => {
                         :
                             <span className='blockyinfoTextValue'>{template}</span> 
                     }
-                </div>
+                </Box>
                 {
                     isAddBranch ? (
-                        <div className={`indicator ${(isDragOver || props.updatedId === id) ? '' : 'invisible'}`}  style={{pointerEvents: 'none', left: `${offsetXTemp-7}px`, top: `${offsetYTemp}px`}}></div>
+                        <Box className={`indicator ${(isDragOver || props.updatedId === id) ? '' : 'invisible'}`}  style={{pointerEvents: 'none', left: `${offsetXTemp-7}px`, top: `${offsetYTemp}px`}}></Box>
                     ) : (
-                        <div className={`indicator ${(isDragOver || props.updatedId === id) ? '' : 'invisible'}`}  style={{pointerEvents: 'none', left: `${offsetXTemp-7}px`}}></div>
+                        <Box className={`indicator ${(isDragOver || props.updatedId === id) ? '' : 'invisible'}`}  style={{pointerEvents: 'none', left: `${offsetXTemp-7}px`}}></Box>
                     )
                 }
-            </div>
-        </>
+            </Box>
+        </Box>
     )
 }
 export default React.memo(RightCard);
