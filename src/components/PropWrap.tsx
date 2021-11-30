@@ -68,8 +68,6 @@ const PropWrap = (props: PropWrapProps) => {
   const [propCard, setPropCard] = useState(props.propData);
   const [inputData, setInputData] = useState('');
 
-  console.log(selableProtocols, selectedHeaderProtocol);
-
   useEffect(() => {
     setIsGlobal(props.isGlobal);
     setIsHeader(props.isHeader);
@@ -148,6 +146,10 @@ const PropWrap = (props: PropWrapProps) => {
     setSelectedProtocol(selProtocol);
     setSelectedHeaderProtocol(selProtocol);
   }, [selProtocol]);
+
+  useEffect(() => {
+    setSelectableProtocols(selableProtocols);
+  }, [selableProtocols])
 
   const customDropdownRenderer = useCallback(({ methods, state, props }) => {
     return (
@@ -243,7 +245,6 @@ const PropWrap = (props: PropWrapProps) => {
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
     setSelectedFilterValue(event.target.value);
   }
 
@@ -258,7 +259,6 @@ const PropWrap = (props: PropWrapProps) => {
         value: selectedFilterValue, 
       }
     }
-    console.log(tempBranch);
     setBranches([...newBranches, tempBranch]);
     setSelectedFilterFilter([]);
     setSelectedFilterValue('');
@@ -313,6 +313,7 @@ const PropWrap = (props: PropWrapProps) => {
         if (tempProtocol)
           tempProtocols.push(tempProtocol);
       }
+
       setSelectableProtocols(tempProtocols);
       setSelectedHeaderProtocol(tempProtocols[0]);
     }
@@ -394,10 +395,10 @@ const PropWrap = (props: PropWrapProps) => {
                   <div style={{margin: '10px 0px'}}>
                     <span className="inputlabel">Protocol: </span>
                     {
-                      (selectedHeaderProtocol && selableProtocols.length > 0) && (
+                      (selectedHeaderProtocol && selectableProtocols.length > 0) && (
                         <Select
                           className="addbranch"
-                          options={selableProtocols}
+                          options={selectableProtocols}
                           values={[selectedHeaderProtocol]}
                           onChange={(value) => {
                             setSelectedHeaderProtocol(value[0]);

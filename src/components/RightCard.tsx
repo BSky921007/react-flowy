@@ -5,7 +5,7 @@ import {base_url, paddingLeft, paddingTop} from '../Globals';
 import { Box } from '@chakra-ui/react'
 
 const RightCard = (props: RightCardProps) => {
-    const { id, lefticon, name, template, addedBranch, begin, position, isOpenProps } = props.data;
+    const { id, savedId, lefticon, name, template, addedBranch, begin, position, isOpenProps } = props.data;
     const [isDragOver, setIsDragOver] = useState(false);
     const [moving, setMoving] = useState(props.isMoving);
     const [isAddBranch, setIsAddBranch] = useState(false);
@@ -20,8 +20,8 @@ const RightCard = (props: RightCardProps) => {
         if (!isDragOver) {
             setIsDragOver(!isDragOver);
         }
-        props.onOver(id);
-    }, [id, position.y, props, isDragOver]);
+        props.onOver(id, savedId);
+    }, [id, savedId, position.y, props, isDragOver]);
 
     const handleDragLeave = useCallback((event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
@@ -55,11 +55,11 @@ const RightCard = (props: RightCardProps) => {
         if ((topBarMargin < clickOffsetX && clickOffsetX < xButtonStartX) && 
             (topBarStartY < clickOffsetY && clickOffsetY < topBarEndY)) {
             setMoving(true);
-            props.onMouseDown(id);
+            props.onMouseDown(id, savedId);
         } else if ((xButtonStartX < clickOffsetX && clickOffsetX < xButtonEndX) && 
                    (topBarStartY < clickOffsetY && clickOffsetY < topBarEndY)) {
             setMoving(false);
-            props.onDeleteCard(id);
+            props.onDeleteCard(id, savedId);
         } else {
             props.onProp(id);
         }
@@ -71,7 +71,7 @@ const RightCard = (props: RightCardProps) => {
             const ratioX = event.screenX/event.pageX;
             const ratioY = event.screenY/event.pageY;
             const ratio = (ratioX < ratioY) ? ratioX : ratioY;
-            props.onMouseMove(movementX, movementY, pageX, pageY, ratio, id);
+            props.onMouseMove(movementX, movementY, pageX, pageY, ratio, id, savedId);
         }
     }
     

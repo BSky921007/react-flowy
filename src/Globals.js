@@ -6,7 +6,14 @@ export const paddingTop = 73;
 export const paddingX = 20;
 export const paddingY = 0;
 export const cardWidth = 318;
-export const cardHeight = 122
+export const cardHeight = 122;
+
+export const token = 'keymneuuZO7FHj0i3';
+export const options = {
+  headers: {
+    'Authorization': `Bearer ${token}`,
+  }
+};
 
 export const CardList_Triggers = [
     {
@@ -163,7 +170,7 @@ export const CardList_Structure = [
 
 export const Right_Card = [
     {
-        id: 'recfpahhLXHEx0QVN', 
+        id: 'recOgGuIm0QxDIDr1', 
         name: "Repeat timer", 
         lefticon: `${base_url}/assets/time_elapsed_blue.svg`, 
         desc: "Trigger care process at a set recurring period.", 
@@ -175,7 +182,7 @@ export const Right_Card = [
         hasTextInput: false,
     }, 
     {
-        id: 'recaAkqkKkiiUHVv5', 
+        id: 'recv0Grnqhae8FNvZ', 
         name: "New patient", 
         lefticon: `${base_url}/assets/new_patient_info_blue.svg`, 
         desc: "Trigger care process when a new patient is created.", 
@@ -187,7 +194,7 @@ export const Right_Card = [
         hasTextInput: false,
     }, 
     {
-        id: 'recHqQFciHIqVO2ew', 
+        id: 'recUlgrKgCmVZZyeP', 
         name: "New action", 
         lefticon: `${base_url}/assets/new_action_blue.svg`, 
         desc: "Trigger care process when a new action is performed.", 
@@ -199,7 +206,7 @@ export const Right_Card = [
         hasSelectInput: false,
     }, 
     {
-        id: 'recGLJ1YRkapykt4U', 
+        id: 'recXpO4OMxQ87yutd', 
         name: "Await result", 
         lefticon: `${base_url}/assets/new_data_blue.svg`, 
         desc: "Trigger care process when a new result is available.", 
@@ -211,7 +218,7 @@ export const Right_Card = [
         hasSelectInput: false,
     }, 
     {
-        id: 'rec3sM2TfHS7VIhJg', 
+        id: 'recVFf8DatCzWA6e5', 
         name: "Elicit", 
         lefticon: `${base_url}/assets/elicit_blue.svg`, 
         desc: "Elicit a set of clinical findings from a patient.", 
@@ -223,7 +230,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 'recSzM5HiqHpCHy29', 
+        id: 'rec1WMQ0oYHa1DFWv', 
         name: "Prescribe", 
         lefticon: `${base_url}/assets/prescribe_blue.svg`, 
         desc: "Prescribe one or more medications.", 
@@ -235,7 +242,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 'rechpNeoJ4l99qpV1', 
+        id: 'rec8gPa92hrApWzmI', 
         name: "Order", 
         lefticon: `${base_url}/assets/order_blue.svg`, 
         desc: "Order a test for a patient.", 
@@ -247,7 +254,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 'reca9htmvyVbsawOo', 
+        id: 'recl3Vx20CLt9Irr2', 
         name: "Record", 
         lefticon: `${base_url}/assets/record_blue.svg`, 
         desc: "Record one or more diagnoses.", 
@@ -259,7 +266,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 'rec7TNaavHMeZD3LR', 
+        id: 'rechlTq5qDEdXe2P7', 
         name: "Apply", 
         lefticon: `${base_url}/assets/apply_blue.svg`, 
         desc: "Apply a guideline recommendation.", 
@@ -271,7 +278,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 'rec8VkmoRHEwW08P6', 
+        id: 'recdzYcD6sSdDfGz3', 
         name: "Schedule", 
         lefticon: `${base_url}/assets/schedule_blue.svg`, 
         desc: "Schedule a follow-up visit.", 
@@ -283,7 +290,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 'reci5wpCzWLbmFhzi', 
+        id: 'recmoaDdoqcFAsDUQ', 
         name: "Link", 
         lefticon: `${base_url}/assets/link_blue.svg`, 
         desc: "Link to another care bundle.", 
@@ -295,7 +302,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 'rec8gbL4jMW4g4XxL', 
+        id: 'recWZf0MvdyOgKlco', 
         name: "Use", 
         lefticon: `${base_url}/assets/use_blue.svg`, 
         desc: "Use a clinical calculator.", 
@@ -307,7 +314,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 'recJOAwaQf279Asvp', 
+        id: 'recZAUrDOKHkfqyim', 
         name: "Custom", 
         lefticon: `${base_url}/assets/custom_blue.svg`, 
         desc: "Write a block with custom text.", 
@@ -331,7 +338,7 @@ export const Right_Card = [
         hasSelectInput: false,
     },
     {
-        id: 'rec5LaYloNDn0SDGW', 
+        id: 'reckKfwdSqYxqo4vD', 
         name: "Start", 
         lefticon: `${base_url}/assets/start_blue.svg`, 
         desc: "Begin care process.", 
@@ -343,7 +350,7 @@ export const Right_Card = [
         hasSelectInput: false,
     }, 
     {
-        id: 'recXg8637oB5oCy5M', 
+        id: 'recj9dsJB5EyEBORS', 
         name: "Include", 
         lefticon: `${base_url}/assets/filter_blue.svg`, 
         desc: "Continue only if a specific condition is met.", 
@@ -355,7 +362,7 @@ export const Right_Card = [
         hasSelectInput: true,
     }, 
     {
-        id: 'recUk31UrCDrLsFVi', 
+        id: 'reck1FNVM7s0yc6mP', 
         name: "Branch", 
         lefticon: `${base_url}/assets/branch_blue.svg`, 
         desc: "Continue only if a specific condition is met. ", 
@@ -367,7 +374,7 @@ export const Right_Card = [
         hasTextInput: false,
     }, 
     {
-        id: 'rec7Fh2BNtNcOKqgP', 
+        id: 'recnayOejKAWUSRKx', 
         name: "End", 
         lefticon: `${base_url}/assets/end_blue.svg`, 
         desc: "End care process.", 

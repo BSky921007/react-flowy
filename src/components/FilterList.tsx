@@ -18,7 +18,6 @@ type FilterPropsType = {
 
 const FilterList = (props: FilterPropsType) => {
     const { data } = props;
-    console.log(data);
 
     const [selectedName, setSelectedName] = useState<SelectTypes[]>(data.data.name);
     const [selectedCondition, setSelectedCondition] = useState<SelectTypes[]>(data.data.condition);
@@ -27,7 +26,6 @@ const FilterList = (props: FilterPropsType) => {
     const [selectableFilters, setSelectableFilters] = useState<SelectTypes[]>([]);
 
     const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(event.target.value);
     }
 
     const changeFilterName = (value: any) => {

@@ -1,8 +1,10 @@
 import React, { DragEvent, MouseEvent, useState, useCallback, useEffect } from 'react';
+import axios from 'axios';
 import RightCard from './RightCard';
 import Arrow from './Arrow';
-import { Right_Card, cardWidth, paddingX, paddingLeft, paddingTop, cardHeight } from '../Globals';
+import { Right_Card, cardWidth, paddingX, paddingLeft, paddingTop, cardHeight, options } from '../Globals';
 import { ArrowData, CardData, Position, CanvasProps, BranchTypes, BlockData } from '../types';
+import { update } from 'lodash';
 
 const Canvas = (props: CanvasProps) => {
     const { selBundle, selProtocol } = props;
@@ -13,14 +15,31 @@ const Canvas = (props: CanvasProps) => {
     const [moveFirstChild, setMoveFirstChild] = useState(false);
     const [cnt, setCnt] = useState(0);
     const [parentId, setParentId] = useState(-1);
+    const [parentSavedId, setParentSavedId] = useState('');
     const [selectedId, setSelectedId] = useState(-1);
+    const [selectedSavedId, setSelectedSavedId] = useState('');
     const [updatedId, setUpdatedId] = useState(-1);
+    const [updatedSavedId, setUpdatedSavedId] = useState('');
     const [selectedCards, setSelectedCards] = useState<CardData[]>([]);
-    const [rightCards, setRightCards] = useState<CardData[]>(props.data);
+    const [rightCards, setRightCards] = useState<CardData[]>(props.cardsData);
     const [selectedBlocks, setSelectedBlocks] = useState<BlockData[]>([]);
-    const [blocks, setBlocks] = useState<BlockData[]>(props.block);
+    const [blocks, setBlocks] = useState<BlockData[]>(props.blocksData);
     const [arrows, setArrows] = useState<ArrowData[]>([]);
     const [selectedArrows, setSelectedArrows] = useState<ArrowData[]>([]);
+
+    const formatParent = () => {
+        setParentId(-1);
+        setParentSavedId('');
+    }  
+
+    const formatCanvasState = () => {
+        setParentId(-1);
+        setParentSavedId('');
+        setSelectedId(-1);
+        setSelectedSavedId('');
+        setUpdatedId(-1);
+        setUpdatedSavedId('');
+    }
 
     const drawArrows = useCallback((elements: CardData[]): ArrowData[] => {
         const newArrow: ArrowData[] = [];
@@ -49,7 +68,7 @@ const Canvas = (props: CanvasProps) => {
     const getElementWidth = useCallback((elementId: number, elements: CardData[]): number => {
         const tempCard = elements.find(({id}) => id === elementId);
         if (!tempCard) return 0;
-        const childrenIds = tempCard.children;
+        const childrenIds = tempCard.childrenIds;
         if (!childrenIds || childrenIds.length === 0) return 1;
         let childWidth = 0;
 
@@ -64,7 +83,7 @@ const Canvas = (props: CanvasProps) => {
     const addPositionToChildren = useCallback((elementId: number, parentPosition: Position, newCards: CardData[]) => {
         const element = newCards.find(({ id }) => elementId === id);
         if (!element) return;
-        const children = element.children;
+        const children = element.childrenIds;
         if (!children || children.length === 0) return;
         const width = getElementWidth(elementId, newCards);
         let tmp = 0;
@@ -96,31 +115,10 @@ const Canvas = (props: CanvasProps) => {
         }
         return newCards;
     }, [getElementWidth, addPositionToChildren]);
-    // }, [getElementWidth, addPositionToChildren, getElements]);
 
-    useEffect(() => {
-        const newCards = rearrange(props.data);
-        if (newCards.length === 0)  setHasFirstCard(false);
-        else                        setHasFirstCard(true);
-        setRightCards(newCards);
-        let tempId = 0;
-        if (newCards.length === 1) tempId = newCards[0].id;
-        else {
-            for (let i = 0; i < newCards.length; i ++) {
-                for (let j = i + 1; j < newCards.length; j ++) {
-                    if (newCards[i].id > newCards[j].id)    tempId = newCards[i].id;
-                    else                                    tempId = newCards[j].id;
-                }
-            }
-        }
-        setCnt(tempId+1);
-        const newArrows = drawArrows(newCards);
-        setArrows(newArrows);
-    }, [props.data, drawArrows, rearrange]);
-    // }, [props.data]);
-
-    const updateParent = (idToUpdate: number) => {
+    const updateParent = (idToUpdate: number, savedIdToUpdate: string) => {
         setParentId(idToUpdate);
+        setParentSavedId(savedIdToUpdate);
     }  
 
     const viewProps = (id: number) => {
@@ -143,52 +141,59 @@ const Canvas = (props: CanvasProps) => {
         props.onPropsView(newCards, id);
     }
 
-    const deleteCard = (id: number) => {
+    const deleteCard = (id: number, savedId: string) => {
         if (id > 0) {
             const newCards = [...rightCards];
+            const newBlocks = [...blocks];
             const tempSelectedIds = getElements(id, newCards);
+            const tempSelectedBlockIds = getBlockIds(savedId, newBlocks);
             const tempSelCard = newCards.find((newCard) => newCard.id === id);
             if (tempSelCard) {
-                const tempParentCard = newCards.find((newCard) => newCard.id === tempSelCard.parentId);
-                if(tempParentCard) {
-                    tempParentCard.children = tempParentCard.children.filter((b) => b !== id);
+                const tempParentCard = newCards.find(({ id }) => id === tempSelCard.parentId);
+                const tempParentBlock = newBlocks.find(({ id }) => id === tempSelCard.parentSavedId);
+                if (tempParentCard) {
+                    tempParentCard.childrenIds = tempParentCard.childrenIds.filter((b) => b !== id);
                     tempParentCard.childrenCnt --;
                 }
-                const nonSelectedCards = rearrange(newCards.filter((newCard) => !tempSelectedIds.includes(newCard.id)));
+                if (tempParentBlock) {
+                    tempParentBlock.fields.edges = tempParentBlock.fields.edges.filter((b) => b !== savedId);
+                }
+
+                const nonSelectedCards = rearrange(newCards.filter(({ id }) => !tempSelectedIds.includes(id)));
+                const nonSelectedBlocks = newBlocks.filter(({ id }) => !tempSelectedBlockIds.includes(id));
+                const selectedBlocks = newBlocks.filter(({ id }) => tempSelectedBlockIds.includes(id));
                 const newArrows = drawArrows(nonSelectedCards);
-                const emptyArrows: ArrowData[] = [];
-                const emptyCards: CardData[] = [];
                 if (tempSelCard.isOpenProps) {
                     tempSelCard.isOpenProps = false;
                     props.onPropsView(nonSelectedCards, id);
                 }
-                setSelectedCards(emptyCards);
-                setSelectedArrows(emptyArrows);
+                setSelectedCards([]);
+                setSelectedArrows([]);
+                setSelectedBlocks([]);
                 setIsMoving(false);
                 setRightCards(nonSelectedCards);
+                setBlocks(nonSelectedBlocks);
                 setArrows(newArrows);
                 if (id === 1) {
                     setHasFirstCard(false);
                     setCnt(1);
                 }
                 setSelectedId(-1);
+                setSelectedSavedId('');
+                deleteBlocks(selectedBlocks);
                 props.onDeleteCard(nonSelectedCards);
             }
         }
-    }
-
-    const formatParent = () => {
-        setParentId(-1);
-    }  
+    }    
 
     const getElements = useCallback((elementId: number, elements: CardData[]): number[] => {
-        const tempCard = elements.find(({id}) => id === elementId);
-        const childrenIds = tempCard?.children;
+        const tempCard = elements.find(({ id }) => id === elementId);
+        const childrenIds = tempCard?.childrenIds;
         if (!childrenIds || childrenIds?.length === 0) {
             return [elementId];
         }
         let result: number[] = [];
-        for (let i = 0; i < childrenIds!.length ; i++) {
+        for (let i = 0; i < childrenIds!.length; i++) {
             const child = childrenIds[i];
             const childElements = getElements(child, elements);
             if (result.find((temp) => temp === elementId)) result = [...result, ...childElements];
@@ -197,6 +202,102 @@ const Canvas = (props: CanvasProps) => {
         if (result.length > 0) return result;
         else return [];
     }, []);
+
+    const getBlockIds = useCallback((elementId: string, elements: BlockData[]): string[] => {
+        const tempBlock = elements.find(({ id }) => id === elementId);
+        if (tempBlock) {
+            const edgeIds = tempBlock.fields.edges;
+            if (!edgeIds || edgeIds.length === 0) {
+                return [elementId];
+            }
+            let result: string[] = [];
+            for (let i = 0; i < edgeIds.length; i ++) {
+                const child = edgeIds[i];
+                const childElements = getBlockIds(child, elements);
+                if (result.find((temp) => temp === elementId)) result = [...result, ...childElements];
+                else result = [...result, elementId, ...childElements];
+            }
+            if (result.length > 0) return result;
+            else return [];
+        } else return [];
+    }, []);
+
+    const saveBlockAndCard = async(card: CardData, block: BlockData) => {
+        const data = {
+            fields: block.fields
+        }
+        await axios.post('https://api.airtable.com/v0/appJ6LHBEjhaorG0k/Blocks', data, options)
+        .then((res: any) => {
+            card.savedId = res.data.id;
+            setArrows(drawArrows([...rightCards, card]));
+            if (!hasFirstCard) {
+                setCnt(2);
+                setRightCards([card]);
+                setBlocks([res.data]);
+                props.onSaveCards([card]);
+                props.onSaveBlocks([res.data]);
+            }
+            else {
+                setCnt(cnt+1);
+                
+                const newCards = [...rightCards];
+                const updateCard = newCards.find(({ id }) => id === parentId);
+                if (updateCard) {
+                    updateCard.childrenSavedIds.push(res.data.id);
+                }
+                setRightCards([...newCards, card]);
+                props.onSaveCards([...rightCards, card]);
+                
+                const updateBlock = blocks.find(({ id }) => id === parentSavedId);
+                if (updateBlock) {
+                    if (!updateBlock.fields.edges) {
+                        updateBlock.fields = {...updateBlock.fields, edges: []}
+                    }
+                    updateBlock.fields.edges.push(res.data.id);
+                    updateBlocks(updateBlock, [...blocks, res.data]);
+                }
+            }
+        })
+        .catch((err: any) => {
+            console.log(err);
+        });
+    }
+
+    const updateBlocks = async(element: BlockData, elements: BlockData[]) => {
+        const data = {
+            fields: {
+                block_type: element.fields.block_type, 
+                edges: element.fields.edges
+            }
+        };
+        await axios.patch(`https://api.airtable.com/v0/appJ6LHBEjhaorG0k/Blocks/${parentSavedId}`, data, options)
+        .then((res: any) => {
+            const newBlocks = [...elements];
+            const updateBlock = newBlocks.find(({ id }) => id === parentSavedId);
+            if (updateBlock) {
+                updateBlock.id = res.data.id;
+                updateBlock.fields = res.data.fields;
+                updateBlock.createdTime = res.data.createdTime;
+                setBlocks(newBlocks);
+                props.onSaveBlocks(newBlocks);
+            }
+        })
+        .catch((err: any) => {
+            console.log(err);
+        });
+    }
+
+    const deleteBlocks = async(blocksData: BlockData[]) => {
+        for (let i = 0; i < blocksData.length; i ++) {
+            await axios.delete(`https://api.airtable.com/v0/appJ6LHBEjhaorG0k/Blocks/${blocksData[i].id}`, options)
+            .then((res: any) => {
+                console.log(res.data);
+            })
+            .catch((err: any) => {
+                console.log(err);
+            })
+        }
+    }
     
     const handleDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
         event.preventDefault();
@@ -212,8 +313,9 @@ const Canvas = (props: CanvasProps) => {
             const activeData = JSON.parse(activeCard);
             if (!hasFirstCard) {
                 setHasFirstCard(true);
-                const data: CardData = {
+                const cardData: CardData = {
                     id: 1, 
+                    savedId: '', 
                     name: Right_Card[activeData.id-1].name, 
                     lefticon: Right_Card[activeData.id-1].lefticon, 
                     desc: Right_Card[activeData.id-1].desc, 
@@ -234,40 +336,59 @@ const Canvas = (props: CanvasProps) => {
                         y: pageY - 135
                     }, 
                     parentId: 0, 
-                    children: [], 
+                    parentSavedId: '', 
+                    childrenIds: [], 
+                    childrenSavedIds: [], 
                     childrenCnt: 0,
                     isOpenProps: false
                 }
-                const blockData = {
-                    id: Right_Card[activeData.id-1].id, 
-                    bundle_name: selBundle.fields.name, 
-                    block_id: Right_Card[activeData.id-1].id, 
-                    _text_template: Right_Card[activeData.id-1].template, 
-                    protocol: [selProtocol.id]
+                const blockData: BlockData = {
+                    id: '', 
+                    fields: {
+                        // bundle_name: selBundle ? selBundle.fields.name : '', 
+                        block_type: [Right_Card[activeData.id-1].id], 
+                        // diseases: [], 
+                        // appointments: [], 
+                        // finds: [], 
+                        // dosages: [], 
+                        // tests: [], 
+                        // _text_template: Right_Card[activeData.id-1].template, 
+                        // output_value: '', 
+                        // criteria: '', 
+                        // calculator: '', 
+                        // keypoint: '', 
+                        // pathway: '', 
+                        // recommendation_match: '', 
+                        // output_name: '', 
+                        // condition: '', 
+                        // references: [], 
+                        edges: [], 
+                        // protocol: selProtocol ? [selProtocol.id] : []
+                    }, 
+                    createdTime: ''
                 }
-                setCnt(2);
-                setParentId(0);
-                setUpdatedId(-1);
-                setRightCards([...rightCards, data]);
-                props.onSaveBlock(blockData);
-                props.onCanvasDrop([...rightCards, data]);
-            } else if (parentId > 0) {
+
+                saveBlockAndCard(cardData, blockData);
+                formatCanvasState();
+            } else if (parentId > 0 && parentSavedId !== '') {
                 const newChilds = [...rightCards];
                 const childToUpdate = newChilds.find(({id}) => id === parentId);
                 if(childToUpdate) {
                     const childrenCount = childToUpdate.childrenCnt;
                     for (let i = 0; i < childrenCount; i ++) {
-                        const childs = newChilds.find(({id}) => id === childToUpdate.children[i]);
+                        const childs = newChilds.find(({id}) => id === childToUpdate.childrenIds[i]);
                         if (childs) {
                             childs.position.x -= 169;
                         }
                     }
     
                     childToUpdate.childrenCnt ++;
-                    childToUpdate.children.push(cnt);
+                    childToUpdate.childrenIds.push(cnt);
+                    setRightCards(newChilds);
 
-                    const data: CardData = {
+                    const cardData: CardData = {
                         id: (cnt), 
+                        savedId: '', 
                         name: Right_Card[activeData.id-1].name, 
                         lefticon: Right_Card[activeData.id-1].lefticon, 
                         desc: Right_Card[activeData.id-1].desc, 
@@ -288,60 +409,72 @@ const Canvas = (props: CanvasProps) => {
                             y: childToUpdate.position.y + 200
                         }, 
                         parentId: parentId, 
-                        children: [], 
+                        parentSavedId: parentSavedId, 
+                        childrenIds: [], 
+                        childrenSavedIds: [], 
                         childrenCnt: 0, 
                         isOpenProps: false
                     }
-    
-                    const newCards = rearrange([...newChilds, data]);
-                    const newArrows = drawArrows(newCards);
-                    
-                    setCnt(cnt+1);
-                    setRightCards(newCards);               
-                    setArrows([...newArrows]);
-                    setParentId(-1);
-                    setUpdatedId(-1);
-                    props.onCanvasDrop(newCards);
+                    const blockData: BlockData = {
+                        id: '', 
+                        fields: {
+                            // bundle_name: selBundle ? selBundle.fields.name : '', 
+                            block_type: [Right_Card[activeData.id-1].id], 
+                            // diseases: [], 
+                            // appointments: [], 
+                            // finds: [], 
+                            // dosages: [], 
+                            // tests: [], 
+                            // _text_template: Right_Card[activeData.id-1].template, 
+                            // output_value: '', 
+                            // criteria: '', 
+                            // calculator: '', 
+                            // keypoint: '', 
+                            // pathway: '', 
+                            // recommendation_match: '', 
+                            // output_name: '', 
+                            // condition: '', 
+                            // references: [], 
+                            edges: [], 
+                            // protocol: selProtocol ? [selProtocol.id] : []
+                        }, 
+                        createdTime: ''
+                    }
+                    saveBlockAndCard(cardData, blockData);
+                    formatCanvasState();
                 }
             }
         } else if (activeBranch) {
             const activeBranchData = JSON.parse(activeBranch);
-            console.log(rightCards);
             if (hasFirstCard && parentId > 0) {
                 const newChilds = [...rightCards];
-                console.log(newChilds);
-                console.log(activeBranchData);
                 const childToUpdate = newChilds.find(({id}) => id === parentId);
                 if (childToUpdate) {
                     if (childToUpdate.isBranch === true) {
                         childToUpdate.addedBranch = activeBranchData.data.filter[0].name.replace('...', '') + ' ' + activeBranchData.data.value;
                         childToUpdate.isBranch = true;
-                        console.log(newChilds);
                         setRightCards(newChilds);
-                        setParentId(-1);
-                        setUpdatedId(-1);
+                        formatCanvasState();
                     }
                 }
             }
         } else {
-            setParentId(-1);
-            setUpdatedId(-1);
+            formatCanvasState();
         }
-    }, [cnt, hasFirstCard, props, parentId, rightCards, drawArrows, rearrange]);
-    // }, [hasFirstCard, parentId]);
+    }, [cnt, hasFirstCard, parentId, parentSavedId, rightCards]);
 
-    const handleMouseDown = (selId: number) => {
-        if (selId > -1) {
+    const handleMouseDown = (selId: number, selSavedId: string) => {
+        if (selId > -1 && selSavedId !== '') {
             setIsMoving(true);
             setSelectedId(selId);
+            setSelectedSavedId(selSavedId);
             
             if (selId === 1)    setMoveFirstChild(true);
             else                setMoveFirstChild(false);
         }
     }
-    // }, [rightCards, selectedCards]);
 
-    const handleMouseMove = useCallback((movementX: number, movementY: number, pageX: number, pageY: number, ratio: number, updateId: number) => {
+    const handleMouseMove = useCallback((movementX: number, movementY: number, pageX: number, pageY: number, ratio: number, updateId: number, updateSavedId: string) => {
         if (isMoving) {
             if (moveFirstChild) {
                 const newChilds = [...rightCards];
@@ -365,82 +498,102 @@ const Canvas = (props: CanvasProps) => {
                         setIsRealMoving(false);
                         return;
                     }
-                    const newChilds = [...selectedCards];
-                    const selectedCard = newChilds.find((newCard) => newCard.id === updateId);
+                    const newCards = [...selectedCards];
+                    const selectedCard = newCards.find(({ id }) => id === updateId);
                     const nonSelected = [...rightCards];
 
                     for (let i = 0; i < nonSelected.length; i ++) {
                         if (((nonSelected[i].position.x+paddingLeft) < pageX && pageX < (nonSelected[i].position.x+paddingLeft+318))
                                 && ((nonSelected[i].position.y+paddingTop) < pageY && pageY < (nonSelected[i].position.y+paddingTop+122))) {
                             setUpdatedId(nonSelected[i].id);
+                            setUpdatedSavedId(nonSelected[i].savedId);
                             break;
                         } else {
                             setUpdatedId(-1);
+                            setUpdatedSavedId('');
                         }
                     }
-                    const newSelectedArrows = drawArrows(newChilds);
-        
+                    
                     if (selectedCard && selectedCards.length) {
-                        for (let i = 0; i < newChilds.length; i ++) {
-                            const { position } = newChilds[i];
+                        for (let i = 0; i < newCards.length; i ++) {
+                            const { position } = newCards[i];
                             position.x += movementX/ratio;
                             position.y += movementY/ratio;
                         }
-        
-                        setRightCards(nonSelected);
-                        setSelectedCards(newChilds);
+                        
+                        const newSelectedArrows = drawArrows(newCards);
+                        // setRightCards(nonSelected);
+                        setSelectedCards(newCards);
                         setSelectedArrows(newSelectedArrows);
                         setSelectedId(updateId);
+                        setSelectedSavedId(updateSavedId);
                     }    
                 } else {
                     const newCards = [...rightCards];
+                    const newBlocks = [...blocks];
                     const tempSelectedIds = getElements(selectedId, newCards);
-                    const tempSelCard = newCards.find((newCard) => newCard.id === selectedId);
+                    const tempSelectedBlockIds = getBlockIds(selectedSavedId, newBlocks);
+                    const tempSelCard = newCards.find(({ id }) => id === selectedId);
                     if (tempSelCard) {
-                        const tempParentCard = newCards.find((newCard) => newCard.id === tempSelCard.parentId);
+                        const tempParentCard = newCards.find(({ id }) => id === tempSelCard.parentId);
                         if(tempParentCard) {
-                            tempParentCard.children = tempParentCard.children.filter((b) => b !== selectedId);
+                            tempParentCard.childrenIds = tempParentCard.childrenIds.filter((b) => b !== selectedId);
+                            
+                            const newBlocks = [...blocks];
+                            const tempSelBlock = newBlocks.find(({ id }) => id === selectedSavedId);
+                            if (tempSelBlock) {
+                                const tempParentBlock = newBlocks.find(({ id }) => id === tempSelCard.parentSavedId);
+                                if (tempParentBlock) {
+                                    tempParentBlock.fields.edges = tempParentBlock.fields.edges.filter((b) => b !== selectedSavedId);
+                                }
+                            }
                         }
                     }
-                    const nonSelectedCards = rearrange(newCards.filter((newCard) => !tempSelectedIds.includes(newCard.id)));
+                    const nonSelectedCards = rearrange(newCards.filter(({ id }) => !tempSelectedIds.includes(id)));
+                    const nonSelectedBlocks = newBlocks.filter(({ id }) => !tempSelectedBlockIds.includes(id));
                     const newArrows = drawArrows(nonSelectedCards);
                     
-                    const newSelectedCards = rearrange(newCards.filter((newCard) => tempSelectedIds.includes(newCard.id)));
+                    const newSelectedCards = rearrange(newCards.filter(({ id }) => tempSelectedIds.includes(id)));
+                    const newSelectedBlocks = newBlocks.filter(({ id }) => tempSelectedBlockIds.includes(id));
                     const newSelectedArrows = drawArrows(newSelectedCards);
-                    setSelectedCards(newSelectedCards)
+
+                    setSelectedCards(newSelectedCards);
+                    setSelectedBlocks(newSelectedBlocks);
                     setSelectedArrows(newSelectedArrows);
                     setSelectedId(selectedId);
+                    setSelectedSavedId(selectedSavedId);
                     setIsMoving(true);
                     setRightCards(nonSelectedCards);
+                    setBlocks(nonSelectedBlocks);
                     setArrows(newArrows);
                     setIsRealMoving(true);
                 }
             }
         }
-    }, [isMoving, isRealMoving, moveFirstChild, rightCards, selectedCards, selectedId, rearrange, drawArrows, getElements]);
-    // }, [selectedCards, selectedId, rightCards, updatedId, isRealMoving]);
+    }, [isMoving, isRealMoving, moveFirstChild, rightCards, blocks, selectedCards, selectedId, selectedSavedId, rearrange, drawArrows, getElements, getBlockIds]);
 
     const handleMouseUp = useCallback(() => {
         if (moveFirstChild) {
             setMoveFirstChild(false);
 	        setSelectedId(-1);
+            setSelectedSavedId('');
         } else {
             if (isMoving) setIsMoving(false);
             else return;
             if (isRealMoving) {
                 if (selectedId > -1) { 
-                    const newCards: CardData[] = [];
-                    const newArrows: ArrowData[] = [];
-                    const newSelectedArrows: ArrowData[] = [];
-                    if (updatedId === -1) {
-                        setSelectedCards(newCards);
-                        setSelectedArrows(newArrows);
+                    if (updatedId === -1 && updatedSavedId === '') {
+                        setSelectedCards([]);
+                        setSelectedArrows([]);
+                        deleteBlocks(selectedBlocks);
                     } else {
                         const newCards = [...rightCards];
                         const updateCard = newCards.find(({ id }) => id === updatedId);
                         if (updateCard) {
-                            updateCard.children.push(selectedId);
+                            updateCard.childrenIds.push(selectedId);
+                            updateCard.childrenSavedIds.push(selectedSavedId);
                             updateCard.childrenCnt ++;
+
                             const tempSelectedCards = [...selectedCards];
                             const tempSelectedCard = tempSelectedCards.find(({ id }) => id === selectedId);
                             if (tempSelectedCard) {
@@ -451,17 +604,23 @@ const Canvas = (props: CanvasProps) => {
                             setRightCards(tempCards);
                             const tempArrows = drawArrows(tempCards);
                             setArrows(tempArrows);
-                            setSelectedArrows(newSelectedArrows);
+                            setSelectedArrows([]);
+
+                            const tempNonSelectedBlocks = [...blocks];
+                            const tempUpdateBlock = tempNonSelectedBlocks.find(({ id }) => id === updatedSavedId);
+                            if (tempUpdateBlock) {
+                                tempUpdateBlock.fields.edges.push(selectedSavedId);
+                            }
+                            const tempBlocks = tempNonSelectedBlocks.concat(selectedBlocks);
+                            setBlocks(tempBlocks);
                         }
                     }
                 }
-                setSelectedId(-1);
-                setUpdatedId(-1); 
+                formatCanvasState();
                 setIsRealMoving(false);
             }
         }
-    }, [rightCards, selectedId, selectedCards, updatedId, isMoving, isRealMoving, moveFirstChild, drawArrows, rearrange]);
-    // }, [selectedId, updatedId, isRealMoving]);
+    }, [rightCards, blocks, selectedId, selectedSavedId, selectedCards, selectedBlocks, updatedId, updatedSavedId, isMoving, isRealMoving, moveFirstChild, drawArrows, rearrange]);
     
     const handleDown = useCallback((event: MouseEvent<HTMLDivElement>) => {
         let isCardClick: boolean = false;
@@ -502,6 +661,33 @@ const Canvas = (props: CanvasProps) => {
             setIsCanvasClicking(false);
         }
     }, [isCanvasClicking]);
+    
+    useEffect(() => {
+        const newCards = rearrange(props.cardsData);
+
+        if (newCards.length === 0)  setHasFirstCard(false);
+        else                        setHasFirstCard(true);        
+        setRightCards(newCards);
+
+        let tempId = 0;
+        if (newCards.length === 1) tempId = newCards[0].id;
+        else {
+            for (let i = 0; i < newCards.length; i ++) {
+                for (let j = i + 1; j < newCards.length; j ++) {
+                    if (newCards[i].id > newCards[j].id)    tempId = newCards[i].id;
+                    else                                    tempId = newCards[j].id;
+                }
+            }
+        }
+        setCnt(tempId+1);
+
+        const newArrows = drawArrows(newCards);
+        setArrows(newArrows);
+    }, [props.cardsData, drawArrows, rearrange]);
+
+    useEffect(() => {
+        setBlocks(props.blocksData);
+    }, [props.blocksData]);
 
     return (
         <div 

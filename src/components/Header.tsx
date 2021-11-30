@@ -87,13 +87,11 @@ const Header = (props: HeaderProps) => {
     };
 
     const handleFileInput = (event: any) => {
-        console.log(event.target.files);
         var fileToLoad = event.target.files[0];
         var fileReader = new FileReader();
         fileReader.onload = function(fileLoadedEvent) {
             const textFromFileLoaded = fileLoadedEvent.target?fileLoadedEvent.target.result:'';
             const tempData = JSON.parse(textFromFileLoaded as string);
-            console.log(tempData.blocks);
             setRightCards(tempData.blocks);
             props.onLoad(tempData);
         };

@@ -40,6 +40,7 @@ export type FilterProps = {
 
 export type CardData = {
     id: number, 
+    savedId: string, 
     name: string, 
     lefticon: string, 
     desc: string, // description of left card
@@ -55,7 +56,9 @@ export type CardData = {
     selectedFilters: FilterProps[], // added filters for the filter cards
     position: Position, // position of the right cards
     parentId: number, // parent's id
-    children: number[], // contains children's id
+    parentSavedId: string, // parent's savedId
+    childrenIds: number[], // contains children's id
+    childrenSavedIds: string[], // contains children's savedId
     childrenCnt: number, // children's cnt
     isOpenProps: Boolean, // the propwrap window is opened or closed
     isBranch: boolean, // parent card is branch or not
@@ -65,27 +68,25 @@ export type CardData = {
 export type BlockData = {
     id: string, // added Block id
     fields: {
-        id: string, // template Block id
-        bundle_name: string, 
-        type: string[], 
-        block_id: string, 
-        diseases: string[], // Action-Record
-        appointments: string[], 
-        finds: string[], // Action-Elicit
-        dosages: string[], // Action-Prescribe
-        tests: string[], //Action-Order
-        _text_template: string, 
-        output_value: string, 
-        criteria: string, 
-        calculator: string, // Action-Use
-        keypoint: string, //Action-Apply
-        pathway: string, // Action-Link
-        recommendation_match: string, 
-        output_name: string, 
-        condition: string, // Structure-Include
-        references: string[],  //Action-Custom
+        // bundle_name: string, 
+        block_type: string[], 
+        // diseases: string[], // Action-Record
+        // appointments: string[], 
+        // finds: string[], // Action-Elicit
+        // dosages: string[], // Action-Prescribe
+        // tests: string[], //Action-Order
+        // _text_template: string, 
+        // output_value: string, 
+        // criteria: string, 
+        // calculator: string, // Action-Use
+        // keypoint: string, //Action-Apply
+        // pathway: string, // Action-Link
+        // recommendation_match: string, 
+        // output_name: string, 
+        // condition: string, // Structure-Include
+        // references: string[],  //Action-Custom
         edges: string[], 
-        protocol: string[]
+        // protocol: string[]
     }, 
     createdTime: string
 }
@@ -159,13 +160,13 @@ export type GlobalWrapProps = {
 
 export type CanvasProps = {
     isOpenProp: Boolean, 
-    data: CardData[], 
-    block: BlockData[], 
+    cardsData: CardData[], 
+    blocksData: BlockData[], 
     selBundle: BundleType|undefined, 
     selProtocol: ProtocolType|undefined, 
     onPropsView: Function, 
-    onCanvasDrop: Function, 
-    onSaveBlock: Function, 
+    onSaveCards: Function, 
+    onSaveBlocks: Function, 
     onDeleteCard: Function
 }
 

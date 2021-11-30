@@ -8,15 +8,8 @@ import LeftTab from './components/LeftTab';
 import Canvas from './components/Canvas';
 import PropWrap from './components/PropWrap';
 import { BranchProps, FilterProps, CardData, SelectTypes, BranchTypes, GlobalData, BundleType, ProtocolType, BlockData } from './types';
-import { arrayToString } from './Globals';
+import { arrayToString, options } from './Globals';
 import BareLayout from './BareLayout'
-
-const token = 'keymneuuZO7FHj0i3';
-const options = {
-  headers: {
-    'Authorization': `Bearer ${token}`,
-  }
-};
 
 export const Builder = () => {
   const { protocolId } = useParams();
@@ -34,40 +27,49 @@ export const Builder = () => {
   const [index, setIndex] = useState(0);
 
   const getElements = useCallback((elementId: number, elements: CardData[]): number[] => {
-    const tempCard = elements.find(({id}) => id === elementId);
-    const childrenIds = tempCard?.children;
+    const tempCard = elements.find(({ id }) => id === elementId);
+    const childrenIds = tempCard?.childrenIds;
     if (!childrenIds || childrenIds?.length === 0) {
-      return [elementId];
+        return [elementId];
     }
     let result: number[] = [];
-    for (let i = 0; i < childrenIds!.length ; i++) {
-      const child = childrenIds[i];
-      const childElements = getElements(child, elements);
-      if (result.find((temp) => temp === elementId)) result = [...result, ...childElements];
-      else result = [...result, elementId, ...childElements];
+    for (let i = 0; i < childrenIds!.length; i++) {
+        const child = childrenIds[i];
+        const childElements = getElements(child, elements);
+        if (result.find((temp) => temp === elementId)) result = [...result, ...childElements];
+        else result = [...result, elementId, ...childElements];
     }
     if (result.length > 0) return result;
     else return [];
   }, []);
 
-  const canvasDrop = (cards: CardData[]) => {
+  const getBlockIds = useCallback((elementId: string, elements: BlockData[]): string[] => {
+      const tempBlock = elements.find(({ id }) => id === elementId);
+      if (tempBlock) {
+          const edgeIds = tempBlock.fields.edges;
+          if (!edgeIds || edgeIds.length === 0) {
+              return [elementId];
+          }
+          let result: string[] = [];
+          for (let i = 0; i < edgeIds.length; i ++) {
+              const child = edgeIds[i];
+              const childElements = getBlockIds(child, elements);
+              if (result.find((temp) => temp === elementId)) result = [...result, ...childElements];
+              else result = [...result, elementId, ...childElements];
+          }
+          if (result.length > 0) return result;
+          else return [];
+      } else return [];
+  }, []);
+
+  const saveCards = (cards: CardData[]) => {
     setRightCards(cards);
   }
 
-  const saveBlock = async(block: any) => {
-    const data = {
-      records: [{ fields: block }]
-    };
-
-    await axios.post('https://api.airtable.com/v0/appJ6LHBEjhaorG0k/Blocks', data, options)
-    .then((res: any) => {
-      console.log(res.data);
-    })
-    .catch((err: any) => {
-      console.log(err);
-    });
+  const saveBlocks = (blocks: BlockData[]) => {
+    setBlocks(blocks);
   }
-  
+
   const onViewProps = (propCards: CardData[], id: number) => {
     let flag = false;
     setRightCards(propCards);
@@ -92,10 +94,9 @@ export const Builder = () => {
   }
 
   const deleteCard = () => {
-    console.log(rightCards, index);
     if (index === 0) {
-      const emptyCards: CardData[] = [];
-      setRightCards(emptyCards);
+      setRightCards([]);
+      setBlocks([]);
     } else if (index > 0) {
       const newCards = [...rightCards];
       const id = newCards[index].id;
@@ -104,13 +105,30 @@ export const Builder = () => {
       if (tempSelCard) {
         const tempParentCard = newCards.find((newCard) => newCard.id === tempSelCard.parentId);
         if(tempParentCard) {
-          tempParentCard.children = tempParentCard.children.filter((b) => b !== id);
+          tempParentCard.childrenIds = tempParentCard.childrenIds.filter((b) => b !== id);
           tempParentCard.childrenCnt --;
         }
         setRightCards(newCards.filter((newCard) => !tempSelectedIds.includes(newCard.id)));
       }
-    } else {
-      return;
+
+      const newBlocks = [...blocks];
+      const savedId = newBlocks[index].id;
+      const tempParentBlock = newBlocks.find(({ id }) => id === newCards[index].parentSavedId);
+      if (tempParentBlock) {
+        tempParentBlock.fields.edges = tempParentBlock.fields.edges.filter((b) => b !== savedId);
+      }
+      const tempSelectedBlockIds = getBlockIds(savedId, newBlocks);
+      const tempNonSelectedBlocks = newBlocks.filter(({ id }) => !tempSelectedBlockIds.includes(id));
+      for (let i = 0; i < tempSelectedBlockIds.length; i ++) {
+        axios.delete(`https://api.airtable.com/v0/appJ6LHBEjhaorG0k/Blocks/${tempSelectedBlockIds[i]}`, options)
+        .then((res: any) => {
+          console.log(res.data);
+        })
+        .catch((err: any) => {
+          console.log(err);
+        })
+      }
+      setBlocks(tempNonSelectedBlocks);
     }
   }
 
@@ -132,7 +150,6 @@ export const Builder = () => {
   const saveBranch = (action: BranchProps[]) => {
     if (index > -1) {
       const newCards = [...rightCards];
-      console.log(newCards);
       const selectedCard = newCards[index];
       selectedCard.selectedBranches = action;
       setRightCards(newCards);
@@ -141,7 +158,6 @@ export const Builder = () => {
 
   const saveFilter = (action: FilterProps[]) => {
     if (index > -1) {
-      console.log(action);
       const newCards = [...rightCards];
       const selectedCard = newCards[index];
       selectedCard.selectedFilters = action;
@@ -190,7 +206,6 @@ export const Builder = () => {
   } 
 
   const viewHeader = () => {
-    console.log(isOpenHeader);
     const newCards = [...rightCards];
     for (let i = 0; i < newCards.length; i ++) {
       newCards[i].isOpenProps = false;
@@ -245,7 +260,6 @@ export const Builder = () => {
         temp.id = res.data.records[0].id;
         temp.fields = res.data.records[0].fields;
         temp.fields.id = res.data.records[0].id;
-        console.log(temp);
         setSelectedProtocol(temp);
       }
       setProtocols(tempProtocols);
@@ -276,7 +290,6 @@ export const Builder = () => {
         temp.createdTime = res.data.records[0].createdTime;
         temp.id = res.data.records[0].id;
         temp.fields = res.data.records[0].fields;
-        console.log(temp);
         setSelectedBundle(temp);
       }
       setBundles(tempBundles);
@@ -375,13 +388,13 @@ export const Builder = () => {
       />
       <Canvas 
         isOpenProp={isOpenProp} 
-        data={rightCards} 
-        block={blocks}
+        cardsData={rightCards} 
+        blocksData={blocks}
         selBundle={selectedBundle}
         selProtocol={selectedProtocol}
         onPropsView={onViewProps} 
-        onCanvasDrop={canvasDrop}
-        onSaveBlock={saveBlock}
+        onSaveCards={saveCards}
+        onSaveBlocks={saveBlocks}
         onDeleteCard={deleteCardFromCanvas}
       />
       </BareLayout>
